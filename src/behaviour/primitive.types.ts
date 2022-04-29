@@ -1,5 +1,5 @@
     
-type PrimitiveBehavior =
+type PrimitiveAction =
     | WorkAction
     | CarryAction
     | ClaimAction
@@ -18,9 +18,9 @@ type FightAction =
     |"attack"|"rangedAttack"|"rangedMassAttack"
     |"heal"|"rangedHeal"
 
-type ContinualAction = Exclude<PrimitiveBehavior,CarryAction|"reserveController">
+type ContinualAction = Exclude<PrimitiveAction,CarryAction|"reserveController">
     
-type ActionDescript<T extends PrimitiveBehavior> = T extends PrimitiveBehavior ? {
+type ActionDescript<T extends PrimitiveAction> = T extends PrimitiveAction ? {
     bhvr_name: T
     args:   CachedArgs<Parameters<Creep[T]>>
 } : never;
@@ -29,6 +29,3 @@ type CachedArgs<T extends any[]> = {
     [P in keyof T] : T[P] extends _HasId
         ? Id<T[P]> : T[P];
 }
-
-type ActionPerformer<T extends PrimitiveBehavior>
-    = (creep:Creep, args:CachedArgs<Parameters<Creep[T]>>) => ScreepsReturnCode

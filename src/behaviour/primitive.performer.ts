@@ -1,5 +1,7 @@
+type ActionPerformer<T extends PrimitiveAction>
+    = (creep:Creep, args:CachedArgs<Parameters<Creep[T]>>) => ScreepsReturnCode
 
-const performer:{[action in PrimitiveBehavior]:ActionPerformer<action>} = {
+const performer:{[action in PrimitiveAction]:ActionPerformer<action>} = {
 
     harvest: function (creep: Creep, args: [target: Id<Source | Mineral<MineralConstant> | Deposit>]) {
         const target = Game.getObjectById(args[0])
@@ -94,7 +96,7 @@ const performer:{[action in PrimitiveBehavior]:ActionPerformer<action>} = {
     }
 }
 
-const perform = function(creep:Creep, behavior:ActionDescript<PrimitiveBehavior>){
+const perform_primitive = function(creep:Creep, behavior:ActionDescript<PrimitiveAction>): ScreepsReturnCode {
     switch(behavior.bhvr_name){
         //WORK
         case 'harvest':
