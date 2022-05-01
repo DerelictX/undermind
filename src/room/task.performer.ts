@@ -24,7 +24,7 @@ export const memory_inspector: {[k in keyof RoomMemory]:
     },
     spawn_loop: function(room: Room){
         const spawn_loop:RoleSpawnLoop={
-            succeed_time:   Game.time+100,
+            succeed_time:   Game.time + 50,
             succ_interval:  1500,
             body_parts:     [],
             boost_queue:    [],
@@ -64,9 +64,6 @@ export const memory_inspector: {[k in keyof RoomMemory]:
     boost: function(room: Room){
         room.memory.boost=[]
     },
-    import_cost: function(room: Room){
-        
-    }
 }
 
 export const harvest_updater = {

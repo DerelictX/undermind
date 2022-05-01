@@ -3,15 +3,15 @@ import { lab_run } from "./structure/lab";
 import { tower_run } from "./structure/tower";
 import { death_detect } from "./creep/death_detect";
 import { spawn_run } from "./structure/spawn";
-import { specialist_run } from "./finder/specialist";
 import { power_spawn_run } from "./structure/power_spawn";
 import { structure_updater } from "./room/structure.updater";
 import { operator_run } from "./power_creep/operator";
-import { owned_rooms, terminal_run } from "./structure/terminal";
+import { terminal_run } from "./structure/terminal";
 import { spawn_loop } from "./room/spawn_loop";
 import { body_generator } from "./creep/body_config";
 import { memory_inspector } from "./room/task.performer";
 import { link_run } from "./structure/link";
+import { perform_any } from "./behaviour/combinative.performer";
 
 export const loop = function () {
 
@@ -19,9 +19,10 @@ export const loop = function () {
         structure_updater
         body_generator
     }
-
-    for(let i in owned_rooms){
-        const room = Game.rooms[owned_rooms[i]];
+    //Memory.owned_rooms = ['sim']
+    //ROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOMS
+    for(let room_name of Memory.owned_rooms){
+        const room = Game.rooms[room_name];
         if(!room)continue
         try{
             if(!room.memory.structures)
@@ -30,6 +31,11 @@ export const loop = function () {
                 memory_inspector.spawn_loop(room)
             if(!room.memory.tasks)
                 memory_inspector.tasks(room)
+            if(!room.memory.reaction)
+                memory_inspector.reaction(room)
+            if(!room.memory.boost)
+                memory_inspector.boost(room)
+                
             spawn_loop(room)
             spawn_run(room)
             tower_run(room)
@@ -41,6 +47,7 @@ export const loop = function () {
         }
     }
 
+    //CREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEPS
     for(var name in Game.creeps) {
         if(Game.cpu.getUsed() > 18)
             break
@@ -50,7 +57,9 @@ export const loop = function () {
                 continue
             
             const cpu = Game.cpu.getUsed()
-            perform_any(creep,creep.memory.)
+            if(creep.memory.behavior)
+                perform_any(creep,creep.memory.behavior)
+                
             const cpv = Game.cpu.getUsed() - cpu
             if(cpv > 1){
                 //console.log(creep.memory.class_memory.role + ':\t' + cpv);
@@ -61,6 +70,7 @@ export const loop = function () {
         }
     }
 
+    //POOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOWWWWWWWEEEEEEEERRRRRRRRR
     for(var name in Game.powerCreeps){
         try{
             const powerCreep = Game.powerCreeps[name]

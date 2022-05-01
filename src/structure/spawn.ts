@@ -27,11 +27,7 @@ export const spawn_run = function(room: Room) {
                     
                 const class_memory = init_class_memory(role_name)
                 if(class_memory) Memory.creeps[creep_name] = {
-                    class_memory:   class_memory,
-                    spawn_room:     room.name,
-                    resource_room:  room.name,
-                    target_room:    room.name,
-                    boost_queue:    []
+                    //
                 }
                 return
             } else {
@@ -41,7 +37,7 @@ export const spawn_run = function(room: Room) {
     }
 }
 
-const init_class_memory = function(role_name: AnyRoleName): AnyClassMemory|undefined{
+const init_class_memory = function(role_name: AnyRoleName) {
     switch(role_name){
         case 'harvester_m':
         case 'harvester_s0':

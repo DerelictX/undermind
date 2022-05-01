@@ -1,5 +1,17 @@
-type CombinativeBehaviorName = "serial"|"parallel"
-type CombinativeBehavior = SerialBehavior|ParallelBehavior
+type AnyBehavior =
+    |CallbackfulBehavior<PrimitiveAction>
+    |SerialBehavior|ParallelBehavior
+
+type TaskReturnCode = TASK_DOING|TASK_COMPLETE|TASK_FAILED
+type TASK_DOING     = -16
+type TASK_COMPLETE  = -17
+type TASK_FAILED    = -18
+
+/****************************************************************************************/
+
+type CallbackfulBehavior<T extends PrimitiveAction> = T extends PrimitiveAction ? {
+    [R in ScreepsReturnCode] ?: CallbackfulBehavior<PrimitiveAction> | TaskReturnCode
+} & {bhvr_name: "callbackful"} & ActionDescript<T> : never
 
 type SerialBehavior = {
     bhvr_name: "serial"
@@ -10,8 +22,7 @@ type ParallelBehavior = {
     sub_tasks: AnyBehavior[]
 }
 
-type AnyBehavior = SynchronousBehavior|CombinativeBehavior
-type TaskReturnCode = TASK_DOING|TASK_COMPLETE|TASK_FAILED
-type TASK_DOING     = -16
-type TASK_COMPLETE  = -17
-type TASK_FAILED    = -18
+type SynchronousBehavior = {
+    [P in PrimitiveAction] ?: CachedArgs<Parameters<Creep[P]>>
+}// & {bhvr_name: "primitive"}
+

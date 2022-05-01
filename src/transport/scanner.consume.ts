@@ -1,4 +1,5 @@
 const consume_updater: TaskUpdater<ConsumeController> = {
+    
     build: function (tasks: CachedRoomTasks<"build">, room: Room): void {
         const sites = room.find(FIND_MY_CONSTRUCTION_SITES)
         sites.forEach(s => tasks.push({

@@ -7,8 +7,6 @@ interface RoomMemory {
 
     reaction:   (MineralConstant|MineralCompoundConstant)[]
     boost:      MineralBoostConstant[]
-
-    import_cost:    {[m in ResourceConstant]:number}
 }
 
 interface RoleSpawnLoop {

@@ -1,4 +1,3 @@
-
 const collect_scanner: {[s in collect_task_name]: (room:Room) => WithdrawTask[]} = {
 
     harvested: function(room:Room):WithdrawTask[] {

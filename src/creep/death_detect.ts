@@ -12,17 +12,4 @@ export const death_detect = function(){
             }
         }
     }
-
-    
-    //visual
-    for(var spawn_name in Game.spawns){
-        var spawn = Game.spawns[spawn_name];
-        
-        if(spawn && spawn.spawning) {
-            var spawningCreep = Game.creeps[spawn.spawning.name];
-            spawn.room.visual.text(
-                spawningCreep.memory.class_memory.role,
-                spawn.pos.x, spawn.pos.y-1);
-        }    
-    }
 }

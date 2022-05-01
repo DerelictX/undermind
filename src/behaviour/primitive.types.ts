@@ -30,11 +30,3 @@ type ActionDescript<T extends PrimitiveAction> = T extends PrimitiveAction ? {
     args:   CachedArgs<Parameters<Creep[T]>>
     pos:    RoomPosition
 } : never;
-
-type SynchronousBehavior = {
-    [P in PrimitiveAction] ?: CachedArgs<Parameters<Creep[P]>>
-}// & {bhvr_name: "primitive"}
-
-type CallbackfulBehavior<T extends PrimitiveAction> = T extends PrimitiveAction ? {
-    [R in ScreepsReturnCode] ?: CallbackfulBehavior<PrimitiveAction> | TaskReturnCode
-} & {bhvr_name: "callbackful"} & ActionDescript<T> : never

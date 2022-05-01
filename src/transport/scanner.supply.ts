@@ -1,5 +1,5 @@
+const supply_updater: TaskUpdater<SupplyController> = {
 
-const supply_scanner: TaskUpdater<SupplyController> = {
     extension: function (tasks: CachedRoomTasks<'transfer'>, room: Room): void {
         const extensions: (AnyStoreStructure & AnyOwnedStructure)[] = room.find(FIND_MY_STRUCTURES, {
             filter: (structure) => {

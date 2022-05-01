@@ -1,6 +1,12 @@
 
 interface CreepMemory {
-    behavior:   AnyBehavior
+    behavior?:   CallbackfulBehavior<PrimitiveAction>
+    _move?:{
+        dest: {x:number,y:number,room:string},
+        time: number,
+        path: string,
+        room: string
+    }
 }
 
 type AnyRoleName = GeneralistRoleName|SpecialistRoleName|CarrierRoleName|FighterRoleName

@@ -120,7 +120,7 @@ const performer:{[action in PrimitiveAction]:ActionPerformer<action>} = {
     }
 }
 
-const perform_primitive = function(creep:Creep, behavior:ActionDescript<PrimitiveAction>): ScreepsReturnCode {
+export const perform_primitive = function(creep:Creep, behavior:ActionDescript<PrimitiveAction>): ScreepsReturnCode {
     const action = behavior.action
     let ret: ScreepsReturnCode
     switch(action){
@@ -149,17 +149,4 @@ const perform_primitive = function(creep:Creep, behavior:ActionDescript<Primitiv
         case 'rangedMassAttack':    ret = performer[action](creep,behavior.args); break;
     }
     return ret
-}
-
-const perform_callbackful = function(creep:Creep, behavior:CallbackfulBehavior<PrimitiveAction>): TaskReturnCode {
-    let ret: ScreepsReturnCode = perform_primitive(creep,behavior)
-    let callback: CallbackfulBehavior<PrimitiveAction> | TaskReturnCode | undefined = behavior[ret]
-    while(callback){
-        if(callback == TASK_DOING || callback == TASK_COMPLETE || callback == TASK_FAILED)
-            return callback
-        ret = perform_primitive(creep,callback)
-        callback = callback[ret]
-    }
-    creep.say('ERR' + ret)
-    return ret ? TASK_FAILED : TASK_DOING
 }
