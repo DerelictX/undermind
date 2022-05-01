@@ -1,95 +1,119 @@
 type ActionPerformer<T extends PrimitiveAction>
-    = (creep:Creep, args:CachedArgs<Parameters<Creep[T]>>) => ScreepsReturnCode
+    = (creep: Creep, args?:CachedArgs<Parameters<Creep[T]>>) => ScreepsReturnCode
 
 const performer:{[action in PrimitiveAction]:ActionPerformer<action>} = {
-
-    harvest: function (creep: Creep, args: [target: Id<Source | Mineral<MineralConstant> | Deposit>]) {
+    harvest: function (creep: Creep, args?: [target: Id<Source | Mineral<MineralConstant> | Deposit>]) {
+        if(!args) return ERR_INVALID_ARGS
         const target = Game.getObjectById(args[0])
         if(!target) return ERR_NOT_FOUND
         return creep.harvest(target);
     },
-    dismantle: function (creep: Creep, args: [target: Id<Structure<StructureConstant>>]) {
+    dismantle: function (creep: Creep, args?: [target: Id<Structure<StructureConstant>>]) {
+        if(!args) return ERR_INVALID_ARGS
         const target = Game.getObjectById(args[0])
         if(!target) return ERR_NOT_FOUND
         return creep.dismantle(target);
     },
-    build: function (creep: Creep, args: [target: Id<ConstructionSite<BuildableStructureConstant>>]) {
+    build: function (creep: Creep, args?: [target: Id<ConstructionSite<BuildableStructureConstant>>]) {
+        if(!args) return ERR_INVALID_ARGS
         const target = Game.getObjectById(args[0])
         if(!target) return ERR_NOT_FOUND
         return creep.build(target);
     },
-    repair: function (creep: Creep, args: [target: Id<Structure<StructureConstant>>]) {
+    repair: function (creep: Creep, args?: [target: Id<Structure<StructureConstant>>]) {
+        if(!args) return ERR_INVALID_ARGS
         const target = Game.getObjectById(args[0])
         if(!target) return ERR_NOT_FOUND
         return creep.repair(target);
     },
-    upgradeController: function (creep: Creep, args: [target: Id<StructureController>]) {
+    upgradeController: function (creep: Creep, args?: [target: Id<StructureController>]) {
+        if(!args) return ERR_INVALID_ARGS
         const target = Game.getObjectById(args[0])
         if(!target) return ERR_NOT_FOUND
         return creep.upgradeController(target);
     },
-    generateSafeMode: function (creep: Creep, args: [target: Id<StructureController>]) {
+    generateSafeMode: function (creep: Creep, args?: [target: Id<StructureController>]) {
+        if(!args) return ERR_INVALID_ARGS
         const target = Game.getObjectById(args[0])
         if(!target) return ERR_NOT_FOUND
         return creep.generateSafeMode(target);
     },
-    withdraw: function (creep: Creep, args: [
+    withdraw: function (creep: Creep, args?: [
             target: Id<Structure<StructureConstant> | Tombstone | Ruin>,
             resourceType: ResourceConstant, amount?: number | undefined]) {
+        if(!args) return ERR_INVALID_ARGS
         const target = Game.getObjectById(args[0])
         if(!target) return ERR_NOT_FOUND
-        return creep.withdraw(target,args[1],args[2]);
+
+        let ret = creep.withdraw(target,args[1],args[2]);
+        if(ret == ERR_FULL || ret == ERR_NOT_ENOUGH_RESOURCES)
+            ret = creep.withdraw(target,args[1]);
+        return ret
     },
-    transfer: function (creep: Creep, args: [
+    transfer: function (creep: Creep, args?: [
             target: Id<Structure<StructureConstant> | AnyCreep>,
             resourceType: ResourceConstant, amount?: number | undefined]) {
+        if(!args) return ERR_INVALID_ARGS
         const target = Game.getObjectById(args[0])
         if(!target) return ERR_NOT_FOUND
-        return creep.transfer(target,args[1],args[2]);
+        
+        let ret = creep.transfer(target,args[1],args[2]);
+        if(ret == ERR_FULL || ret == ERR_NOT_ENOUGH_RESOURCES)
+            ret = creep.transfer(target,args[1]);
+        return ret
     },
-    pickup: function (creep: Creep, args: [target: Id<Resource<ResourceConstant>>]) {
+    pickup: function (creep: Creep, args?: [target: Id<Resource<ResourceConstant>>]) {
+        if(!args) return ERR_INVALID_ARGS
         const target = Game.getObjectById(args[0])
         if(!target) return ERR_NOT_FOUND
         return creep.pickup(target);
     },
-    drop: function (creep: Creep, args: [
+    drop: function (creep: Creep, args?: [
             resourceType: ResourceConstant, amount?: number | undefined]) {
+        if(!args) return ERR_INVALID_ARGS
         return creep.drop(args[0],args[1]);
     },
-    attackController: function (creep: Creep, args: [target: Id<StructureController>]) {
+    attackController: function (creep: Creep, args?: [target: Id<StructureController>]) {
+        if(!args) return ERR_INVALID_ARGS
         const target = Game.getObjectById(args[0])
         if(!target) return ERR_NOT_FOUND
         return creep.attackController(target);
     },
-    reserveController: function (creep: Creep, args: [target: Id<StructureController>]) {
+    reserveController: function (creep: Creep, args?: [target: Id<StructureController>]) {
+        if(!args) return ERR_INVALID_ARGS
         const target = Game.getObjectById(args[0])
         if(!target) return ERR_NOT_FOUND
         return creep.reserveController(target);
     },
-    claimController: function (creep: Creep, args: [target: Id<StructureController>]) {
+    claimController: function (creep: Creep, args?: [target: Id<StructureController>]) {
+        if(!args) return ERR_INVALID_ARGS
         const target = Game.getObjectById(args[0])
         if(!target) return ERR_NOT_FOUND
         return creep.claimController(target);
     },
-    attack: function (creep: Creep, args: [target: Id<Structure<StructureConstant> | AnyCreep>]) {
+    attack: function (creep: Creep, args?: [target: Id<Structure<StructureConstant> | AnyCreep>]) {
+        if(!args) return ERR_INVALID_ARGS
         const target = Game.getObjectById(args[0])
         if(!target) return ERR_NOT_FOUND
         return creep.attack(target);
     },
-    rangedAttack: function (creep: Creep, args: [target: Id<Structure<StructureConstant> | AnyCreep>]) {
+    rangedAttack: function (creep: Creep, args?: [target: Id<Structure<StructureConstant> | AnyCreep>]) {
+        if(!args) return ERR_INVALID_ARGS
         const target = Game.getObjectById(args[0])
         if(!target) return ERR_NOT_FOUND
         return creep.rangedAttack(target);
     },
-    rangedMassAttack: function (creep: Creep, args: []) {
+    rangedMassAttack: function (creep: Creep, args?: []) {
         return creep.rangedMassAttack();
     },
-    heal: function (creep: Creep, args: [target: Id<AnyCreep>]) {
+    heal: function (creep: Creep, args?: [target: Id<AnyCreep>]) {
+        if(!args) return ERR_INVALID_ARGS
         const target = Game.getObjectById(args[0])
         if(!target) return ERR_NOT_FOUND
         return creep.heal(target);
     },
-    rangedHeal: function (creep: Creep, args: [target: Id<AnyCreep>]) {
+    rangedHeal: function (creep: Creep, args?: [target: Id<AnyCreep>]) {
+        if(!args) return ERR_INVALID_ARGS
         const target = Game.getObjectById(args[0])
         if(!target) return ERR_NOT_FOUND
         return creep.rangedHeal(target);
@@ -97,41 +121,45 @@ const performer:{[action in PrimitiveAction]:ActionPerformer<action>} = {
 }
 
 const perform_primitive = function(creep:Creep, behavior:ActionDescript<PrimitiveAction>): ScreepsReturnCode {
-    switch(behavior.bhvr_name){
+    const action = behavior.action
+    let ret: ScreepsReturnCode
+    switch(action){
         //WORK
-        case 'harvest':
-            return performer[behavior.bhvr_name](creep,behavior.args)
+        case 'harvest':             ret = performer[action](creep,behavior.args); break;
         case 'dismantle':
         //WORK & CARRY
-        case 'repair':
-            return performer[behavior.bhvr_name](creep,behavior.args)
-        case 'build':
-            return performer[behavior.bhvr_name](creep,behavior.args)
+        case 'repair':              ret = performer[action](creep,behavior.args); break;
+        case 'build':               ret = performer[action](creep,behavior.args); break;
         case 'upgradeController':
         //CLAIM
         case 'claimController':
         case 'attackController':
         case 'reserveController':
         //CARRY
-        case 'generateSafeMode':
-            return performer[behavior.bhvr_name](creep,behavior.args)
-        case "withdraw":
-            return performer[behavior.bhvr_name](creep,behavior.args)
-        case 'transfer':
-            return performer[behavior.bhvr_name](creep,behavior.args)
-        case 'pickup':
-            return performer[behavior.bhvr_name](creep,behavior.args)
-        case 'drop':
-            return performer[behavior.bhvr_name](creep,behavior.args)
+        case 'generateSafeMode':    ret = performer[action](creep,behavior.args); break;
+        case "withdraw":            ret = performer[action](creep,behavior.args); break;
+        case 'transfer':            ret = performer[action](creep,behavior.args); break;
+        case 'pickup':              ret = performer[action](creep,behavior.args); break;
+        case 'drop':                ret = performer[action](creep,behavior.args); break;
         //ATTACK
         case 'attack':
-        case 'rangedAttack':
-            return performer[behavior.bhvr_name](creep,behavior.args)
+        case 'rangedAttack':        ret = performer[action](creep,behavior.args); break;
         case 'heal':
-        case 'rangedHeal':
-            return performer[behavior.bhvr_name](creep,behavior.args)
-        case 'rangedMassAttack':
-            return performer[behavior.bhvr_name](creep,behavior.args)
+        case 'rangedHeal':          ret = performer[action](creep,behavior.args); break;
+        case 'rangedMassAttack':    ret = performer[action](creep,behavior.args); break;
     }
-    
+    return ret
+}
+
+const perform_callbackful = function(creep:Creep, behavior:CallbackfulBehavior<PrimitiveAction>): TaskReturnCode {
+    let ret: ScreepsReturnCode = perform_primitive(creep,behavior)
+    let callback: CallbackfulBehavior<PrimitiveAction> | TaskReturnCode | undefined = behavior[ret]
+    while(callback){
+        if(callback == TASK_DOING || callback == TASK_COMPLETE || callback == TASK_FAILED)
+            return callback
+        ret = perform_primitive(creep,callback)
+        callback = callback[ret]
+    }
+    creep.say('ERR' + ret)
+    return ret ? TASK_FAILED : TASK_DOING
 }

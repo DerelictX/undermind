@@ -3,10 +3,7 @@ import { lab_run } from "./structure/lab";
 import { tower_run } from "./structure/tower";
 import { death_detect } from "./creep/death_detect";
 import { spawn_run } from "./structure/spawn";
-import { carrier_run } from "./creep/carrier/carrier";
-import { generalist_run } from "./creep/generalist/generalist";
-import { specialist_run } from "./creep/specialist/specialist";
-import { fighter_run } from "./creep/fighter/fighter";
+import { specialist_run } from "./finder/specialist";
 import { power_spawn_run } from "./structure/power_spawn";
 import { structure_updater } from "./room/structure.updater";
 import { operator_run } from "./power_creep/operator";
@@ -53,22 +50,7 @@ export const loop = function () {
                 continue
             
             const cpu = Game.cpu.getUsed()
-            switch (creep.memory.class_memory.class) {
-                case 'specialist':
-                    specialist_run(creep)
-                    break;
-                case 'generalist':
-                    generalist_run(creep)
-                    break;
-                case 'carrier':
-                    carrier_run(creep)
-                    break;
-                case 'fighter':
-                    fighter_run(creep)
-                    break;
-                default:
-                    break;
-            }
+            perform_any(creep,creep.memory.)
             const cpv = Game.cpu.getUsed() - cpu
             if(cpv > 1){
                 //console.log(creep.memory.class_memory.role + ':\t' + cpv);

@@ -3,37 +3,22 @@ const TASK_COMPLETE:    TASK_COMPLETE   = -17
 const TASK_FAILED:      TASK_FAILED     = -18
 
 const combo_performer = {
-    approach: function(creep: Creep, behavior:ApproachBehavior) {
-        if(creep.pos.inRangeTo(behavior.args[0],behavior.args[1]))
-            return TASK_COMPLETE
-        if(creep.moveTo(behavior.args[0]) == OK)
-            return TASK_DOING
-        return TASK_FAILED
-    },
     serial: function(creep: Creep, behavior:SerialBehavior) {
         const task = behavior.sub_tasks[0]
-        if(!task) return
+        if(!task) return TASK_COMPLETE
+        const ret = perform_any(creep,task)
+        if(ret == TASK_COMPLETE){
+            behavior.sub_tasks.shift()
+            if(behavior.sub_tasks.length == 0)
+                return TASK_COMPLETE
+        }
+        return ret
     },
     parallel: function(creep: Creep, behavior:ParallelBehavior) {
-        if(creep.pos.inRangeTo(behavior.args[0],behavior.args[1]))
-            return TASK_COMPLETE
-        if(creep.moveTo(behavior.args[0]) == OK)
-            return TASK_DOING
-        return TASK_FAILED
-    },
-    serial: function(creep: Creep, behavior:ApproachBehavior) {
-        if(creep.pos.inRangeTo(behavior.args[0],behavior.args[1]))
-            return TASK_COMPLETE
-        if(creep.moveTo(behavior.args[0]) == OK)
-            return TASK_DOING
-        return TASK_FAILED
-    },
-    serial: function(creep: Creep, behavior:ApproachBehavior) {
-        if(creep.pos.inRangeTo(behavior.args[0],behavior.args[1]))
-            return TASK_COMPLETE
-        if(creep.moveTo(behavior.args[0]) == OK)
-            return TASK_DOING
-        return TASK_FAILED
+        for(let task of behavior.sub_tasks){
+            const ret = perform_any(creep,task)
+        }
+        return TASK_DOING
     },
 }
 
@@ -43,15 +28,7 @@ const perform_any = function(creep:Creep, behavior:AnyBehavior):TaskReturnCode {
             return combo_performer[behavior.bhvr_name](creep,behavior)
         case 'parallel':
             return combo_performer[behavior.bhvr_name](creep,behavior)
-        case 'switch':
-            return combo_performer[behavior.bhvr_name](creep,behavior)
-        case 'approach':
-            return combo_performer[behavior.bhvr_name](creep,behavior)
-        case 'flee':
-            return combo_performer[behavior.bhvr_name](creep,behavior)
         default:
-            if(perform_primitive(creep,behavior) == OK)
-                return TASK_DOING
-            return TASK_FAILED
+            return perform_primitive(creep,behavior)
     }
 }

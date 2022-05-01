@@ -1,4 +1,3 @@
-type collect_task_name = 'harvested'|'loot'|'sweep'|'compound'
 
 const collect_scanner: {[s in collect_task_name]: (room:Room) => WithdrawTask[]} = {
 
@@ -11,6 +10,7 @@ const collect_scanner: {[s in collect_task_name]: (room:Room) => WithdrawTask[]}
         for(let link of links_nexi){
             if(!link) continue
             tasks.push({
+                pos:            link.pos,
                 target:         link.id,
                 resourceType:   'energy',
                 amount:         link.store['energy']
@@ -26,6 +26,7 @@ const collect_scanner: {[s in collect_task_name]: (room:Room) => WithdrawTask[]}
             var resourceType: keyof typeof store
             for(resourceType in store){
                 tasks.push({
+                    pos:            container.pos,
                     target:         container.id,
                     resourceType:   resourceType,
                     amount:         container.store[resourceType]
@@ -53,6 +54,7 @@ const collect_scanner: {[s in collect_task_name]: (room:Room) => WithdrawTask[]}
             var resourceType: keyof typeof store
             for(resourceType in store){
                 tasks.push({
+                    pos:            hostile_store.pos,
                     target:         hostile_store.id,
                     resourceType:   resourceType,
                     amount:         hostile_store.store[resourceType]
@@ -76,6 +78,7 @@ const collect_scanner: {[s in collect_task_name]: (room:Room) => WithdrawTask[]}
             var resourceType: keyof typeof store
             for(resourceType in store){
                 tasks.push({
+                    pos:            tombstone.pos,
                     target:         tombstone.id,
                     resourceType:   resourceType,
                     amount:         tombstone.store[resourceType]
@@ -93,6 +96,7 @@ const collect_scanner: {[s in collect_task_name]: (room:Room) => WithdrawTask[]}
             var resourceType: keyof typeof store
             for(resourceType in store){
                 tasks.push({
+                    pos:            ruin.pos,
                     target:         ruin.id,
                     resourceType:   resourceType,
                     amount:         ruin.store[resourceType]
@@ -116,6 +120,7 @@ const collect_scanner: {[s in collect_task_name]: (room:Room) => WithdrawTask[]}
             if(boostType){
                 if(lab_out.mineralType && boostType != lab_out.mineralType){
                     tasks.push({
+                        pos:            lab_out.pos,
                         target:         lab_out.id,
                         resourceType:   lab_out.mineralType,
                         amount:         lab_out.store[lab_out.mineralType]
@@ -125,6 +130,7 @@ const collect_scanner: {[s in collect_task_name]: (room:Room) => WithdrawTask[]}
                 if(lab_out.mineralType && (compoundType != lab_out.mineralType
                     || lab_out.store[compoundType] >= 600)){
                     tasks.push({
+                        pos:            lab_out.pos,
                         target:         lab_out.id,
                         resourceType:   lab_out.mineralType,
                         amount:         lab_out.store[lab_out.mineralType]
