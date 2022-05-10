@@ -18,8 +18,6 @@ type FightAction =
     |"attack"|"rangedAttack"|"rangedMassAttack"
     |"heal"|"rangedHeal"
 
-type ContinualAction = Exclude<PrimitiveAction,CarryAction|"reserveController">
-
 type CachedArgs<T extends any[]> = {
     [P in keyof T] : T[P] extends _HasId
         ? Id<T[P]> : T[P];

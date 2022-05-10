@@ -1,7 +1,7 @@
-type ActionPerformer<T extends PrimitiveAction>
+type PrimitivePerformer<T extends PrimitiveAction>
     = (creep: Creep, args?:CachedArgs<Parameters<Creep[T]>>) => ScreepsReturnCode
 
-const performer:{[action in PrimitiveAction]:ActionPerformer<action>} = {
+const performer:{[action in PrimitiveAction]:PrimitivePerformer<action>} = {
     harvest: function (creep: Creep, args?: [target: Id<Source | Mineral<MineralConstant> | Deposit>]) {
         if(!args) return ERR_INVALID_ARGS
         const target = Game.getObjectById(args[0])
