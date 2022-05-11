@@ -1,8 +1,7 @@
-
 type VirtualPerformer<T extends keyof VirtualAction>
     = (creep: Creep, args:VirtualAction[T]) => ScreepsReturnCode
 
-const performer:{[action in keyof VirtualAction]:VirtualPerformer<action>} = {
+const performer:{[action in keyof VirtualAction]: VirtualPerformer<action>} = {
     prejudge_full: function(creep:Creep, args:VirtualAction['prejudge_full']){
         return creep.store.getFreeCapacity() > args[0] ? OK : ERR_FULL
     },
@@ -13,14 +12,17 @@ const performer:{[action in keyof VirtualAction]:VirtualPerformer<action>} = {
     
     approach: function(creep:Creep, args:VirtualAction['approach']){
         const pos = new RoomPosition(args[0].x,args[0].y,args[0].roomName)
-        return creep.pos.inRangeTo(pos,args[1]) ? OK : creep.moveTo(pos)
+        return creep.pos.inRangeTo(pos,args[1]) ? OK : creep.moveTo(pos)//custom_move.moveTo(creep,pos)
     }
 }
 
-type VirtualAction = {
-    prejudge_full:  [amount:number],
-
-    prejudge_empty: [amount:number],
-    
-    approach:   [pos:RoomPosition, range:number]
+export const perform_virtual = function(creep:Creep, behavior:ActionDescript<keyof VirtualAction>): ScreepsReturnCode {
+    const action = behavior.action
+    let ret: ScreepsReturnCode
+    switch(action){
+        case 'approach':        ret = performer[action](creep,behavior.args); break;
+        case 'prejudge_full':
+        case 'prejudge_empty':  ret = performer[action](creep,behavior.args); break;
+    }
+    return ret
 }

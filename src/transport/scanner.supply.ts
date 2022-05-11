@@ -10,8 +10,7 @@ const supply_updater: TaskUpdater<SupplyController> = {
             }
         })
         for (let extension of extensions) {
-            if (!extension)
-                continue
+            if (!extension) continue
             tasks.push({
                 action: 'transfer',
                 args: [extension.id, 'energy', extension.store.getFreeCapacity('energy')],
@@ -25,8 +24,7 @@ const supply_updater: TaskUpdater<SupplyController> = {
             .map(id => Game.getObjectById(id))
             .filter(s => s && s.store.getFreeCapacity('energy') >= 400)
         for (let tower of towers) {
-            if (!tower)
-                continue
+            if (!tower) continue
             tasks.push({
                 action: 'transfer',
                 args: [tower.id, 'energy', tower.store.getFreeCapacity('energy')],
@@ -39,8 +37,7 @@ const supply_updater: TaskUpdater<SupplyController> = {
         for (let i in room.memory.structures.labs_out) {
             const boostType: MineralBoostConstant | undefined = room.memory.boost[i]
             const lab_out = Game.getObjectById(room.memory.structures.labs_out[i])
-            if (!lab_out)
-                continue
+            if (!lab_out) continue
 
             if (boostType && lab_out.store.getFreeCapacity(boostType) >= 1800) {
                 tasks.push({
@@ -66,8 +63,7 @@ const supply_updater: TaskUpdater<SupplyController> = {
         for (let i in room.memory.structures.labs_in) {
             const reactantType = reaction[i]
             const lab_in = Game.getObjectById(room.memory.structures.labs_in[i])
-            if (!lab_in)
-                continue
+            if (!lab_in) continue
 
             //reactant
             if (lab_in.store.getFreeCapacity(reactantType) > 2400) {

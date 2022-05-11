@@ -1,4 +1,5 @@
-    
+type AnyAction = PrimitiveAction | keyof VirtualAction
+
 type PrimitiveAction =
     | WorkAction
     | CarryAction
@@ -18,13 +19,23 @@ type FightAction =
     |"attack"|"rangedAttack"|"rangedMassAttack"
     |"heal"|"rangedHeal"
 
+type VirtualAction = {
+    prejudge_full:  [amount:number],
+
+    prejudge_empty: [amount:number],
+    
+    approach:   [pos:RoomPosition, range:number]
+}
+
 type CachedArgs<T extends any[]> = {
     [P in keyof T] : T[P] extends _HasId
         ? Id<T[P]> : T[P];
 }
 
-type ActionDescript<T extends PrimitiveAction> = T extends PrimitiveAction ? {
+type ActionDescript<T extends PrimitiveAction | keyof VirtualAction> = T extends PrimitiveAction ? {
     action: T
     args:   CachedArgs<Parameters<Creep[T]>>
-    pos:    RoomPosition
+} : T extends keyof VirtualAction ? {
+    action: T
+    args:   VirtualAction[T]
 } : never;

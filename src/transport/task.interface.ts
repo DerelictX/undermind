@@ -33,7 +33,7 @@ type TaskUpdater<T extends {[P in keyof T]: CachedRoomTasks<PrimitiveAction>}> =
     [P in keyof T]: (tasks:T[P],room:Room) => void
 }
 
-type CachedRoomTasks<T extends PrimitiveAction> = Looper & ActionDescript<T>[]
+type CachedRoomTasks<T extends PrimitiveAction> = Looper & ({pos: RoomPosition} & ActionDescript<T>)[]
 
 interface ConsumeController {
     repair:     CachedRoomTasks<'repair'>
