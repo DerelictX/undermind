@@ -1,28 +1,3 @@
-type supply_task_name = 'extension'|'tower'|'boost'|'reactant'|'power_spawn'
-type collect_task_name = 'harvested'|'loot'|'sweep'|'compound'
-
-interface TransportTask{
-    source:         Id<AnyStoreStructure|Tombstone|Ruin>
-    target:         Id<AnyCreep|AnyStoreStructure>
-    resourceType:   ResourceConstant
-    amount:         number
-}
-
-interface TransferTask {
-    pos:            RoomPosition
-    //args:           ActionDescript<'transfer'>
-    target:         Id<AnyCreep|AnyStoreStructure>
-    resourceType:   ResourceConstant
-    amount:         number
-}
-
-interface WithdrawTask {
-    pos:            RoomPosition
-    //args:           ActionDescript<'withdraw'>
-    target:         Id<AnyStoreStructure|Tombstone|Ruin>
-    resourceType:   ResourceConstant
-    amount:         number
-}
 
 type Looper = {
     reload_time:    number
@@ -33,14 +8,31 @@ type TaskUpdater<T extends {[P in keyof T]: CachedRoomTasks<PrimitiveAction>}> =
     [P in keyof T]: (tasks:T[P],room:Room) => void
 }
 
-type CachedRoomTasks<T extends PrimitiveAction> = Looper & ({pos: RoomPosition} & ActionDescript<T>)[]
+type CachedRoomTasks<T extends PrimitiveAction> =
+    Looper & ({pos: RoomPosition} & ActionDescript<T>)[]
+
+interface ProduceController {
+    source:     CachedRoomTasks<'harvest'>
+    mineral:    CachedRoomTasks<'harvest'>
+    deposit:    CachedRoomTasks<'harvest'>
+    recycle:    CachedRoomTasks<'dismantle'>
+}
+
+interface CollectController {
+    harvested:  CachedRoomTasks<'withdraw'>
+    loot:       CachedRoomTasks<'withdraw'>
+    sweep:      CachedRoomTasks<'withdraw'>
+    compound:   CachedRoomTasks<'withdraw'>
+}
 
 interface ConsumeController {
-    repair:     CachedRoomTasks<'repair'>
-    maintain:   CachedRoomTasks<'repair'|'upgradeController'>
-    anti_nuke:  CachedRoomTasks<'repair'>
     build:      CachedRoomTasks<'build'>
-    fortifer:   CachedRoomTasks<'repair'>
+    repair:     CachedRoomTasks<'repair'>
+    decayed:    CachedRoomTasks<'repair'>
+    fortify:    CachedRoomTasks<'repair'>
+    anti_nuke:  CachedRoomTasks<'repair'>
+    upgrade:    CachedRoomTasks<'upgradeController'>
+    downgraded: CachedRoomTasks<'upgradeController'>
 }
 
 interface SupplyController {

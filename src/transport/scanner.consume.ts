@@ -1,5 +1,4 @@
 const consume_updater: TaskUpdater<ConsumeController> = {
-    
     build: function (tasks: CachedRoomTasks<"build">, room: Room): void {
         const sites = room.find(FIND_MY_CONSTRUCTION_SITES)
         sites.forEach(s => tasks.push({
@@ -23,17 +22,7 @@ const consume_updater: TaskUpdater<ConsumeController> = {
         }))
     },
 
-    maintain: function (tasks: CachedRoomTasks<"repair" | "upgradeController">, room: Room): void {
-        const downgraded = room.controller
-        if (downgraded && downgraded.my && !downgraded.upgradeBlocked) {
-            if (downgraded.ticksToDowngrade < CONTROLLER_DOWNGRADE[downgraded.level] - 8000)
-                tasks.push({
-                    action: 'upgradeController',
-                    args: [downgraded.id],
-                    pos: downgraded.pos
-                })
-        }
-
+    decayed: function (tasks: CachedRoomTasks<"repair">, room: Room): void {
         const decayed = room.find(FIND_STRUCTURES, {
             filter: (structure) => {
                 if (structure.structureType == STRUCTURE_ROAD)
@@ -50,7 +39,7 @@ const consume_updater: TaskUpdater<ConsumeController> = {
         }))
     },
 
-    fortifer: function (tasks: CachedRoomTasks<"repair">, room: Room): void {
+    fortify: function (tasks: CachedRoomTasks<"repair">, room: Room): void {
         var wallHits = room.memory.structures.wall_hits - 1000
         let walls = room.find(FIND_STRUCTURES, {
             filter: (structure) => {
@@ -78,5 +67,28 @@ const consume_updater: TaskUpdater<ConsumeController> = {
 
     anti_nuke: function (tasks: CachedRoomTasks<"repair">, room: Room): void {
         const nukes = room.find(FIND_NUKES)
+    },
+
+    downgraded: function (tasks: CachedRoomTasks<"upgradeController">, room: Room): void {
+        const downgraded = room.controller
+        if (downgraded && downgraded.my && !downgraded.upgradeBlocked) {
+            if (downgraded.ticksToDowngrade < CONTROLLER_DOWNGRADE[downgraded.level] - 8000)
+                tasks.push({
+                    action: 'upgradeController',
+                    args: [downgraded.id],
+                    pos: downgraded.pos
+                })
+        }
+    },
+    upgrade: function (tasks: CachedRoomTasks<"upgradeController">, room: Room): void {
+        const controller = room.controller
+        if (controller && controller.my && !controller.upgradeBlocked) {
+            if (controller.level < 8)
+                tasks.push({
+                    action: 'upgradeController',
+                    args: [controller.id],
+                    pos: controller.pos
+                })
+        }
     }
 }

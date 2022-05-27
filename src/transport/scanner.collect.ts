@@ -1,18 +1,15 @@
-const collect_scanner: {[s in collect_task_name]: (room:Room) => WithdrawTask[]} = {
+const collect_updater: TaskUpdater<CollectController> = {
 
-    harvested: function(room:Room):WithdrawTask[] {
-        let tasks:WithdrawTask[] = []
-
+    harvested: function (tasks: CachedRoomTasks<"withdraw">, room: Room): void {
         const links_nexi = room.memory.structures.link_nexus
             .map(id => Game.getObjectById(id))
             .filter(s => s && s.store['energy'] >= 300)
         for(let link of links_nexi){
             if(!link) continue
             tasks.push({
-                pos:            link.pos,
-                target:         link.id,
-                resourceType:   'energy',
-                amount:         link.store['energy']
+                action: 'withdraw',
+                args:   [link.id,'energy',link.store['energy']],
+                pos:    link.pos
             })
         }
 
@@ -25,20 +22,15 @@ const collect_scanner: {[s in collect_task_name]: (room:Room) => WithdrawTask[]}
             var resourceType: keyof typeof store
             for(resourceType in store){
                 tasks.push({
-                    pos:            container.pos,
-                    target:         container.id,
-                    resourceType:   resourceType,
-                    amount:         container.store[resourceType]
+                    action: 'withdraw',
+                    args:   [container.id,resourceType,container.store[resourceType]],
+                    pos:    container.pos
                 })
             }
         }
-
-        return tasks
     },
 
-    loot: function(room:Room):WithdrawTask[] {
-        let tasks:WithdrawTask[] = []
-
+    loot: function (tasks: CachedRoomTasks<"withdraw">, room: Room): void {
         const hostile_stores:(AnyStoreStructure&AnyOwnedStructure)[] = room.find(FIND_HOSTILE_STRUCTURES, {
             filter: (structure) => {
                 if(structure.structureType == STRUCTURE_STORAGE
@@ -53,20 +45,16 @@ const collect_scanner: {[s in collect_task_name]: (room:Room) => WithdrawTask[]}
             var resourceType: keyof typeof store
             for(resourceType in store){
                 tasks.push({
-                    pos:            hostile_store.pos,
-                    target:         hostile_store.id,
-                    resourceType:   resourceType,
-                    amount:         hostile_store.store[resourceType]
+                    action: 'withdraw',
+                    args:   [hostile_store.id,resourceType,hostile_store.store[resourceType]],
+                    pos:    hostile_store.pos
                 })
             }
         }
 
-        return tasks
     },
 
-    sweep: function(room:Room):WithdrawTask[] {
-        let tasks:WithdrawTask[] = []
-
+    sweep: function (tasks: CachedRoomTasks<"withdraw">, room: Room): void {
         const tombstones:Tombstone[] = room.find(FIND_TOMBSTONES, {
             filter: (tombstone) => {
                 return tombstone.store.getUsedCapacity() >= 200
@@ -77,10 +65,9 @@ const collect_scanner: {[s in collect_task_name]: (room:Room) => WithdrawTask[]}
             var resourceType: keyof typeof store
             for(resourceType in store){
                 tasks.push({
-                    pos:            tombstone.pos,
-                    target:         tombstone.id,
-                    resourceType:   resourceType,
-                    amount:         tombstone.store[resourceType]
+                    action: 'withdraw',
+                    args:   [tombstone.id,resourceType,tombstone.store[resourceType]],
+                    pos:    tombstone.pos
                 })
             }
         }
@@ -95,48 +82,42 @@ const collect_scanner: {[s in collect_task_name]: (room:Room) => WithdrawTask[]}
             var resourceType: keyof typeof store
             for(resourceType in store){
                 tasks.push({
-                    pos:            ruin.pos,
-                    target:         ruin.id,
-                    resourceType:   resourceType,
-                    amount:         ruin.store[resourceType]
+                    action: 'withdraw',
+                    args:   [ruin.id,resourceType,ruin.store[resourceType]],
+                    pos:    ruin.pos
                 })
             }
         }
-        return tasks
     },
 
-    compound: function(room:Room):WithdrawTask[] {
-        let tasks:WithdrawTask[] = []
+    compound: function (tasks: CachedRoomTasks<"withdraw">, room: Room): void {
         const reaction = room.memory.reaction;
-        if(!reaction) return []
+        if(!reaction) return
         const compoundType = reaction[2];
             
         for(let i in room.memory.structures.labs_out){
             const boostType:MineralBoostConstant|undefined = room.memory.boost[i]
             const lab_out = Game.getObjectById(room.memory.structures.labs_out[i])
-            if(!lab_out || boostType)continue
+            if(!lab_out) continue
 
             if(boostType){
                 if(lab_out.mineralType && boostType != lab_out.mineralType){
                     tasks.push({
-                        pos:            lab_out.pos,
-                        target:         lab_out.id,
-                        resourceType:   lab_out.mineralType,
-                        amount:         lab_out.store[lab_out.mineralType]
+                        action: 'withdraw',
+                        args:   [lab_out.id,lab_out.mineralType,lab_out.store[lab_out.mineralType]],
+                        pos:    lab_out.pos
                     })
                 }
             } else {
                 if(lab_out.mineralType && (compoundType != lab_out.mineralType
-                    || lab_out.store[compoundType] >= 600)){
+                        || lab_out.store[compoundType] >= 600)) {
                     tasks.push({
-                        pos:            lab_out.pos,
-                        target:         lab_out.id,
-                        resourceType:   lab_out.mineralType,
-                        amount:         lab_out.store[lab_out.mineralType]
+                        action: 'withdraw',
+                        args:   [lab_out.id,lab_out.mineralType,lab_out.store[lab_out.mineralType]],
+                        pos:    lab_out.pos
                     })
                 }
             }
         }
-        return tasks
     }
 }
