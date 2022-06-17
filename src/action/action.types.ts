@@ -32,7 +32,7 @@ type CachedArgs<T extends any[]> = {
         ? Id<T[P]> : T[P];
 }
 
-type ActionDescript<T extends PrimitiveAction | keyof VirtualAction> = T extends PrimitiveAction ? {
+type ActionDescript<T extends AnyAction> = T extends PrimitiveAction ? {
     action: T
     args:   CachedArgs<Parameters<Creep[T]>>
 } : T extends keyof VirtualAction ? {

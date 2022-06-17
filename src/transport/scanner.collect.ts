@@ -1,6 +1,7 @@
 const collect_updater: TaskUpdater<CollectController> = {
 
     harvested: function (tasks: CachedRoomTasks<"withdraw">, room: Room): void {
+/*
         const links_nexi = room.memory.structures.link_nexus
             .map(id => Game.getObjectById(id))
             .filter(s => s && s.store['energy'] >= 300)
@@ -12,7 +13,7 @@ const collect_updater: TaskUpdater<CollectController> = {
                 pos:    link.pos
             })
         }
-
+*/
         const containers = room.memory.structures.containers_in
             .map(id => Game.getObjectById(id))
             .filter(s => s && s.store.getUsedCapacity() >= 1200)
