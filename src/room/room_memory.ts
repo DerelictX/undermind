@@ -1,12 +1,15 @@
 
 interface RoomMemory {
     structures: RoomStructureList
-    tasks:      RoomTaskList
 
-    spawn_loop: {[R in AnyRoleName]: RoleSpawnLoop}
+    _static:    Partial<StaticController>
+    _consume:   Partial<ConsumeController>
+    _supply:    Partial<SupplyController>
 
-    reaction:   (MineralConstant|MineralCompoundConstant)[]
-    boost:      MineralBoostConstant[]
+    spawn:  {[R in AnyRoleName]: RoleSpawnLoop}
+
+    //reaction:   (MineralConstant|MineralCompoundConstant)[]
+    //boost:      MineralBoostConstant[]
 }
 
 interface RoleSpawnLoop {
@@ -19,12 +22,6 @@ interface RoleSpawnLoop {
     queued:         number
 }
 
-interface RoomTaskList{
-    harvest:    StaticHarvestTask[],
-    harvest_m:  StaticHarvestTask[],
-    upgrade:    StaticUpgradeTask[],
-}
-
 interface RoomStructureList {
     factory:        null|Id<StructureFactory>
     power_spawn:    null|Id<StructurePowerSpawn>
@@ -32,16 +29,26 @@ interface RoomStructureList {
     observer:       null|Id<StructureObserver>
 
     towers:         Id<StructureTower>[]
-    
-    links_in:       Id<StructureLink>[]
-    link_nexus:     Id<StructureLink>[]
-    links_out:      Id<StructureLink>[]
-
-    containers_in:  Id<StructureContainer>[]
-    containers_out: Id<StructureContainer>[]
-
-    labs_in:        Id<StructureLab>[]
-    labs_out:       Id<StructureLab>[]
-    
+    links:          LinkConfig
+    containers:     ContainerConfig
+    labs:           LabConfig
     wall_hits:      number
+}
+
+interface LinkConfig {
+    nexus:      Id<StructureLink>[]
+    ins:        Id<StructureLink>[]
+    outs:       Id<StructureLink>[]
+}
+
+interface ContainerConfig {
+    ins:        Id<StructureContainer>[]
+    outs:       Id<StructureContainer>[]
+}
+
+interface LabConfig {
+    ins:        Id<StructureLab>[]
+    outs:       Id<StructureLab>[]
+    reaction:   MineralCompoundConstant|null
+    boosts:     MineralBoostConstant[]
 }

@@ -9,22 +9,20 @@ type TaskUpdater<T extends {[P in keyof T]: CachedRoomTasks<PrimitiveAction>}> =
 }
 
 type CachedRoomTasks<T extends PrimitiveAction> =
-    Looper & ({pos: RoomPosition} & ActionDescript<T>)[]
+    ({pos: RoomPosition} & ActionDescript<T>)[]
 
-interface ProduceController {
+interface CollectController {
     source:     CachedRoomTasks<'harvest'>
     mineral:    CachedRoomTasks<'harvest'>
     deposit:    CachedRoomTasks<'harvest'>
     recycle:    CachedRoomTasks<'dismantle'>
-}
-
-interface CollectController {
     harvested:  CachedRoomTasks<'withdraw'>
     loot:       CachedRoomTasks<'withdraw'>
     sweep:      CachedRoomTasks<'withdraw'>
     compound:   CachedRoomTasks<'withdraw'>
 }
 
+//consume energy
 interface ConsumeController {
     build:      CachedRoomTasks<'build'>
     repair:     CachedRoomTasks<'repair'>
@@ -33,13 +31,21 @@ interface ConsumeController {
     anti_nuke:  CachedRoomTasks<'repair'>
     upgrade:    CachedRoomTasks<'upgradeController'>
     downgraded: CachedRoomTasks<'upgradeController'>
+    extension:  CachedRoomTasks<'transfer'>
+    tower:      CachedRoomTasks<'transfer'>
 }
 
 interface SupplyController {
-    extension:  CachedRoomTasks<'transfer'>
-    tower:      CachedRoomTasks<'transfer'>
     boost:      CachedRoomTasks<'transfer'>
     reactant:   CachedRoomTasks<'transfer'>
     pwr_spawn:  CachedRoomTasks<'transfer'>
     safe_mode:  CachedRoomTasks<'generateSafeMode'>
+}
+
+interface StaticController {
+    source:     StaticBehavior[]
+    mineral:    StaticBehavior[]
+    upgrade:    StaticBehavior[]
+    reserve:    CachedRoomTasks<ClaimAction>
+    siege:      CachedRoomTasks<'dismantle'>
 }

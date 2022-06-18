@@ -47,69 +47,39 @@ export const structure_updater = {
     },
 
     containers: function(room:Room){
-        room.memory.structures.containers_in = []
-        let sources: (Source|Mineral)[] = room.find(FIND_SOURCES)
-        sources = sources.concat(room.find(FIND_MINERALS));
-        for(let s in sources){
-            let containers:StructureContainer[] = sources[s].pos.findInRange(FIND_STRUCTURES,2,{
-                filter: {structureType: STRUCTURE_CONTAINER}
-            });
-            for(let i in containers){
-                room.memory.structures.containers_in.push(containers[i].id)
-            }
-        }
-        
-        room.memory.structures.containers_out = []
-        const controller = room.controller;
-        if(controller){
-            let containers:StructureContainer[] = controller.pos.findInRange(FIND_STRUCTURES,3,{
-                filter: {structureType: STRUCTURE_CONTAINER}
-            });
-            for(let i in containers){
-                room.memory.structures.containers_out.push(containers[i].id)
-            }
+        room.memory.structures.containers.ins = []
+        room.memory.structures.containers.outs = []
+        const containers:StructureContainer[] = room.find(FIND_STRUCTURES,{
+            filter: {structureType: STRUCTURE_CONTAINER}
+        });
+
+        for(let container of containers){
+            if(container.pos.findInRange(FIND_SOURCES,2)){
+                room.memory.structures.containers.ins.push(container.id)
+            } else room.memory.structures.containers.outs.push(container.id)
         }
     },
 
     links: function(room:Room){
-        room.memory.structures.links_in = []
-        const sources = room.find(FIND_SOURCES);
-        for(let s in sources){
-            let links:StructureLink[] = sources[s].pos.findInRange(FIND_STRUCTURES,2,{
-                filter: {structureType: STRUCTURE_LINK}
-            });
-            for(let i in links){
-                room.memory.structures.links_in.push(links[i].id)
-            }
-        }
+        room.memory.structures.links.nexus = []
+        room.memory.structures.links.ins = []
+        room.memory.structures.links.outs = []
+        const links:StructureLink[] = room.find(FIND_MY_STRUCTURES,{
+            filter: {structureType: STRUCTURE_LINK}
+        });
 
-        room.memory.structures.link_nexus = []
-        let storage: StructureStorage|StructureTerminal|undefined = room.storage;
-        if(!storage || !storage.my) storage = room.terminal;
-        if(storage){
-            let links:StructureLink[] = storage.pos.findInRange(FIND_MY_STRUCTURES,2,{
-                filter: {structureType: STRUCTURE_LINK}
-            });
-            for(let i in links){
-                room.memory.structures.link_nexus.push(links[i].id)
-            }
+        for(let link of links){
+            if(link.pos.findInRange(FIND_STRUCTURES,2,{filter: {structureType: STRUCTURE_STORAGE}})){
+                room.memory.structures.links.nexus.push(link.id)
+            } else if(link.pos.findInRange(FIND_SOURCES,2)){
+                room.memory.structures.links.ins.push(link.id)
+            } else room.memory.structures.links.outs.push(link.id)
         }
-
-        room.memory.structures.links_out = []
-        const controller = room.controller;
-        if(controller){
-            let link:StructureLink|null = controller.pos.findClosestByRange(FIND_MY_STRUCTURES,{
-                filter: {structureType: STRUCTURE_LINK}
-            });
-            if(link && link.pos.inRangeTo(controller,3))
-                room.memory.structures.links_out.push(link.id)
-        }
-
     },
 
     labs: function(room:Room){
-        room.memory.structures.labs_in = []
-        room.memory.structures.labs_out = []
+        room.memory.structures.labs.ins = []
+        room.memory.structures.labs.outs = []
         const labs:StructureLab[] = room.find(FIND_MY_STRUCTURES,{
             filter: {structureType: STRUCTURE_LAB}
         });
@@ -123,9 +93,9 @@ export const structure_updater = {
         }
     
         for(let i in labs){
-            if(labs.length >= 6 && near_num[i] == labs.length && room.memory.structures.labs_in.length < 2)
-                room.memory.structures.labs_in.push(labs[i].id)
-            else room.memory.structures.labs_out.push(labs[i].id)
+            if(labs.length > 3 && near_num[i] == labs.length && room.memory.structures.labs.ins.length < 2)
+                room.memory.structures.labs.ins.push(labs[i].id)
+            else room.memory.structures.labs.outs.push(labs[i].id)
         }
     },
 

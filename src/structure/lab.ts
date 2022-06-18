@@ -1,18 +1,19 @@
 import _ from "lodash";
 
 export const lab_run = function(room: Room){
-
-    if(room.memory.reaction){
-        const labs_in0 = Game.getObjectById(room.memory.structures.labs_in[0]);
-        const labs_in1 = Game.getObjectById(room.memory.structures.labs_in[1]);
+    const labs = room.memory.structures.labs
+    const reaction = labs.reaction
+    if(reaction){
+        const labs_in0 = Game.getObjectById(labs.ins[0]);
+        const labs_in1 = Game.getObjectById(labs.ins[1]);
         if(!labs_in0 || !labs_in1)return
-        if(labs_in0.mineralType != room.memory.reaction[0]
-            || labs_in1.mineralType != room.memory.reaction[1])
+        if(labs_in0.mineralType != reactions[reaction][0]
+            || labs_in1.mineralType != reactions[reaction][1])
             return
-        const labs_out = room.memory.structures.labs_out;
+        const labs_out = labs.outs;
         for(var id in labs_out){
             let lab = Game.getObjectById(labs_out[id]);
-            if(!lab || room.memory.boost && room.memory.boost[id])
+            if(!lab || labs.boosts[id])
                 continue;
             let ret = lab.runReaction(labs_in0, labs_in1);
             if(ret != OK)
@@ -30,7 +31,7 @@ export const change_reaction = function(room:Room){
     const terminal = room.terminal
     if(!terminal || !terminal.my)
         return
-    room.memory.reaction = []
+    room.memory.structures.labs.reaction = null
     
     for(let tier = 3; tier >= 0; tier--){
         const reacts = compound_tier[tier]
@@ -41,7 +42,7 @@ export const change_reaction = function(room:Room){
                 continue
             const reactants = reactions[reacts[i]] 
             if(terminal.store[reactants[0]] >= 1000 && terminal.store[reactants[1]] >= 1000){
-                room.memory.reaction = [reactants[0], reactants[1], reacts[i]]
+                room.memory.structures.labs.reaction = reacts[i]
                 return
             }
         }
@@ -61,7 +62,7 @@ const compound_tier:MineralCompoundConstant[][]  = [
         'ZHO2','GHO2','LHO2',
         'KHO2','UH2O',
         'LH2O','ZH2O','GH2O',
-        //'KH2O','UHO2'
+        'KH2O','UHO2'
     ],[
         'XZHO2','XGHO2','XLHO2',
         'XKHO2','XUH2O',
@@ -70,7 +71,7 @@ const compound_tier:MineralCompoundConstant[][]  = [
     ]
 ]
 
-const reactions: {[m in MineralCompoundConstant]:(MineralConstant|MineralCompoundConstant)[]} = {
+export const reactions: {[m in MineralCompoundConstant]:(MineralConstant|MineralCompoundConstant)[]} = {
     OH: ["O","H"],
     ZK: ["Z","K"],
     UL: ["U","L"],

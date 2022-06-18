@@ -6,10 +6,8 @@ import { spawn_run } from "./structure/spawn";
 import { power_spawn_run } from "./structure/power_spawn";
 import { structure_updater } from "./room/structure.updater";
 import { operator_run } from "./power_creep/operator";
-import { terminal_run } from "./structure/terminal";
 import { spawn_loop } from "./room/spawn_loop";
 import { body_generator } from "./creep/body_config";
-import { memory_inspector } from "./room/task.performer";
 import { link_run } from "./structure/link";
 import { perform_any } from "./behaviour/combinative.performer";
 
@@ -25,16 +23,7 @@ export const loop = function () {
         const room = Game.rooms[room_name];
         if(!room)continue
         try{
-            if(!room.memory.structures)
-                memory_inspector.structures(room)
-            if(!room.memory.spawn_loop)
-                memory_inspector.spawn_loop(room)
-            if(!room.memory.tasks)
-                memory_inspector.tasks(room)
-            if(!room.memory.reaction)
-                memory_inspector.reaction(room)
-            if(!room.memory.boost)
-                memory_inspector.boost(room)
+            inspector_memory(room)
                 
             spawn_loop(room)
             spawn_run(room)
@@ -89,7 +78,7 @@ export const loop = function () {
     
     try{
         death_detect()
-        terminal_run()
+        //terminal_run()
         //Game.cpu.generatePixel();
     }catch(error){
         console.log(':' + error);

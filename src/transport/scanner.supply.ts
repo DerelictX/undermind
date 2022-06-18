@@ -1,42 +1,13 @@
+import { reactions } from "@/structure/lab"
+
 const supply_updater: TaskUpdater<SupplyController> = {
 
-    extension: function (tasks: CachedRoomTasks<'transfer'>, room: Room): void {
-        const extensions: (AnyStoreStructure & AnyOwnedStructure)[] = room.find(FIND_MY_STRUCTURES, {
-            filter: (structure) => {
-                if (structure.structureType == STRUCTURE_EXTENSION
-                    || structure.structureType == STRUCTURE_SPAWN)
-                    return structure.store.getFreeCapacity('energy') > 0
-                return false
-            }
-        })
-        for (let extension of extensions) {
-            if (!extension) continue
-            tasks.push({
-                action: 'transfer',
-                args: [extension.id, 'energy', extension.store.getFreeCapacity('energy')],
-                pos: extension.pos
-            })
-        }
-    },
-
-    tower: function (tasks: CachedRoomTasks<'transfer'>, room: Room): void {
-        const towers = room.memory.structures.towers
-            .map(id => Game.getObjectById(id))
-            .filter(s => s && s.store.getFreeCapacity('energy') >= 400)
-        for (let tower of towers) {
-            if (!tower) continue
-            tasks.push({
-                action: 'transfer',
-                args: [tower.id, 'energy', tower.store.getFreeCapacity('energy')],
-                pos: tower.pos
-            })
-        }
-    },
-
     boost: function (tasks: CachedRoomTasks<'transfer'>, room: Room): void {
-        for (let i in room.memory.structures.labs_out) {
-            const boostType: MineralBoostConstant | undefined = room.memory.boost[i]
-            const lab_out = Game.getObjectById(room.memory.structures.labs_out[i])
+        const labs = room.memory.structures.labs
+
+        for (let i in labs.outs) {
+            const boostType: MineralBoostConstant | undefined = labs.boosts[i]
+            const lab_out = Game.getObjectById(labs.outs[i])
             if (!lab_out) continue
 
             if (boostType && lab_out.store.getFreeCapacity(boostType) >= 1800) {
@@ -57,12 +28,13 @@ const supply_updater: TaskUpdater<SupplyController> = {
     },
 
     reactant: function (tasks: CachedRoomTasks<'transfer'>, room: Room): void {
-        const reaction = room.memory.reaction
-        if (!reaction) return
+        const labs = room.memory.structures.labs
+        const compoundType = labs.reaction
+        if (!compoundType) return
 
-        for (let i in room.memory.structures.labs_in) {
-            const reactantType = reaction[i]
-            const lab_in = Game.getObjectById(room.memory.structures.labs_in[i])
+        for (let i in labs.ins) {
+            const reactantType = reactions[compoundType][i]
+            const lab_in = Game.getObjectById(labs.ins[i])
             if (!lab_in) continue
 
             //reactant

@@ -1,9 +1,4 @@
-import _ from "lodash";
-
-export const terminal_run = function(){
-    if(Game.time % 23 != 0)
-        return
-
+const terminal_run = function(){
     var terminals: StructureTerminal[] = []
     for(let room_name of Memory.owned_rooms){
         const room = Game.rooms[room_name]

@@ -90,5 +90,38 @@ const consume_updater: TaskUpdater<ConsumeController> = {
                     pos: controller.pos
                 })
         }
+    },
+    
+    extension: function (tasks: CachedRoomTasks<'transfer'>, room: Room): void {
+        const extensions: (AnyStoreStructure & AnyOwnedStructure)[] = room.find(FIND_MY_STRUCTURES, {
+            filter: (structure) => {
+                if (structure.structureType == STRUCTURE_EXTENSION
+                    || structure.structureType == STRUCTURE_SPAWN)
+                    return structure.store.getFreeCapacity('energy') > 0
+                return false
+            }
+        })
+        for (let extension of extensions) {
+            if (!extension) continue
+            tasks.push({
+                action: 'transfer',
+                args: [extension.id, 'energy', extension.store.getFreeCapacity('energy')],
+                pos: extension.pos
+            })
+        }
+    },
+
+    tower: function (tasks: CachedRoomTasks<'transfer'>, room: Room): void {
+        const towers = room.memory.structures.towers
+            .map(id => Game.getObjectById(id))
+            .filter(s => s && s.store.getFreeCapacity('energy') >= 400)
+        for (let tower of towers) {
+            if (!tower) continue
+            tasks.push({
+                action: 'transfer',
+                args: [tower.id, 'energy', tower.store.getFreeCapacity('energy')],
+                pos: tower.pos
+            })
+        }
     }
 }

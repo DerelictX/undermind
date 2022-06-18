@@ -8,3 +8,12 @@ const productions: {[d in DepositConstant]:CommodityConstant[]} = {
     metal:      ['alloy','tube','fixtures','frame','hydraulics','machine'],
     silicon:    ['wire','switch','transistor','microchip','circuit','device']
 }
+
+const product_tier:CommodityConstant[][]  = [
+    ['alloy','cell','wire','condensate'],
+    ['tube','phlegm','switch','concentrate','composite'],
+    ['fixtures','tissue','transistor','extract','crystal'],
+    ['frame','muscle','microchip','spirit','liquid'],
+    ['hydraulics','organoid','circuit','emanation'],
+    ['machine','organism','device','essence']
+]

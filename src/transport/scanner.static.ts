@@ -1,74 +1,8 @@
-export const memory_inspector: {[k in keyof RoomMemory]:
-    (room: Room) => void
-} = {
-    structures: function(room: Room){
-        let wallHits = 100000
-        if(room.controller){
-            wallHits += room.controller.level * room.controller.level * 100000
-        }
-        room.memory.structures={
-            factory:        null,
-            power_spawn:    null,
-            nuker:          null,
-            observer:       null,
-            towers:         [],
-            links_in:       [],
-            link_nexus:     [],
-            links_out:      [],
-            containers_in:  [],
-            containers_out: [],
-            labs_in:        [],
-            labs_out:       [],
-            wall_hits:      wallHits
-        }
-    },
-    spawn_loop: function(room: Room){
-        const spawn_loop:RoleSpawnLoop={
-            succeed_time:   Game.time + 50,
-            succ_interval:  1500,
-            body_parts:     [],
-            boost_queue:    [],
-            queued:         0
-        }
-        room.memory.spawn_loop={
-            pioneer:    spawn_loop,
-            builder:    spawn_loop,
-            maintainer: spawn_loop,
-            fortifier:  spawn_loop,
+type StaticUpdater = {[P in keyof StaticController]: (tasks:StaticController[P],room:Room) => void}
 
-            harvester_m:    spawn_loop,
-            harvester_s0:   spawn_loop,
-            harvester_s1:   spawn_loop,
-            upgrader_s:     spawn_loop,
-            reserver:       spawn_loop,
-
-            supplier:   spawn_loop,
-            collector:  spawn_loop,
-            emergency:  spawn_loop,
-
-            healer:     spawn_loop,
-            melee:      spawn_loop,
-            ranged:     spawn_loop,
-        }
-    },
-    tasks: function(room: Room){
-        room.memory.tasks={
-            harvest:    [],
-            harvest_m:  [],
-            upgrade:    [],
-        }
-    },
-    reaction: function(room: Room){
-        room.memory.reaction=[]
-    },
-    boost: function(room: Room){
-        room.memory.boost=[]
-    },
-}
-
-export const harvest_updater = {
-    source: function(room: Room){
-        room.memory.tasks.harvest = []
+export const static_updater: StaticUpdater = {
+    source: function(tasks: StaticBehavior[], room: Room){
+        tasks = []
         const sources = room.find(FIND_SOURCES)
         for(let i in sources) {
             const source: Source = sources[i]
@@ -77,10 +11,12 @@ export const harvest_updater = {
                 filter: {structureType: STRUCTURE_CONTAINER}
             })
             if(!container || !container.pos.isNearTo(source)) continue
-            let task: StaticHarvestTask = {
-                target:         source.id,
-                structs_from:   [container.id],
-                structs_to:     []
+            let task: StaticBehavior = {
+                bhvr_name: "static",
+                pos: container.pos,
+                work: [],
+                withdraw: [],
+                transfer: []
             }
             
             const near_structs:AnyStoreStructure[] = container.pos.findInRange(FIND_STRUCTURES,1,{
@@ -106,7 +42,11 @@ export const harvest_updater = {
     mineral: function(room: Room){
         room.memory.tasks.harvest_m = []
         const mineral: Mineral = room.find(FIND_MINERALS,{
-            filter: (mineral) => {return mineral.mineralAmount > 0}
+            filter: (mineral) => {
+                if(room.storage && room.storage.store[mineral.mineralType] < 100000)
+                    return mineral.mineralAmount > 0
+                return false
+            }
         })[0]
         if(!mineral) return
 

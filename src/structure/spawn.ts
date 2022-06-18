@@ -1,4 +1,5 @@
 import { body_generator, default_body_config } from "@/creep/body_config";
+import { default_role_behavior } from "@/creep/default_role_behavior";
 
 export const spawn_run = function(room: Room) {
     if(room.energyAvailable < 300)
@@ -7,11 +8,11 @@ export const spawn_run = function(room: Room) {
     if(!spawn)return
 
     let role_name: AnyRoleName
-    for(role_name in room.memory.spawn_loop){
-        const spawn_loop = room.memory.spawn_loop[role_name]
+    for(role_name in room.memory.spawn){
+        const spawn_loop = room.memory.spawn[role_name]
         if(spawn_loop.queued == 1){
             let body_parts = spawn_loop.body_parts
-            const creep_name = default_body_config[role_name].generator
+            const creep_name = role_name
                 +'_'+ room.name +'_'+ Game.time%10000
             
             let ret = spawn.spawnCreep(body_parts, creep_name)
@@ -21,13 +22,13 @@ export const spawn_run = function(room: Room) {
                 ret = spawn.spawnCreep(body_parts, creep_name)
             }
             if(ret == OK){
-                room.memory.spawn_loop[role_name].queued = 0
-                room.memory.spawn_loop[role_name].succeed_time = Game.time
+                room.memory.spawn[role_name].queued = 0
+                room.memory.spawn[role_name].succeed_time = Game.time
                     + spawn_loop.succ_interval + 10
                     
                 const class_memory = init_class_memory(role_name)
                 if(class_memory) Memory.creeps[creep_name] = {
-                    //
+                    behavior:   default_role_behavior[role_name]
                 }
                 return
             } else {
