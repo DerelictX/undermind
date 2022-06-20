@@ -7,8 +7,8 @@ type CachedRoomTasks<T extends PrimitiveAction> =
     ({pos: RoomPosition} & ActionDescript<T>)[]
 
 interface CollectController {
-    autarky:    CachedRoomTasks<'harvest'>
-    mining:     CachedRoomTasks<'harvest'>
+    source:     CachedRoomTasks<'harvest'>
+    mineral:    CachedRoomTasks<'harvest'>
     deposit:    CachedRoomTasks<'harvest'>
     recycle:    CachedRoomTasks<'dismantle'>
     harvested:  CachedRoomTasks<'withdraw'>

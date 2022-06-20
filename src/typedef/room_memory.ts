@@ -2,7 +2,7 @@
 interface RoomMemory {
     structures: RoomStructureList
 
-    _static:    Partial<StaticController>
+    _static:    StaticController
     _consume:   Partial<ConsumeController>
     _supply:    Partial<SupplyController>
 

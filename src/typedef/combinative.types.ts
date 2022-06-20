@@ -16,6 +16,7 @@ type ComboBehavior = {
 type StaticBehavior = {
     bhvr_name:  "static"
     pos:        RoomPosition
+    range:      number
     input:      ActionDescript<'withdraw'|'harvest'|'dismantle'>[]
     output:     ActionDescript<'transfer'|'repair'|'build'|'upgradeController'>[]
 }

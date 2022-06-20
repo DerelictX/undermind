@@ -1,18 +1,18 @@
 import { body_generator, default_body_config } from "@/creep/body_config"
-import { change_reaction } from "@/structure/lab"
 import { static_updater } from "@/scanner/static"
+import { change_reaction } from "@/structure/lab"
 import { structure_updater } from "./structure.updater"
 
 const spawn_handler: {[r in AnyRoleName]:(room:Room) => boolean} = {
     harvester_m: function(room:Room){
         static_updater.mineral(room)
-        if(room.memory.tasks.harvest_m[0])
+        if(room.memory._static.mineral[0])
             return true
         return false
     },
     harvester_s0: function(room:Room){
         static_updater.source(room)
-        if(!room.memory.tasks.harvest[0])
+        if(room.memory._static.source[0])
             return false
 
         const generator = body_generator[default_body_config['harvester_s0'].generator]
@@ -25,7 +25,7 @@ const spawn_handler: {[r in AnyRoleName]:(room:Room) => boolean} = {
     },
     harvester_s1: function(room:Room){
         static_updater.source(room)
-        if(!room.memory.tasks.harvest[1])
+        if(room.memory._static.source[1])
             return false
 
         const generator = body_generator[default_body_config['harvester_s1'].generator]
@@ -69,7 +69,7 @@ const spawn_handler: {[r in AnyRoleName]:(room:Room) => boolean} = {
         room.memory.spawn['upgrader_s'].succ_interval = 1500
         if(room.storage && room.storage.my && room.storage.store['energy'] < 240000)
             return false
-        if(room.memory.tasks.upgrade[0])
+        if(room.memory._static.upgrade[0])
             return true
         return false
     },

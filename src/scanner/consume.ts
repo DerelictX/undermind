@@ -1,13 +1,16 @@
 const consume_updater: TaskUpdater<ConsumeController> = {
-    build: function (tasks: CachedRoomTasks<"build">, room: Room) {
+    build: function (room: Room) {
+        var tasks: CachedRoomTasks<"build"> = []
         const sites = room.find(FIND_MY_CONSTRUCTION_SITES)
         sites.forEach(s => tasks.push({
             action: 'build',
             args: [s.id],
             pos: s.pos
         }))
+        return tasks
     },
-    repair: function (tasks: CachedRoomTasks<"repair">, room: Room) {
+    repair: function (room: Room) {
+        var tasks: CachedRoomTasks<"repair"> = []
         const damaged = room.find(FIND_MY_STRUCTURES, {
             filter: (structure) => {
                 if (structure.structureType == STRUCTURE_RAMPART)
@@ -20,9 +23,11 @@ const consume_updater: TaskUpdater<ConsumeController> = {
             args: [s.id],
             pos: s.pos
         }))
+        return tasks
     },
 
-    decayed: function (tasks: CachedRoomTasks<"repair">, room: Room) {
+    decayed: function (room: Room) {
+        var tasks: CachedRoomTasks<"repair"> = []
         const decayed = room.find(FIND_STRUCTURES, {
             filter: (structure) => {
                 if (structure.structureType == STRUCTURE_ROAD)
@@ -37,9 +42,11 @@ const consume_updater: TaskUpdater<ConsumeController> = {
             args: [s.id],
             pos: s.pos
         }))
+        return tasks
     },
 
-    fortify: function (tasks: CachedRoomTasks<"repair">, room: Room) {
+    fortify: function (room: Room) {
+        var tasks: CachedRoomTasks<"repair"> = []
         var wallHits = room.memory.structures.wall_hits - 1000
         let walls = room.find(FIND_STRUCTURES, {
             filter: (structure) => {
@@ -63,13 +70,16 @@ const consume_updater: TaskUpdater<ConsumeController> = {
             wallHits += 30000
         if (wallHits >= 100000 && wallHits <= 100000000)
             room.memory.structures.wall_hits = wallHits
+        return tasks
     },
 
     anti_nuke: function (room: Room) {
         const nukes = room.find(FIND_NUKES)
+        return []
     },
 
-    downgraded: function (tasks: CachedRoomTasks<"upgradeController">, room: Room) {
+    downgraded: function (room: Room) {
+        var tasks: CachedRoomTasks<"upgradeController"> = []
         const downgraded = room.controller
         if (downgraded && downgraded.my && !downgraded.upgradeBlocked) {
             if (downgraded.ticksToDowngrade < CONTROLLER_DOWNGRADE[downgraded.level] - 8000)
@@ -79,8 +89,10 @@ const consume_updater: TaskUpdater<ConsumeController> = {
                     pos: downgraded.pos
                 })
         }
+        return tasks
     },
-    upgrade: function (tasks: CachedRoomTasks<"upgradeController">, room: Room) {
+    upgrade: function (room: Room) {
+        var tasks: CachedRoomTasks<"upgradeController"> = []
         const controller = room.controller
         if (controller && controller.my && !controller.upgradeBlocked) {
             if (controller.level < 8)
@@ -90,9 +102,11 @@ const consume_updater: TaskUpdater<ConsumeController> = {
                     pos: controller.pos
                 })
         }
+        return tasks
     },
 
-    extension: function (tasks: CachedRoomTasks<'transfer'>, room: Room) {
+    extension: function (room: Room) {
+        var tasks: CachedRoomTasks<'transfer'> = []
         const extensions: (AnyStoreStructure & AnyOwnedStructure)[] = room.find(FIND_MY_STRUCTURES, {
             filter: (structure) => {
                 if (structure.structureType == STRUCTURE_EXTENSION
@@ -110,9 +124,11 @@ const consume_updater: TaskUpdater<ConsumeController> = {
                 pos: extension.pos
             })
         }
+        return tasks
     },
 
-    tower: function (tasks: CachedRoomTasks<'transfer'>, room: Room) {
+    tower: function (room: Room) {
+        var tasks: CachedRoomTasks<'transfer'> = []
         const towers = room.memory.structures.towers
             .map(id => Game.getObjectById(id))
             .filter(s => s && s.store.getFreeCapacity('energy') >= 400)
@@ -125,8 +141,9 @@ const consume_updater: TaskUpdater<ConsumeController> = {
                 pos: tower.pos
             })
         }
+        return []
     },
     buffer: function (room: Room) {
-        throw new Error("Function not implemented.")
+        return []
     }
 }
