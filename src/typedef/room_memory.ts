@@ -6,21 +6,19 @@ interface RoomMemory {
     _consume:   Partial<ConsumeController>
     _supply:    Partial<SupplyController>
 
-    spawn:  {[R in AnyRoleName]: RoleSpawnLoop}
+    _spawn:  {[R in CreepClassName]: RoleSpawnLoop}
 
     //reaction:   (MineralConstant|MineralCompoundConstant)[]
     //boost:      MineralBoostConstant[]
 }
 
-interface RoleSpawnLoop {
-    succeed_time:   number,
-    succ_interval:  number,
+type RoleSpawnLoop = {
     body_parts:     BodyPartConstant[]
     boost_queue:    {
         part:BodyPartConstant
         boost:MineralBoostConstant}[]
     queued:         number
-}
+} & Looper
 
 interface RoomStructureList {
     factory:        null|Id<StructureFactory>

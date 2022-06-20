@@ -117,7 +117,7 @@ const collect_updater: TaskUpdater<CollectController> = {
         }
         return tasks
     },
-    autarky: function (room: Room): CachedRoomTasks<"harvest"> {
+    source: function (room: Room): CachedRoomTasks<"harvest"> {
         var tasks: CachedRoomTasks<"harvest"> = []
         const sources = room.find(FIND_SOURCES)
         for(let source of sources) {
@@ -129,7 +129,7 @@ const collect_updater: TaskUpdater<CollectController> = {
         }
         return tasks
     },
-    mining: function (room: Room): CachedRoomTasks<"harvest"> {
+    mineral: function (room: Room): CachedRoomTasks<"harvest"> {
         var tasks: CachedRoomTasks<"harvest"> = []
         const minerals = room.find(FIND_SOURCES)
         for(let mineral of minerals) {

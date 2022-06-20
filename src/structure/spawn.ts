@@ -1,5 +1,4 @@
 import { body_generator, default_body_config } from "@/creep/body_config";
-import { default_role_behavior } from "@/creep/default_role_behavior";
 
 export const spawn_run = function(room: Room) {
     if(room.energyAvailable < 300)
@@ -7,9 +6,9 @@ export const spawn_run = function(room: Room) {
     const spawn = room.find(FIND_MY_SPAWNS).find(spawn => !spawn.spawning)
     if(!spawn)return
 
-    let role_name: AnyRoleName
-    for(role_name in room.memory.spawn){
-        const spawn_loop = room.memory.spawn[role_name]
+    let role_name: CreepClassName
+    for(role_name in room.memory._spawn){
+        const spawn_loop = room.memory._spawn[role_name]
         if(spawn_loop.queued == 1){
             let body_parts = spawn_loop.body_parts
             const creep_name = role_name
@@ -22,12 +21,12 @@ export const spawn_run = function(room: Room) {
                 ret = spawn.spawnCreep(body_parts, creep_name)
             }
             if(ret == OK){
-                room.memory.spawn[role_name].queued = 0
-                room.memory.spawn[role_name].succeed_time = Game.time
-                    + spawn_loop.succ_interval + 10
+                room.memory._spawn[role_name].queued = 0
+                room.memory._spawn[role_name].reload_time = Game.time
+                    + spawn_loop.interval + 10
                     
-                const class_memory = init_class_memory(role_name)
-                if(class_memory) Memory.creeps[creep_name] = {
+                Memory.creeps[creep_name] = {
+                    _class:     role_name,
                     behavior:   default_role_behavior[role_name]
                 }
                 return
@@ -38,44 +37,9 @@ export const spawn_run = function(room: Room) {
     }
 }
 
-const init_class_memory = function(role_name: AnyRoleName) {
-    switch(role_name){
-        case 'harvester_m':
-        case 'harvester_s0':
-        case 'harvester_s1':
-        case 'upgrader_s':
-        case 'reserver':
-            return {
-                class:  'specialist',
-                role:   role_name
-            }
-        case 'builder':
-        case 'maintainer':
-        case 'fortifier':
-        case 'pioneer':
-            return {
-                class:  'generalist',
-                role:   role_name,
-                state:  'obtain'
-            }
-        case 'supplier':
-        case 'collector':
-        case 'emergency':
-            return {
-                class:  'carrier',
-                role:   role_name,
-                state:  'collect',
-                collect:    [],
-                supply:     []
-            }
-        case 'healer':
-        case 'ranged':
-        case 'melee':
-            return {
-                class:  'fighter',
-                role:   role_name
-            }
-        default:
-            return undefined
-    }
+const default_role_behavior: {[r in CreepClassName]:CallbackfulBehavior<AnyAction>|undefined} = {
+    generalist: undefined,
+    specialist: undefined,
+    carrier: undefined,
+    fighter: undefined
 }

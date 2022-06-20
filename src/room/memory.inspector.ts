@@ -1,4 +1,4 @@
-const inspector_memory = function (room: Room) {
+export const inspector_memory = function (room: Room) {
     var k: keyof RoomMemory
     for(k in memory_inspector){
         if(!room.memory[k])
@@ -38,33 +38,19 @@ const memory_inspector: {[k in keyof RoomMemory]:
             wall_hits: wallHits
         }
     },
-    spawn: function (room: Room) {
+    _spawn: function (room: Room) {
         const spawn_loop: RoleSpawnLoop = {
-            succeed_time: Game.time + 50,
-            succ_interval: 1500,
+            reload_time: Game.time + 20,
+            interval: 400,
             body_parts: [],
             boost_queue: [],
             queued: 0
         }
-        room.memory.spawn = {
-            pioneer: spawn_loop,
-            builder: spawn_loop,
-            maintainer: spawn_loop,
-            fortifier: spawn_loop,
-
-            harvester_m: spawn_loop,
-            harvester_s0: spawn_loop,
-            harvester_s1: spawn_loop,
-            upgrader_s: spawn_loop,
-            reserver: spawn_loop,
-
-            supplier: spawn_loop,
-            collector: spawn_loop,
-            emergency: spawn_loop,
-
-            healer: spawn_loop,
-            melee: spawn_loop,
-            ranged: spawn_loop,
+        room.memory._spawn = {
+            generalist: spawn_loop,
+            specialist: spawn_loop,
+            carrier:    spawn_loop,
+            fighter:    spawn_loop
         }
     },
     _consume: function (room: Room): void {
@@ -74,6 +60,12 @@ const memory_inspector: {[k in keyof RoomMemory]:
         room.memory._supply = {}
     },
     _static: function (room: Room): void {
-        room.memory._static = {}
+        room.memory._static = {
+            source:     [],
+            mineral:    [],
+            upgrade:    [],
+            reserve:    [],
+            siege:      []
+        }
     }
 }

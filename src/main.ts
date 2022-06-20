@@ -1,15 +1,12 @@
-
-import { lab_run } from "./structure/lab";
-import { tower_run } from "./structure/tower";
-import { death_detect } from "./creep/death_detect";
-import { spawn_run } from "./structure/spawn";
-import { power_spawn_run } from "./structure/power_spawn";
 import { structure_updater } from "./room/structure.updater";
 import { operator_run } from "./power_creep/operator";
-import { spawn_loop } from "./room/spawn_loop";
 import { body_generator } from "./creep/body_config";
-import { link_run } from "./structure/link";
 import { perform_any } from "./performer/combinative.performer";
+import { inspector_memory } from "./room/memory.inspector";
+import { run_role } from "./creep/role.run";
+import { spawn_loop } from "./creep/spawn_loop";
+import { spawn_run } from "./structure/spawn";
+import { tower_run } from "./structure/tower";
 
 export const loop = function () {
 
@@ -17,43 +14,37 @@ export const loop = function () {
         structure_updater
         body_generator
     }
-    //Memory.owned_rooms = ['sim']
+    
     //ROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOMS
+    if(!Memory.owned_rooms)
+        Memory.owned_rooms = []
     for(let room_name of Memory.owned_rooms){
         const room = Game.rooms[room_name];
         if(!room)continue
         try{
             inspector_memory(room)
-                
             spawn_loop(room)
             spawn_run(room)
             tower_run(room)
-            link_run(room)
-            lab_run(room)
-            power_spawn_run(room)
         }catch(error){
             console.log(room.name +':' + error);
         }
     }
 
     //CREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEPS
-    for(var name in Game.creeps) {
-        if(Game.cpu.getUsed() > 18)
-            break
+    for(var name in Memory.creeps) {
         try{
-            const creep = Game.creeps[name];
+            const creep = Game.creeps[name]
+            if(!creep){
+                delete Memory.creeps[name];
+                continue
+            }
             if(creep.spawning)
                 continue
-            
-            const cpu = Game.cpu.getUsed()
+                
             if(creep.memory.behavior)
                 perform_any(creep,creep.memory.behavior)
-                
-            const cpv = Game.cpu.getUsed() - cpu
-            if(cpv > 1){
-                //console.log(creep.memory.class_memory.role + ':\t' + cpv);
-            }
-                
+            else run_role[creep.memory._class](creep) 
         }catch(error){
             console.log(name + ':' + error + '');
         }
@@ -70,18 +61,8 @@ export const loop = function () {
                     operator_run(powerCreep);
                     break;
             }
-
         }catch(error){
             console.log(name + ':' + error);
         }
     }
-    
-    try{
-        death_detect()
-        //terminal_run()
-        //Game.cpu.generatePixel();
-    }catch(error){
-        console.log(':' + error);
-    }
-
 }
