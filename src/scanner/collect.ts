@@ -1,6 +1,6 @@
 const collect_updater: TaskUpdater<CollectController> = {
-
-    harvested: function (tasks: CachedRoomTasks<"withdraw">, room: Room): void {
+    harvested: function (room: Room) {
+        var tasks: CachedRoomTasks<"withdraw"> = []
         const containers = room.memory.structures.containers.ins
             .map(id => Game.getObjectById(id))
             .filter(s => s && s.store.getUsedCapacity() >= 1200)
@@ -17,9 +17,11 @@ const collect_updater: TaskUpdater<CollectController> = {
                 })
             }
         }
+        return tasks
     },
 
-    loot: function (tasks: CachedRoomTasks<"withdraw">, room: Room): void {
+    loot: function (room: Room) {
+        var tasks: CachedRoomTasks<"withdraw"> = []
         const hostile_stores: (AnyStoreStructure & AnyOwnedStructure)[] = room.find(FIND_HOSTILE_STRUCTURES, {
             filter: (structure) => {
                 if (structure.structureType == STRUCTURE_STORAGE
@@ -40,10 +42,11 @@ const collect_updater: TaskUpdater<CollectController> = {
                 })
             }
         }
-
+        return tasks
     },
 
-    sweep: function (tasks: CachedRoomTasks<"withdraw">, room: Room): void {
+    sweep: function (room: Room) {
+        var tasks: CachedRoomTasks<"withdraw"> = []
         const tombstones: Tombstone[] = room.find(FIND_TOMBSTONES, {
             filter: (tombstone) => {
                 return tombstone.store.getUsedCapacity() >= 200
@@ -77,17 +80,21 @@ const collect_updater: TaskUpdater<CollectController> = {
                 })
             }
         }
+        return tasks
     },
 
-    compound: function (tasks: CachedRoomTasks<"withdraw">, room: Room): void {
+    compound: function (room: Room) {
+        var tasks: CachedRoomTasks<"withdraw"> = []
         const labs = room.memory.structures.labs
         const compoundType = labs.reaction
-        if (!compoundType) return
+        if (!compoundType)
+            return []
 
         for (let i in labs.outs) {
             const boostType: MineralBoostConstant | undefined = labs.boosts[i]
             const lab_out = Game.getObjectById(labs.outs[i])
-            if (!lab_out) continue
+            if (!lab_out)
+                continue
 
             if (boostType) {
                 if (lab_out.mineralType && boostType != lab_out.mineralType) {
@@ -108,17 +115,45 @@ const collect_updater: TaskUpdater<CollectController> = {
                 }
             }
         }
+        return tasks
     },
-    source: function (tasks: CachedRoomTasks<"harvest">, room: Room): void {
-        throw new Error("Function not implemented.")
+    autarky: function (room: Room): CachedRoomTasks<"harvest"> {
+        var tasks: CachedRoomTasks<"harvest"> = []
+        const sources = room.find(FIND_SOURCES)
+        for(let source of sources) {
+            tasks.push({
+                action: 'harvest',
+                args:   [source.id],
+                pos:    source.pos
+            })
+        }
+        return tasks
     },
-    mineral: function (tasks: CachedRoomTasks<"harvest">, room: Room): void {
-        throw new Error("Function not implemented.")
+    mining: function (room: Room): CachedRoomTasks<"harvest"> {
+        var tasks: CachedRoomTasks<"harvest"> = []
+        const minerals = room.find(FIND_SOURCES)
+        for(let mineral of minerals) {
+            tasks.push({
+                action: 'harvest',
+                args:   [mineral.id],
+                pos:    mineral.pos
+            })
+        }
+        return tasks
     },
-    deposit: function (tasks: CachedRoomTasks<"harvest">, room: Room): void {
-        throw new Error("Function not implemented.")
+    deposit: function (room: Room): CachedRoomTasks<"harvest"> {
+        var tasks: CachedRoomTasks<"harvest"> = []
+        const deposits = room.find(FIND_SOURCES)
+        for(let deposit of deposits) {
+            tasks.push({
+                action: 'harvest',
+                args:   [deposit.id],
+                pos:    deposit.pos
+            })
+        }
+        return tasks
     },
-    recycle: function (tasks: CachedRoomTasks<"dismantle">, room: Room): void {
-        throw new Error("Function not implemented.")
+    recycle: function (room: Room): CachedRoomTasks<"dismantle"> {
+        return []
     }
 }

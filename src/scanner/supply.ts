@@ -2,9 +2,9 @@ import { reactions } from "@/structure/lab"
 
 const supply_updater: TaskUpdater<SupplyController> = {
 
-    boost: function (tasks: CachedRoomTasks<'transfer'>, room: Room): void {
+    boost: function (room: Room) {
         const labs = room.memory.structures.labs
-
+        var tasks: CachedRoomTasks<'transfer'> = []
         for (let i in labs.outs) {
             const boostType: MineralBoostConstant | undefined = labs.boosts[i]
             const lab_out = Game.getObjectById(labs.outs[i])
@@ -25,13 +25,14 @@ const supply_updater: TaskUpdater<SupplyController> = {
                 })
             }
         }
+        return tasks
     },
 
-    reactant: function (tasks: CachedRoomTasks<'transfer'>, room: Room): void {
+    reactant: function (room: Room) {
         const labs = room.memory.structures.labs
         const compoundType = labs.reaction
-        if (!compoundType) return
-
+        if (!compoundType) return []
+        var tasks: CachedRoomTasks<'transfer'> = []
         for (let i in labs.ins) {
             const reactantType = reactions[compoundType][i]
             const lab_in = Game.getObjectById(labs.ins[i])
@@ -46,13 +47,14 @@ const supply_updater: TaskUpdater<SupplyController> = {
                 })
             }
         }
+        return tasks
     },
 
-    pwr_spawn: function (tasks: CachedRoomTasks<'transfer'>, room: Room): void {
-        if (!room.memory.structures.power_spawn) return
+    pwr_spawn: function (room: Room) {
+        if (!room.memory.structures.power_spawn) return []
         const power_spawn = Game.getObjectById(room.memory.structures.power_spawn)
-        if (!power_spawn) return
-
+        if (!power_spawn) return []
+        var tasks: CachedRoomTasks<'transfer'> = []
         if (power_spawn.store['energy'] <= 3000) {
             tasks.push({
                 action: 'transfer',
@@ -67,16 +69,17 @@ const supply_updater: TaskUpdater<SupplyController> = {
                 pos: power_spawn.pos
             })
         }
+        return tasks
     },
 
-    safe_mode: function (tasks: CachedRoomTasks<"generateSafeMode">, room: Room): void {
+    safe_mode: function (room: Room) {
         const controller = room.controller
         if(controller && controller.my && controller.level > 2 && controller.safeModeAvailable == 0) {
-            tasks.push({
+            return [{
                 action: 'generateSafeMode',
                 args:   [controller.id],
                 pos:    controller.pos
-            })
-        }
+            }]
+        } else return []
     }
 }

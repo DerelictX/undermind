@@ -9,7 +9,7 @@ import { operator_run } from "./power_creep/operator";
 import { spawn_loop } from "./room/spawn_loop";
 import { body_generator } from "./creep/body_config";
 import { link_run } from "./structure/link";
-import { perform_any } from "./behaviour/combinative.performer";
+import { perform_any } from "./performer/combinative.performer";
 
 export const loop = function () {
 

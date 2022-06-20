@@ -1,5 +1,5 @@
-import { perform_virtual } from "@/action/performer.virtual"
-import { perform_primitive } from "@/action/primitive.performer"
+import { perform_virtual } from "@/performer/performer.virtual"
+import { perform_primitive } from "@/performer/primitive.performer"
 
 const TASK_DOING:       TASK_DOING      = -16
 const TASK_COMPLETE:    TASK_COMPLETE   = -17
@@ -11,6 +11,7 @@ export const perform_any = function(creep:Creep, behavior:AnyBehavior):TaskRetur
         case 'parallel':
         case 'backtrack':
             return combo_performer[behavior.bhvr_name](creep,behavior.sub_tasks)
+        case 'static':
         default:
             return perform_callbackful(creep,behavior)
     }

@@ -1,7 +1,12 @@
 
 type StorePropertiesOnly = { [P in ResourceConstant]: number } &
-    { [P in Exclude<ResourceConstant, ResourceConstant>]: 0 };
+    { [P in Exclude<ResourceConstant, ResourceConstant>]: 0 }
     
-    interface Memory {
-        owned_rooms: string[]
-    }
+type Looper = {
+    reload_time:    number
+    interval:       number
+}
+
+interface Memory {
+    owned_rooms: string[]
+}

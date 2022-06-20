@@ -1,24 +1,19 @@
 
-type Looper = {
-    reload_time:    number
-    interval:       number
-}
-
-type TaskUpdater<T extends {[P in keyof T]: CachedRoomTasks<PrimitiveAction>}> = {
-    [P in keyof T]: (tasks:T[P],room:Room) => void
+type TaskUpdater<T extends {[P in keyof T]: CachedRoomTasks<PrimitiveAction> | StaticBehavior[]}> = {
+    [P in keyof T]: (room:Room) => T[P]
 }
 
 type CachedRoomTasks<T extends PrimitiveAction> =
     ({pos: RoomPosition} & ActionDescript<T>)[]
 
 interface CollectController {
-    source:     CachedRoomTasks<'harvest'>
-    mineral:    CachedRoomTasks<'harvest'>
+    autarky:    CachedRoomTasks<'harvest'>
+    mining:     CachedRoomTasks<'harvest'>
     deposit:    CachedRoomTasks<'harvest'>
     recycle:    CachedRoomTasks<'dismantle'>
     harvested:  CachedRoomTasks<'withdraw'>
     loot:       CachedRoomTasks<'withdraw'>
-    sweep:      CachedRoomTasks<'withdraw'>
+    sweep:      CachedRoomTasks<'withdraw'|'pickup'>
     compound:   CachedRoomTasks<'withdraw'>
 }
 
@@ -33,6 +28,7 @@ interface ConsumeController {
     downgraded: CachedRoomTasks<'upgradeController'>
     extension:  CachedRoomTasks<'transfer'>
     tower:      CachedRoomTasks<'transfer'>
+    buffer:     CachedRoomTasks<'transfer'>
 }
 
 interface SupplyController {

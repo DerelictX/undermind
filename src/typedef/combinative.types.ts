@@ -16,9 +16,8 @@ type ComboBehavior = {
 type StaticBehavior = {
     bhvr_name:  "static"
     pos:        RoomPosition
-    work:       ActionDescript<WorkAction>[]
-    withdraw:   Id<AnyStoreStructure>[]
-    transfer:   Id<AnyStoreStructure>[]
+    input:      ActionDescript<'withdraw'|'harvest'|'dismantle'>[]
+    output:     ActionDescript<'transfer'|'repair'|'build'|'upgradeController'>[]
 }
 
 type CallbackfulBehavior<T extends AnyAction> = T extends AnyAction ? {

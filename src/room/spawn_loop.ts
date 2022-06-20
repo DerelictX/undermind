@@ -1,6 +1,6 @@
 import { body_generator, default_body_config } from "@/creep/body_config"
 import { change_reaction } from "@/structure/lab"
-import { static_updater } from "@/transport/scanner.static"
+import { static_updater } from "@/scanner/static"
 import { structure_updater } from "./structure.updater"
 
 const spawn_handler: {[r in AnyRoleName]:(room:Room) => boolean} = {

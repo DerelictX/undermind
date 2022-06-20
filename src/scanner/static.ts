@@ -1,12 +1,8 @@
-type StaticUpdater = {[P in keyof StaticController]: (tasks:StaticController[P],room:Room) => void}
-
-export const static_updater: StaticUpdater = {
-    source: function(tasks: StaticBehavior[], room: Room){
+const static_updater: TaskUpdater<StaticController> = {
+    source: function(room: Room){
         tasks = []
         const sources = room.find(FIND_SOURCES)
-        for(let i in sources) {
-            const source: Source = sources[i]
-
+        for(let source of sources) {
             let container:StructureContainer|null = source.pos.findClosestByRange(FIND_STRUCTURES,{
                 filter: {structureType: STRUCTURE_CONTAINER}
             })
@@ -14,9 +10,8 @@ export const static_updater: StaticUpdater = {
             let task: StaticBehavior = {
                 bhvr_name: "static",
                 pos: container.pos,
-                work: [],
-                withdraw: [],
-                transfer: []
+                input:  [],
+                output: []
             }
             
             const near_structs:AnyStoreStructure[] = container.pos.findInRange(FIND_STRUCTURES,1,{
@@ -33,7 +28,7 @@ export const static_updater: StaticUpdater = {
             })
             near_structs.sort((a, b) => a.store.getCapacity('energy') - b.store.getCapacity('energy'))
             for(let j in near_structs){
-                task.structs_to.push(near_structs[j].id)
+                task.tr.push(near_structs[j].id)
             }
             room.memory.tasks.harvest.push(task)
         }
