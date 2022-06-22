@@ -1,47 +1,63 @@
 
-type TaskUpdater<T extends {[P in keyof T]: CachedRoomTasks<PrimitiveAction> | StaticBehavior[]}> = {
+type TaskUpdater<T extends {[P in keyof T]: PosedCreepTasks<TargetedAction>}> = {
     [P in keyof T]: (room:Room) => T[P]
 }
 
-type CachedRoomTasks<T extends PrimitiveAction> =
+type CachedPool<T extends {[P in keyof T]: PosedCreepTasks<TargetedAction>}> =
+    T extends {[P in keyof T]: PosedCreepTasks<CollectAction&TargetedAction>}
+            ? {[P in keyof T]: PosedCreepTasks<CollectAction&TargetedAction>} :
+    T extends {[P in keyof T]: PosedCreepTasks<ConsumeAction&TargetedAction>}
+            ? {[P in keyof T]: PosedCreepTasks<ConsumeAction&TargetedAction>} :
+    {[P in keyof T]: PosedCreepTasks<TargetedAction>}
+
+type PosedCreepTasks<T extends TargetedAction> =
     ({pos: RoomPosition} & ActionDescript<T>)[]
 
-interface CollectController {
-    source:     CachedRoomTasks<'harvest'>
-    mineral:    CachedRoomTasks<'harvest'>
-    deposit:    CachedRoomTasks<'harvest'>
-    recycle:    CachedRoomTasks<'dismantle'>
-    harvested:  CachedRoomTasks<'withdraw'>
-    loot:       CachedRoomTasks<'withdraw'>
-    sweep:      CachedRoomTasks<'withdraw'|'pickup'>
-    compound:   CachedRoomTasks<'withdraw'>
+interface CollectTaskPool {
+    H_src0:     PosedCreepTasks<'harvest'>
+    H_src1:     PosedCreepTasks<'harvest'>
+    H_src2:     PosedCreepTasks<'harvest'>
+    H_mnrl:     PosedCreepTasks<'harvest'>
+
+    H_srcs:     PosedCreepTasks<'harvest'>
+    deposit:    PosedCreepTasks<'harvest'>
+    recycle:    PosedCreepTasks<'dismantle'>
+    
+    W_srcs:     PosedCreepTasks<'withdraw'>
+    W_mnrl:     PosedCreepTasks<'withdraw'>
+    W_ctrl:     PosedCreepTasks<'withdraw'>
+    
+    loot:       PosedCreepTasks<'withdraw'>
+    sweep:      PosedCreepTasks<'withdraw'|'pickup'>
+    compound:   PosedCreepTasks<'withdraw'>
 }
 
-//consume energy
-interface ConsumeController {
-    build:      CachedRoomTasks<'build'>
-    repair:     CachedRoomTasks<'repair'>
-    decayed:    CachedRoomTasks<'repair'>
-    fortify:    CachedRoomTasks<'repair'>
-    anti_nuke:  CachedRoomTasks<'repair'>
-    upgrade:    CachedRoomTasks<'upgradeController'>
-    downgraded: CachedRoomTasks<'upgradeController'>
-    extension:  CachedRoomTasks<'transfer'>
-    tower:      CachedRoomTasks<'transfer'>
-    buffer:     CachedRoomTasks<'transfer'>
+interface ConsumeTaskPool {
+    T_src0:     PosedCreepTasks<'transfer'|'repair'>
+    T_src1:     PosedCreepTasks<'transfer'|'repair'>
+    T_src2:     PosedCreepTasks<'transfer'|'repair'>
+    T_mnrl:     PosedCreepTasks<'transfer'>
+
+    build:      PosedCreepTasks<'build'>
+    fortify:    PosedCreepTasks<'repair'>
+    decayed:    PosedCreepTasks<'repair'>
+    U_ctrl:     PosedCreepTasks<'upgradeController'>
+    
+    repair:     PosedCreepTasks<'repair'>
+    anti_nuke:  PosedCreepTasks<'repair'>
+    downgraded: PosedCreepTasks<'upgradeController'>
+    gen_safe:   PosedCreepTasks<'generateSafeMode'>
+
+    T_ext:      PosedCreepTasks<'transfer'>
+    T_tower:    PosedCreepTasks<'transfer'>
+    T_ctrl:     PosedCreepTasks<'transfer'>
+
+    T_boost:    PosedCreepTasks<'transfer'>
+    T_react:    PosedCreepTasks<'transfer'>
+    T_power:    PosedCreepTasks<'transfer'>
 }
 
-interface SupplyController {
-    boost:      CachedRoomTasks<'transfer'>
-    reactant:   CachedRoomTasks<'transfer'>
-    pwr_spawn:  CachedRoomTasks<'transfer'>
-    safe_mode:  CachedRoomTasks<'generateSafeMode'>
-}
-
-interface StaticController {
-    source:     StaticBehavior[]
-    mineral:    StaticBehavior[]
-    upgrade:    StaticBehavior[]
-    reserve:    CachedRoomTasks<ClaimAction>
-    siege:      CachedRoomTasks<'dismantle'>
+interface StaticTaskPool {
+    reserve:    PosedCreepTasks<'reserveController'>
+    siege:      PosedCreepTasks<'dismantle'>
 }

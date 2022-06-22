@@ -1,7 +1,6 @@
 type AnyBehavior =
     |CallbackfulBehavior<AnyAction>
     |ComboBehavior
-    |StaticBehavior
 
 type TaskReturnCode = TASK_DOING|TASK_COMPLETE|TASK_FAILED
 type TASK_DOING     = -16

@@ -151,8 +151,7 @@ export const perform_primitive = function(creep:Creep, behavior:ActionDescript<P
     return ret
 }
 
-const goPerform = function(creep:Creep, behavior:ActionDescript<Exclude<
-        PrimitiveAction,"drop"|"rangedMassAttack">>): ScreepsReturnCode {
+export const goPerform = function(creep:Creep, behavior:ActionDescript<TargetedAction>): ScreepsReturnCode {
     let ret = perform_primitive(creep,behavior)
     if(ret == ERR_NOT_IN_RANGE){
         const target = Game.getObjectById(behavior.args[0])

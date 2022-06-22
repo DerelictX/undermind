@@ -2,29 +2,24 @@
 interface RoomMemory {
     structures: RoomStructureList
 
-    _static:    StaticController
-    _consume:   Partial<ConsumeController>
-    _supply:    Partial<SupplyController>
+    _static:    Partial<CachedPool<StaticTaskPool>>
+    _consume:   Partial<CachedPool<ConsumeTaskPool>>
+    _collect:   Partial<CachedPool<CollectTaskPool>>
 
     _spawn:  {[R in CreepClassName]: RoleSpawnLoop}
-
-    //reaction:   (MineralConstant|MineralCompoundConstant)[]
-    //boost:      MineralBoostConstant[]
 }
 
 type RoleSpawnLoop = {
     body_parts:     BodyPartConstant[]
-    boost_queue:    {
-        part:BodyPartConstant
-        boost:MineralBoostConstant}[]
+    boost_queue:    MineralBoostConstant[]
     queued:         number
 } & Looper
 
 interface RoomStructureList {
-    factory:        null|Id<StructureFactory>
-    power_spawn:    null|Id<StructurePowerSpawn>
-    nuker:          null|Id<StructureNuker>
-    observer:       null|Id<StructureObserver>
+    factory?:       Id<StructureFactory>
+    power_spawn?:   Id<StructurePowerSpawn>
+    nuker?:         Id<StructureNuker>
+    observer?:      Id<StructureObserver>
 
     towers:         Id<StructureTower>[]
     links:          LinkConfig

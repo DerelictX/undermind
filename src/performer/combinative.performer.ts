@@ -11,8 +11,6 @@ export const perform_any = function(creep:Creep, behavior:AnyBehavior):TaskRetur
         case 'parallel':
         case 'backtrack':
             return combo_performer[behavior.bhvr_name](creep,behavior.sub_tasks)
-        case 'static':
-            return perform_static(creep,behavior)
         default:
             return perform_callbackful(creep,behavior)
     }
@@ -35,10 +33,6 @@ const perform_callbackful = function(creep:Creep, behavior:CallbackfulBehavior<A
     }while(callback)
     if(ret) creep.say('ERR' + ret)
     return ret ? TASK_FAILED : TASK_DOING
-}
-
-function perform_static(creep: Creep, behavior: StaticBehavior): TaskReturnCode {
-    throw new Error("Function not implemented.")
 }
 
 const combo_performer: {

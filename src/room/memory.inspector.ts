@@ -12,13 +12,9 @@ const memory_inspector: {[k in keyof RoomMemory]:
     structures: function (room: Room) {
         let wallHits = 100000
         if (room.controller) {
-            //wallHits += room.controller.level * room.controller.level * 100000
+            wallHits += room.controller.level * 100000
         }
         room.memory.structures = {
-            factory: null,
-            power_spawn: null,
-            nuker: null,
-            observer: null,
             towers: [],
             links: {
                 nexus: [],
@@ -49,23 +45,17 @@ const memory_inspector: {[k in keyof RoomMemory]:
         room.memory._spawn = {
             generalist: spawn_loop,
             specialist: spawn_loop,
-            carrier:    spawn_loop,
-            fighter:    spawn_loop
+            carrier: spawn_loop,
+            fighter: spawn_loop
         }
     },
     _consume: function (room: Room): void {
         room.memory._consume = {}
     },
-    _supply: function (room: Room): void {
-        room.memory._supply = {}
-    },
     _static: function (room: Room): void {
-        room.memory._static = {
-            source:     [],
-            mineral:    [],
-            upgrade:    [],
-            reserve:    [],
-            siege:      []
-        }
+        room.memory._static = {}
+    },
+    _collect: function (room: Room): void {
+        room.memory._static = {}
     }
 }

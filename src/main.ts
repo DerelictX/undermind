@@ -3,7 +3,6 @@ import { operator_run } from "./power_creep/operator";
 import { body_generator } from "./creep/body_config";
 import { perform_any } from "./performer/combinative.performer";
 import { inspector_memory } from "./room/memory.inspector";
-import { run_role } from "./creep/role.run";
 import { spawn_loop } from "./creep/spawn_loop";
 import { spawn_run } from "./structure/spawn";
 import { tower_run } from "./structure/tower";
@@ -44,7 +43,7 @@ export const loop = function () {
                 
             if(creep.memory.behavior)
                 perform_any(creep,creep.memory.behavior)
-            else run_role[creep.memory._class](creep) 
+            //else run_role[creep.memory._class](creep)
         }catch(error){
             console.log(name + ':' + error + '');
         }

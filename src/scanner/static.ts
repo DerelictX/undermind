@@ -1,4 +1,4 @@
-export const static_updater: TaskUpdater<StaticController> = {
+const static_updater = {
     source: function (room: Room): StaticBehavior[] {
         var tasks: StaticBehavior[] = []
         const sources = room.find(FIND_SOURCES)
@@ -79,10 +79,10 @@ export const static_updater: TaskUpdater<StaticController> = {
         }
         return [task]
     },
-    reserve: function (room: Room): CachedRoomTasks<ClaimAction> {
+    reserve: function (room: Room): PosedCreepTasks<'reserveController'> {
         throw new Error("Function not implemented.")
     },
-    siege: function (room: Room): CachedRoomTasks<"dismantle"> {
+    siege: function (room: Room): PosedCreepTasks<"dismantle"> {
         throw new Error("Function not implemented.")
     }
 }

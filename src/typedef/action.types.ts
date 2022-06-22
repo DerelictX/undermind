@@ -6,19 +6,29 @@ type PrimitiveAction =
     | ClaimAction
     | FightAction
 
+type ConsumeAction =
+    |"build"|"repair"|"upgradeController"
+    |"transfer"|"drop"|"generateSafeMode"
+type CollectAction =
+    |"harvest"|"dismantle"
+    |"withdraw"|"pickup"
+
 type WorkAction =
     |"harvest"|"dismantle"
     |"build"|"repair"|"upgradeController"
 type CarryAction =
-    |"generateSafeMode"
     |"withdraw"|"transfer"
     |"pickup"|"drop"
+    |"generateSafeMode"
+
 type ClaimAction =
     |"attackController"|"reserveController"|"claimController"
 type FightAction =
     |"attack"|"rangedAttack"|"rangedMassAttack"
     |"heal"|"rangedHeal"
 
+type TargetedAction = Exclude<PrimitiveAction,"drop"|"rangedMassAttack">
+    
 type VirtualAction = {
     prejudge_full:  [amount:number],
 
