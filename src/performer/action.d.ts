@@ -30,11 +30,10 @@ type FightAction =
 type TargetedAction = Exclude<PrimitiveAction,"drop"|"rangedMassAttack">
     
 type VirtualAction = {
+    approach:   [pos:RoomPosition, range:number],
+    escape:     [pos:RoomPosition, range:number],
     prejudge_full:  [amount:number],
-
     prejudge_empty: [amount:number],
-    
-    approach:   [pos:RoomPosition, range:number]
 }
 
 type CachedArgs<T extends any[]> = {

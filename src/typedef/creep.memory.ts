@@ -1,7 +1,7 @@
 
 interface CreepMemory {
     _class:     CreepClassName
-    behavior?:  CallbackfulBehavior<AnyAction>
+    behavior?:  AnyBehavior
     _move?:{
         dest: {x:number,y:number,room:string},
         time: number,
@@ -19,3 +19,7 @@ interface CreepMemory {
 }
 
 type CreepClassName = 'generalist'|'specialist'|'carrier'|'fighter'
+
+type GeneralistRole =
+    |"HS0"|"HS1"|"HS2"|"HM"|"Up"
+    |"HD"|"Bu"|"Ma"|"Co"|"Su"|"Ch"

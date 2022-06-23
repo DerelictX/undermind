@@ -37,7 +37,7 @@ export const spawn_run = function(room: Room) {
     }
 }
 
-const default_role_behavior: {[r in CreepClassName]:CallbackfulBehavior<AnyAction>|undefined} = {
+const default_role_behavior: {[r in CreepClassName]:CallbackBehavior<AnyAction>|undefined} = {
     generalist: undefined,
     specialist: undefined,
     carrier: undefined,

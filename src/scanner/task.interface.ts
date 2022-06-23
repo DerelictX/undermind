@@ -10,6 +10,10 @@ type CachedPool<T extends {[P in keyof T]: PosedCreepTasks<TargetedAction>}> =
             ? {[P in keyof T]: PosedCreepTasks<ConsumeAction&TargetedAction>} :
     {[P in keyof T]: PosedCreepTasks<TargetedAction>}
 
+type ResFlow = [
+    from:   'lazy' | keyof CollectTaskPool,
+    to:     'lazy' | keyof ConsumeTaskPool]
+
 type PosedCreepTasks<T extends TargetedAction> =
     ({pos: RoomPosition} & ActionDescript<T>)[]
 

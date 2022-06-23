@@ -1,11 +1,11 @@
 import { structure_updater } from "./room/structure.updater";
 import { operator_run } from "./power_creep/operator";
 import { body_generator } from "./creep/body_config";
-import { perform_any } from "./performer/combinative.performer";
 import { inspector_memory } from "./room/memory.inspector";
 import { spawn_loop } from "./creep/spawn_loop";
 import { spawn_run } from "./structure/spawn";
 import { tower_run } from "./structure/tower";
+import { perform_any } from "./performer/behavior.any";
 
 export const loop = function () {
 
