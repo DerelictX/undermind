@@ -15,11 +15,15 @@ type ComboBehavior = {
 
 interface FlowBehavior {
     bhvr_name:  "flow"
+    
+    state:      "collect"|"consume"
+    collect:    ActionDescript<CollectAction&TargetedAction>[]
+    consume:    ActionDescript<ConsumeAction&TargetedAction>[]
+    current:    ResFlow
+
     fromRoom:   string
     toRoom:     string
     priority:   ResFlow[]
-    collect:    ActionDescript<CollectAction&TargetedAction>[]
-    consume:    ActionDescript<ConsumeAction&TargetedAction>[]
 }
 
 type CallbackBehavior<T extends AnyAction> = T extends AnyAction ? {
