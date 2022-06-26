@@ -8,12 +8,12 @@ export const TASK_FAILED:      TASK_FAILED     = -18
 
 export const perform_any = function(creep:Creep, behavior:AnyBehavior):TaskReturnCode {
     switch(behavior.bhvr_name){
+        case 'flow':
+            return perfrom_flow(creep,behavior)
         case 'serial':
         case 'parallel':
         case 'backtrack':
             return combo_performer[behavior.bhvr_name](creep,behavior.sub_tasks)
-        case 'flow':
-            return perfrom_flow(creep,behavior)
         default:
             return perform_callback(creep,behavior)
     }

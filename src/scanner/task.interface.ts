@@ -11,7 +11,11 @@ type CachedPool<T extends {[P in keyof T]: PosedCreepTasks<TargetedAction>}> =
     {[P in keyof T]: PosedCreepTasks<TargetedAction>}
 
 type ResFlow = [
-    from:   'lazy' | keyof CollectTaskPool,
+    from:   keyof CollectTaskPool,
+    to:     keyof ConsumeTaskPool]
+| [ from:   'lazy' | keyof CollectTaskPool,
+    to:     keyof ConsumeTaskPool]
+| [ from:   keyof CollectTaskPool,
     to:     'lazy' | keyof ConsumeTaskPool]
 
 type PosedCreepTasks<T extends TargetedAction> =

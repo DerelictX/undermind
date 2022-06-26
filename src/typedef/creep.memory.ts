@@ -1,6 +1,5 @@
 
 interface CreepMemory {
-    _class:     CreepClassName
     behavior?:  AnyBehavior
     _move?:{
         dest: {x:number,y:number,room:string},

@@ -1,23 +1,44 @@
-import { body_generator, default_body_config } from "./body_config"
+import { body_generator, default_body_config } from "./config.body"
 
-const spawn_handler: {[r in CreepClassName]:(room:Room) => boolean} = {
-    generalist: function (room: Room): boolean {
-        return true
+const spawn_handler: {[r in GeneralistRole]:(room:Room) => boolean} = {
+    HS0: function (room: Room): boolean {
+        return false
     },
-    specialist: function (room: Room): boolean {
-        return true
+    HS1: function (room: Room): boolean {
+        return false
     },
-    carrier: function (room: Room): boolean {
-        return true
+    HS2: function (room: Room): boolean {
+        return false
     },
-    fighter: function (room: Room): boolean {
+    HM: function (room: Room): boolean {
+        return false
+    },
+    Up: function (room: Room): boolean {
+        return false
+    },
+    HD: function (room: Room): boolean {
+        return false
+    },
+    Bu: function (room: Room): boolean {
+        return false
+    },
+    Ma: function (room: Room): boolean {
+        return false
+    },
+    Co: function (room: Room): boolean {
+        return false
+    },
+    Su: function (room: Room): boolean {
+        return false
+    },
+    Ch: function (room: Room): boolean {
         return false
     }
 }
 
 
 export const spawn_loop = function(room: Room) {
-    var role_name: CreepClassName
+    var role_name: GeneralistRole
     for(role_name in room.memory._spawn){
         const spawn = room.memory._spawn[role_name]
         

@@ -1,38 +1,106 @@
 import { collect_updater } from "@/scanner/collect"
 import { consume_updater } from "@/scanner/consume"
-import { TASK_DOING } from "./behavior.any"
+import { TASK_COMPLETE, TASK_DOING, TASK_FAILED } from "./behavior.any"
 import { goPerform } from "./action.primitive"
 
 export const perfrom_flow = function(creep:Creep,fb:FlowBehavior){
+    if(fb.state == 'idle'){
+        const flow = change_flow(fb)
+        if(flow){
+            fb.current = flow
+            find_cosume(creep,fb)
+            find_collect(creep,fb)
+            fb.state = 'collect'
+            return TASK_COMPLETE
+        }
+        return TASK_DOING
+    }
     if(fb.state == 'collect'){
-        if(!fb.collect[0]){
+        if(!fb.collect.length){
+            find_collect(creep,fb)
+            if(!fb.collect.length) {
+                fb.state = 'idle'
+                return TASK_COMPLETE
+            }
+        }
+        const ret = goPerform(creep,fb.collect[0])
+        if(ret == ERR_FULL){
             fb.state = 'consume'
             return TASK_DOING
         }
-        const ret = goPerform(creep,fb.collect[0])
         if(ret != OK) fb.collect.shift()
         return TASK_DOING
     }
     if(fb.state == 'consume'){
-        if(!fb.consume[0]){
+        if(!fb.consume.length) {
+            find_cosume(creep,fb)
+            if(!fb.consume.length) {
+                fb.state = 'idle'
+                return TASK_COMPLETE
+            }
+        }
+        const ret = goPerform(creep,fb.consume[0])
+        if(ret == ERR_NOT_ENOUGH_RESOURCES){
             fb.state = 'collect'
             return TASK_DOING
         }
-        const ret = goPerform(creep,fb.consume[0])
         if(ret != OK) fb.consume.shift()
         return TASK_DOING
     }
+    return TASK_FAILED
 }
 
 const change_flow = function(fb:FlowBehavior) {
     const collect = Memory.rooms[fb.fromRoom]._collect
     const consume = Memory.rooms[fb.fromRoom]._consume
     for(let flow of fb.priority){
-        if(flow[0] == 'lazy' && flow[1] == 'lazy') continue
         if(flow[0] != 'lazy' && collect[flow[0]]?.length) continue
         if(flow[1] != 'lazy' && consume[flow[1]]?.length) continue
-        fb.current = flow
+        return flow
+    }
+    return null
+}
+
+const find_cosume = function(creep:Creep,fb:FlowBehavior){
+    const consume = Memory.rooms[fb.fromRoom]._consume
+    if(fb.current[1] == 'lazy'){
+        lazy_restock(creep,fb)
         return
+    }
+    let free = creep.store.getCapacity()
+    const pool = consume[fb.current[1]]
+    while(pool && pool.length && free > 0) {
+        const task = pool[0]
+        if(task.action == 'transfer' && task.args[2])
+            free -= task.args[2]
+        else if(task.action == 'generateSafeMode')
+            free -= 1000
+        else free = 0
+
+        if(free < 0) break
+        fb.consume.push(task)
+        pool.shift()
+    }
+    
+}
+
+const find_collect = function(creep:Creep,fb:FlowBehavior){
+    const collect = Memory.rooms[fb.fromRoom]._collect
+    if(fb.current[0] == 'lazy'){
+        lazy_storage(fb)
+        return
+    }
+    let free = creep.store.getFreeCapacity()
+    const pool = collect[fb.current[0]]
+    while(pool && pool.length && free > 0) {
+        const task = pool[0]
+        if(task.action == 'withdraw' && task.args[2])
+            free -= task.args[2]
+        else free = 0
+
+        if(free < 0) break
+        fb.collect.push(task)
+        pool.shift()
     }
 }
 

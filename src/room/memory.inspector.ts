@@ -43,10 +43,17 @@ const memory_inspector: {[k in keyof RoomMemory]:
             queued: 0
         }
         room.memory._spawn = {
-            generalist: spawn_loop,
-            specialist: spawn_loop,
-            carrier: spawn_loop,
-            fighter: spawn_loop
+            HS0: spawn_loop,
+            HS1: spawn_loop,
+            HS2: spawn_loop,
+            HM: spawn_loop,
+            Up: spawn_loop,
+            HD: spawn_loop,
+            Bu: spawn_loop,
+            Ma: spawn_loop,
+            Co: spawn_loop,
+            Su: spawn_loop,
+            Ch: spawn_loop
         }
     },
     _consume: function (room: Room): void {

@@ -70,11 +70,19 @@ export const body_generator:{[c in body_generator_name]:
 }
 _.assign(global, {body_generator:body_generator})
 
-export const default_body_config: {[R in CreepClassName]:
+export const default_body_config: {[R in GeneralistRole]:
     {generator:body_generator_name ,workload:number}
 } = {
-    generalist: {generator:'WCM',   workload:4},
-    specialist: {generator:'W2cM',  workload:3},
-    carrier:    {generator:'C2M',   workload:4},
-    fighter:    {generator:'ClM',   workload:2},
+    HS0: {generator: "W2cM", workload: 3},
+    HS1: {generator: "W2cM", workload: 3},
+    HS2: {generator: "W2cM", workload: 3},
+    HM: {generator: "W2cM", workload: 3},
+    Up: {generator: "W2cM", workload: 3},
+    HD: {generator: "WCM", workload: 4},
+
+    Bu: {generator: "WCM", workload: 4},
+    Ma: {generator: "WCM", workload: 4},
+    Co: {generator: "C2M", workload: 4},
+    Su: {generator: "C2M", workload: 4},
+    Ch: {generator: "C2M", workload: 4},
 }

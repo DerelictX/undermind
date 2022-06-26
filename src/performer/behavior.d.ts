@@ -16,7 +16,7 @@ type ComboBehavior = {
 interface FlowBehavior {
     bhvr_name:  "flow"
     
-    state:      "collect"|"consume"
+    state:      "collect"|"consume"|"idle"
     collect:    ActionDescript<CollectAction&TargetedAction>[]
     consume:    ActionDescript<ConsumeAction&TargetedAction>[]
     current:    ResFlow

@@ -6,7 +6,7 @@ interface RoomMemory {
     _consume:   Partial<CachedPool<ConsumeTaskPool>>
     _collect:   Partial<CachedPool<CollectTaskPool>>
 
-    _spawn:  {[R in CreepClassName]: RoleSpawnLoop}
+    _spawn:  {[R in GeneralistRole]: RoleSpawnLoop}
 }
 
 type RoleSpawnLoop = {
@@ -16,10 +16,10 @@ type RoleSpawnLoop = {
 } & Looper
 
 interface RoomStructureList {
-    factory?:       Id<StructureFactory>
-    power_spawn?:   Id<StructurePowerSpawn>
-    nuker?:         Id<StructureNuker>
-    observer?:      Id<StructureObserver>
+    factory?:       Id<StructureFactory>|null
+    power_spawn?:   Id<StructurePowerSpawn>|null
+    nuker?:         Id<StructureNuker>|null
+    observer?:      Id<StructureObserver>|null
 
     towers:         Id<StructureTower>[]
     links:          LinkConfig
