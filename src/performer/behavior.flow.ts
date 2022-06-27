@@ -4,16 +4,15 @@ import { TASK_COMPLETE, TASK_DOING, TASK_FAILED } from "./behavior.any"
 import { goPerform } from "./action.primitive"
 
 export const perfrom_flow = function(creep:Creep,fb:FlowBehavior){
+    creep.say(fb.state)
     if(fb.state == 'idle'){
         const flow = change_flow(fb)
-        if(flow){
-            fb.current = flow
-            find_cosume(creep,fb)
-            find_collect(creep,fb)
-            fb.state = 'collect'
-            return TASK_COMPLETE
-        }
-        return TASK_DOING
+        if(!flow) return TASK_DOING
+        fb.current = flow
+        find_consume(creep,fb)
+        find_collect(creep,fb)
+        fb.state = 'collect'
+        return TASK_COMPLETE
     }
     if(fb.state == 'collect'){
         if(!fb.collect.length){
@@ -33,7 +32,7 @@ export const perfrom_flow = function(creep:Creep,fb:FlowBehavior){
     }
     if(fb.state == 'consume'){
         if(!fb.consume.length) {
-            find_cosume(creep,fb)
+            find_consume(creep,fb)
             if(!fb.consume.length) {
                 fb.state = 'idle'
                 return TASK_COMPLETE
@@ -61,7 +60,7 @@ const change_flow = function(fb:FlowBehavior) {
     return null
 }
 
-const find_cosume = function(creep:Creep,fb:FlowBehavior){
+const find_consume = function(creep:Creep,fb:FlowBehavior){
     const consume = Memory.rooms[fb.fromRoom]._consume
     if(fb.current[1] == 'lazy'){
         lazy_restock(creep,fb)
