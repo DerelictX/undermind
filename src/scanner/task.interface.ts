@@ -1,5 +1,5 @@
 
-type TaskUpdater<T extends {[P in keyof T]: PosedCreepTask<TargetedAction>}> = {
+type TaskUpdater<T extends {[P in keyof T]: PosedCreepTask<TargetedAction>[]}> = {
     [P in keyof T]: (room:Room) => T[P]
 }
 

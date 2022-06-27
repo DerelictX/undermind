@@ -2,10 +2,10 @@ import { body_generator, default_body_config } from "./config.body"
 
 const spawn_handler: {[r in GeneralistRole]:(room:Room) => boolean} = {
     HS0: function (room: Room): boolean {
-        return false
+        return true
     },
     HS1: function (room: Room): boolean {
-        return false
+        return true
     },
     HS2: function (room: Room): boolean {
         return false
@@ -20,10 +20,10 @@ const spawn_handler: {[r in GeneralistRole]:(room:Room) => boolean} = {
         return false
     },
     Bu: function (room: Room): boolean {
-        return false
+        return true
     },
     Ma: function (room: Room): boolean {
-        return false
+        return true
     },
     Co: function (room: Room): boolean {
         return false
@@ -44,7 +44,7 @@ export const spawn_loop = function(room: Room) {
         
         if(spawn.reload_time > Game.time)
             continue
-        room.memory._spawn[role_name].reload_time = Game.time + 400
+        room.memory._spawn[role_name].reload_time = Game.time + 1500
         if(room.memory._spawn[role_name].interval < 200)
             room.memory._spawn[role_name].interval = 200
 

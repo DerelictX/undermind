@@ -14,10 +14,10 @@ export const perform_callback = function(creep:Creep, behavior:CallbackBehavior<
                 ret = perform_virtual(creep,callback); break;
             default: ret = perform_primitive(creep,callback)
         }
+        console.log(callback.action + ret)
         callback = callback[ret]
         if(callback == TASK_DOING || callback == TASK_COMPLETE || callback == TASK_FAILED)
             return callback
     }while(callback)
-    if(ret) creep.say('ERR' + ret)
     return ret ? TASK_FAILED : TASK_DOING
 }

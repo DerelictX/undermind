@@ -36,8 +36,8 @@ const memory_inspector: {[k in keyof RoomMemory]:
     },
     _spawn: function (room: Room) {
         const spawn_loop: RoleSpawnLoop = {
-            reload_time: Game.time + 20,
-            interval: 400,
+            reload_time: Game.time + 10,
+            interval: 1500,
             body_parts: [],
             boost_queue: [],
             queued: 0
@@ -63,6 +63,6 @@ const memory_inspector: {[k in keyof RoomMemory]:
         room.memory._static = {}
     },
     _collect: function (room: Room): void {
-        room.memory._static = {}
+        room.memory._collect = {}
     }
 }

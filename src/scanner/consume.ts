@@ -2,7 +2,7 @@ import { reactions } from "@/structure/lab"
 
 export const consume_updater: TaskUpdater<ConsumeTaskPool> = {
     build: function (room: Room) {
-        var tasks: PosedCreepTasks<"build"> = []
+        var tasks: PosedCreepTask<"build">[] = []
         const sites = room.find(FIND_MY_CONSTRUCTION_SITES)
         sites.forEach(s => tasks.push({
             action: 'build',
@@ -12,7 +12,7 @@ export const consume_updater: TaskUpdater<ConsumeTaskPool> = {
         return tasks
     },
     repair: function (room: Room) {
-        var tasks: PosedCreepTasks<"repair"> = []
+        var tasks: PosedCreepTask<"repair">[] = []
         const damaged = room.find(FIND_MY_STRUCTURES, {
             filter: (structure) => {
                 if (structure.structureType == STRUCTURE_RAMPART)
@@ -29,7 +29,7 @@ export const consume_updater: TaskUpdater<ConsumeTaskPool> = {
     },
 
     decayed: function (room: Room) {
-        var tasks: PosedCreepTasks<"repair"> = []
+        var tasks: PosedCreepTask<"repair">[] = []
         const decayed = room.find(FIND_STRUCTURES, {
             filter: (structure) => {
                 if (structure.structureType == STRUCTURE_ROAD)
@@ -48,7 +48,7 @@ export const consume_updater: TaskUpdater<ConsumeTaskPool> = {
     },
 
     fortify: function (room: Room) {
-        var tasks: PosedCreepTasks<"repair"> = []
+        var tasks: PosedCreepTask<"repair">[] = []
         var wallHits = room.memory.structures.wall_hits - 1000
         let walls = room.find(FIND_STRUCTURES, {
             filter: (structure) => {
@@ -81,7 +81,7 @@ export const consume_updater: TaskUpdater<ConsumeTaskPool> = {
     },
 
     downgraded: function (room: Room) {
-        var tasks: PosedCreepTasks<"upgradeController"> = []
+        var tasks: PosedCreepTask<"upgradeController">[] = []
         const downgraded = room.controller
         if (downgraded && downgraded.my && !downgraded.upgradeBlocked) {
             if (downgraded.ticksToDowngrade < CONTROLLER_DOWNGRADE[downgraded.level] - 8000)
@@ -94,7 +94,7 @@ export const consume_updater: TaskUpdater<ConsumeTaskPool> = {
         return tasks
     },
     U_ctrl: function (room: Room) {
-        var tasks: PosedCreepTasks<"upgradeController"> = []
+        var tasks: PosedCreepTask<"upgradeController">[] = []
         const controller = room.controller
         if (controller && controller.my && !controller.upgradeBlocked) {
             if (controller.level < 8)
@@ -108,7 +108,7 @@ export const consume_updater: TaskUpdater<ConsumeTaskPool> = {
     },
 
     T_ext: function (room: Room) {
-        var tasks: PosedCreepTasks<'transfer'> = []
+        var tasks: PosedCreepTask<'transfer'>[] = []
         const extensions: (AnyStoreStructure & AnyOwnedStructure)[] = room.find(FIND_MY_STRUCTURES, {
             filter: (structure) => {
                 if (structure.structureType == STRUCTURE_EXTENSION
@@ -130,7 +130,7 @@ export const consume_updater: TaskUpdater<ConsumeTaskPool> = {
     },
 
     T_tower: function (room: Room) {
-        var tasks: PosedCreepTasks<'transfer'> = []
+        var tasks: PosedCreepTask<'transfer'>[] = []
         const towers = room.memory.structures.towers
             .map(id => Game.getObjectById(id))
             .filter(s => s && s.store.getFreeCapacity('energy') >= 400)
@@ -150,7 +150,7 @@ export const consume_updater: TaskUpdater<ConsumeTaskPool> = {
         return []
     },
 
-    gen_safe: function (room: Room): PosedCreepTasks<"generateSafeMode"> {
+    gen_safe: function (room: Room): PosedCreepTask<"generateSafeMode">[] {
         const controller = room.controller
         if (controller && controller.my && controller.level > 2 && controller.safeModeAvailable == 0) {
             return [{
@@ -164,7 +164,7 @@ export const consume_updater: TaskUpdater<ConsumeTaskPool> = {
 
     T_boost: function (room: Room) {
         const labs = room.memory.structures.labs
-        var tasks: PosedCreepTasks<'transfer'> = []
+        var tasks: PosedCreepTask<'transfer'>[] = []
         for (let i in labs.outs) {
             const boostType: MineralBoostConstant | undefined = labs.boosts[i]
             const lab_out = Game.getObjectById(labs.outs[i])
@@ -189,12 +189,12 @@ export const consume_updater: TaskUpdater<ConsumeTaskPool> = {
         return tasks
     },
 
-    T_react: function (room: Room): PosedCreepTasks<"transfer"> {
+    T_react: function (room: Room): PosedCreepTask<"transfer">[] {
         const labs = room.memory.structures.labs
         const compoundType = labs.reaction
         if (!compoundType)
             return []
-        var tasks: PosedCreepTasks<'transfer'> = []
+        var tasks: PosedCreepTask<'transfer'>[] = []
         for (let i in labs.ins) {
             const reactantType = reactions[compoundType][i]
             const lab_in = Game.getObjectById(labs.ins[i])
@@ -213,13 +213,13 @@ export const consume_updater: TaskUpdater<ConsumeTaskPool> = {
         return tasks
     },
 
-    T_power: function (room: Room): PosedCreepTasks<"transfer"> {
+    T_power: function (room: Room): PosedCreepTask<"transfer">[] {
         if (!room.memory.structures.power_spawn)
             return []
         const power_spawn = Game.getObjectById(room.memory.structures.power_spawn)
         if (!power_spawn)
             return []
-        var tasks: PosedCreepTasks<'transfer'> = []
+        var tasks: PosedCreepTask<'transfer'>[] = []
         if (power_spawn.store['energy'] <= 3000) {
             tasks.push({
                 action: 'transfer',
@@ -236,16 +236,60 @@ export const consume_updater: TaskUpdater<ConsumeTaskPool> = {
         }
         return tasks
     },
-    T_src0: function (room: Room): PosedCreepTasks<"repair" | "transfer"> {
-        throw new Error("Function not implemented.")
+    T_src0: function (room: Room): PosedCreepTask<"repair" | "transfer">[] {
+        const source = room.find(FIND_SOURCES)[0]
+        const container:StructureContainer|null = source.pos.findClosestByRange(FIND_STRUCTURES,{
+            filter: {structureType: STRUCTURE_CONTAINER}
+        })
+        if(!container || !container.pos.isNearTo(source)) return []
+        let tasks: PosedCreepTask<"repair" | "transfer">[] = [
+            {action:'repair',args:[container.id],pos:container.pos}
+        ]
+        const near_structs:AnyStoreStructure[] = container.pos.findInRange(FIND_STRUCTURES,1,{
+            filter: (structure) => {
+                if(structure.structureType == STRUCTURE_CONTAINER
+                    || structure.structureType == STRUCTURE_STORAGE
+                    || structure.structureType == STRUCTURE_TERMINAL
+                    || structure.structureType == STRUCTURE_LINK)
+                    return true
+                return false
+            }
+        })
+        near_structs.sort((a, b) => a.store.getCapacity('energy') - b.store.getCapacity('energy'))
+        for(let struct of near_structs){
+            tasks.push({action:'transfer',args:[struct.id,'energy'],pos:struct.pos})
+        }
+        return tasks
     },
-    T_src1: function (room: Room): PosedCreepTasks<"repair" | "transfer"> {
-        throw new Error("Function not implemented.")
+    T_src1: function (room: Room): PosedCreepTask<"repair" | "transfer">[] {
+        const source = room.find(FIND_SOURCES)[1]
+        const container:StructureContainer|null = source.pos.findClosestByRange(FIND_STRUCTURES,{
+            filter: {structureType: STRUCTURE_CONTAINER}
+        })
+        if(!container || !container.pos.isNearTo(source)) return []
+        let tasks: PosedCreepTask<"repair" | "transfer">[] = [
+            {action:'repair',args:[container.id],pos:container.pos}
+        ]
+        const near_structs:AnyStoreStructure[] = container.pos.findInRange(FIND_STRUCTURES,1,{
+            filter: (structure) => {
+                if(structure.structureType == STRUCTURE_CONTAINER
+                    || structure.structureType == STRUCTURE_STORAGE
+                    || structure.structureType == STRUCTURE_TERMINAL
+                    || structure.structureType == STRUCTURE_LINK)
+                    return true
+                return false
+            }
+        })
+        near_structs.sort((a, b) => a.store.getCapacity('energy') - b.store.getCapacity('energy'))
+        for(let struct of near_structs){
+            tasks.push({action:'transfer',args:[struct.id,'energy'],pos:struct.pos})
+        }
+        return tasks
     },
-    T_src2: function (room: Room): PosedCreepTasks<"repair" | "transfer"> {
-        throw new Error("Function not implemented.")
+    T_src2: function (room: Room): PosedCreepTask<"repair" | "transfer">[] {
+        return []
     },
-    T_mnrl: function (room: Room): PosedCreepTasks<"transfer"> {
-        throw new Error("Function not implemented.")
+    T_mnrl: function (room: Room): PosedCreepTask<"transfer">[] {
+        return []
     }
 }

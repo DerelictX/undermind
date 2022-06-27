@@ -9,8 +9,6 @@ export const perfrom_flow = function(creep:Creep,fb:FlowBehavior){
         const flow = change_flow(fb)
         if(!flow) return TASK_DOING
         fb.current = flow
-        find_consume(creep,fb)
-        find_collect(creep,fb)
         fb.state = 'collect'
         return TASK_COMPLETE
     }
@@ -23,11 +21,11 @@ export const perfrom_flow = function(creep:Creep,fb:FlowBehavior){
             }
         }
         const ret = perform_callback(creep,fb.collect[0])
+        if(ret != TASK_DOING) fb.collect.shift()
         if(ret == TASK_FAILED){
             fb.state = 'consume'
             return TASK_DOING
         }
-        if(ret != TASK_DOING) fb.collect.shift()
         return TASK_DOING
     }
     if(fb.state == 'consume'){
@@ -39,11 +37,11 @@ export const perfrom_flow = function(creep:Creep,fb:FlowBehavior){
             }
         }
         const ret = perform_callback(creep,fb.consume[0])
+        if(ret != TASK_DOING) fb.collect.shift()
         if(ret == TASK_FAILED){
             fb.state = 'collect'
             return TASK_DOING
         }
-        if(ret != TASK_DOING) fb.consume.shift()
         return TASK_DOING
     }
     return TASK_FAILED
@@ -53,8 +51,14 @@ const change_flow = function(fb:FlowBehavior) {
     const collect = Memory.rooms[fb.fromRoom]._collect
     const consume = Memory.rooms[fb.fromRoom]._consume
     for(let flow of fb.priority){
-        if(flow[0] != 'lazy' && collect[flow[0]]?.length) continue
-        if(flow[1] != 'lazy' && consume[flow[1]]?.length) continue
+        if(flow[0] != 'lazy' && !collect[flow[0]]?.length) {
+            collect[flow[0]] = collect_updater[flow[0]](Game.rooms[fb.fromRoom])
+            continue
+        }
+        if(flow[1] != 'lazy' && !consume[flow[1]]?.length) {
+            consume[flow[1]] = consume_updater[flow[1]](Game.rooms[fb.fromRoom])
+            continue
+        }
         return flow
     }
     return null
@@ -170,12 +174,23 @@ const lazy_energy = function(creep:Creep,fb:FlowBehavior){
 
 const parse_posed_task = function(posed:PosedCreepTask<TargetedAction>):CallbackBehavior<TargetedAction>{
     var root: CallbackBehavior<TargetedAction> = {...{bhvr_name:'callbackful'},...posed}
-    root[ERR_NOT_IN_RANGE] = {...{bhvr_name:'callbackful'},...{action:"approach",args:[posed.pos,1]}}
+    const move: CallbackBehavior<'approach'> = {...{bhvr_name:'callbackful'},
+            ...{action:"approach",args:[posed.pos,1]}}
+    move[ERR_TIRED] = TASK_DOING
+    root[ERR_NOT_IN_RANGE] = move
     switch(root.action){
         case 'withdraw':
         case 'transfer':
         case 'pickup':
             root[OK] = TASK_COMPLETE
+            break
+        case 'harvest':
+            root[ERR_TIRED] = TASK_DOING
+        case 'dismantle':
+            root[OK] = {...{bhvr_name:'callbackful'},...{action:"prejudge_full",args:[0]}}
+            break
+        case 'build':
+            root[ERR_NOT_FOUND] = TASK_COMPLETE
             break
     }
     return root
