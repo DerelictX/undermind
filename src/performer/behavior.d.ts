@@ -17,8 +17,8 @@ interface FlowBehavior {
     bhvr_name:  "flow"
     
     state:      "collect"|"consume"|"idle"
-    collect:    ActionDescript<CollectAction&TargetedAction>[]
-    consume:    ActionDescript<ConsumeAction&TargetedAction>[]
+    collect:    CallbackBehavior<TargetedAction>[]
+    consume:    CallbackBehavior<TargetedAction>[]
     current:    ResFlow
 
     fromRoom:   string

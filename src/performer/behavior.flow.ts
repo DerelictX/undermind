@@ -1,7 +1,7 @@
 import { collect_updater } from "@/scanner/collect"
 import { consume_updater } from "@/scanner/consume"
 import { TASK_COMPLETE, TASK_DOING, TASK_FAILED } from "./behavior.any"
-import { goPerform } from "./action.primitive"
+import { perform_callback } from "./behavior.callback"
 
 export const perfrom_flow = function(creep:Creep,fb:FlowBehavior){
     creep.say(fb.state)
@@ -22,12 +22,12 @@ export const perfrom_flow = function(creep:Creep,fb:FlowBehavior){
                 return TASK_COMPLETE
             }
         }
-        const ret = goPerform(creep,fb.collect[0])
-        if(ret == ERR_FULL){
+        const ret = perform_callback(creep,fb.collect[0])
+        if(ret == TASK_FAILED){
             fb.state = 'consume'
             return TASK_DOING
         }
-        if(ret != OK) fb.collect.shift()
+        if(ret != TASK_DOING) fb.collect.shift()
         return TASK_DOING
     }
     if(fb.state == 'consume'){
@@ -38,12 +38,12 @@ export const perfrom_flow = function(creep:Creep,fb:FlowBehavior){
                 return TASK_COMPLETE
             }
         }
-        const ret = goPerform(creep,fb.consume[0])
-        if(ret == ERR_NOT_ENOUGH_RESOURCES){
+        const ret = perform_callback(creep,fb.consume[0])
+        if(ret == TASK_FAILED){
             fb.state = 'collect'
             return TASK_DOING
         }
-        if(ret != OK) fb.consume.shift()
+        if(ret != TASK_DOING) fb.consume.shift()
         return TASK_DOING
     }
     return TASK_FAILED
@@ -77,7 +77,7 @@ const find_consume = function(creep:Creep,fb:FlowBehavior){
         else free = 0
 
         if(free < 0) break
-        fb.consume.push(task)
+        fb.consume.push(parse_posed_task(task))
         pool.shift()
     }
     
@@ -98,7 +98,7 @@ const find_collect = function(creep:Creep,fb:FlowBehavior){
         else free = 0
 
         if(free < 0) break
-        fb.collect.push(task)
+        fb.collect.push(parse_posed_task(task))
         pool.shift()
     }
 }
@@ -115,10 +115,11 @@ const lazy_restock = function(creep:Creep,fb:FlowBehavior) {
     var store: StorePropertiesOnly = creep.store
     var resourceType: keyof typeof store
     for (resourceType in store) {
-        fb.consume.push({
+        fb.consume.push(parse_posed_task({
+            pos: storage.pos,
             action: 'transfer',
             args: [storage.id, resourceType]
-        })
+        }))
     }
 }
 
@@ -126,7 +127,8 @@ const lazy_storage = function(fb:FlowBehavior) {
     const storage = Game.rooms[fb.fromRoom].storage
     if(!storage) return
     for(let consume of fb.consume){
-        let collect: ActionDescript<'withdraw'> = {
+        let collect: PosedCreepTask<'withdraw'> = {
+            pos:    storage.pos,
             action: 'withdraw',
             args:   [storage.id,'energy']
         }
@@ -141,7 +143,7 @@ const lazy_storage = function(fb:FlowBehavior) {
                 && last_collect.args[1] == collect.args[1]) {
             last_collect.args[2] = (last_collect.args[2] && collect.args[2])
                 ? (last_collect.args[2] + collect.args[2]) : undefined
-        } else fb.collect.push(collect)
+        } else fb.collect.push(parse_posed_task(collect))
     }
 }
 
@@ -164,4 +166,17 @@ const lazy_energy = function(creep:Creep,fb:FlowBehavior){
         action: 'withdraw',
         args:   [source.id,'energy']
     }
+}
+
+const parse_posed_task = function(posed:PosedCreepTask<TargetedAction>):CallbackBehavior<TargetedAction>{
+    var root: CallbackBehavior<TargetedAction> = {...{bhvr_name:'callbackful'},...posed}
+    root[ERR_NOT_IN_RANGE] = {...{bhvr_name:'callbackful'},...{action:"approach",args:[posed.pos,1]}}
+    switch(root.action){
+        case 'withdraw':
+        case 'transfer':
+        case 'pickup':
+            root[OK] = TASK_COMPLETE
+            break
+    }
+    return root
 }

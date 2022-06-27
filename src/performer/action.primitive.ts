@@ -150,12 +150,3 @@ export const perform_primitive = function(creep:Creep, behavior:ActionDescript<P
     }
     return ret
 }
-
-export const goPerform = function(creep:Creep, behavior:ActionDescript<TargetedAction>): ScreepsReturnCode {
-    let ret = perform_primitive(creep,behavior)
-    if(ret == ERR_NOT_IN_RANGE){
-        const target = Game.getObjectById(behavior.args[0])
-        if(target) ret = creep.moveTo(target)
-    }
-    return ret
-}
