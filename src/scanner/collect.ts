@@ -117,15 +117,15 @@ export const collect_updater: TaskUpdater<CollectTaskPool> = {
         return room.memory._static.H_srcs
     },
     H_src0: function (room: Room): PosedCreepTask<"harvest">[] {
-        if(!room.memory._static.H_srcs || room.memory._static.H_srcs[0]) return []
+        if(!room.memory._static.H_srcs || !room.memory._static.H_srcs[0]) return []
         return [room.memory._static.H_srcs[0]]
     },
     H_src1: function (room: Room): PosedCreepTask<"harvest">[] {
-        if(!room.memory._static.H_srcs || room.memory._static.H_srcs[1]) return []
+        if(!room.memory._static.H_srcs || !room.memory._static.H_srcs[1]) return []
         return [room.memory._static.H_srcs[1]]
     },
     H_src2: function (room: Room): PosedCreepTask<"harvest">[] {
-        if(!room.memory._static.H_srcs || room.memory._static.H_srcs[2]) return []
+        if(!room.memory._static.H_srcs || !room.memory._static.H_srcs[2]) return []
         return [room.memory._static.H_srcs[2]]
     },
     H_mnrl: function (room: Room): PosedCreepTask<"harvest">[] {

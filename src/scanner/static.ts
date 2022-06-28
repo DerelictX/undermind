@@ -4,9 +4,10 @@ export const static_updater = {
     sources: function (room:Room,pool:Partial<StaticTaskPool>) {
         pool.H_srcs = []
         pool.W_srcs = []
-        var T_srcs: PosedCreepTask<"repair" | "transfer">[][] = [[],[],[]]
+        var T_srcs: PosedCreepTask<"transfer">[][] = [[],[],[]]
         const sources = room.find(FIND_SOURCES)
         for(let i in sources) {
+            T_srcs[i] = []
             const source = sources[i]
             pool.H_srcs.push({
                 action: 'harvest',
@@ -23,7 +24,6 @@ export const static_updater = {
                 pos: container.pos
             })
             
-            T_srcs[i] = [{action:'repair',args:[container.id],pos:container.pos}]
             const near_structs:AnyStoreStructure[] = container.pos.findInRange(FIND_STRUCTURES,1,{
                 filter: (structure) => {
                     if(structure.structureType == STRUCTURE_CONTAINER

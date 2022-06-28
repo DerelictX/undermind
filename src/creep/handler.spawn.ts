@@ -1,3 +1,4 @@
+import { structure_updater } from "@/room/structure.updater"
 import { static_updater } from "@/scanner/static"
 import { body_generator, default_body_config } from "./config.body"
 
@@ -44,12 +45,19 @@ const spawn_handler: {[r in GeneralistRole]:(room:Room) => boolean} = {
     },
 
     Collector: function (room: Room): boolean {
-        return false
+        structure_updater.containers(room)
+        structure_updater.links(room)
+        return true
     },
     Supplier: function (room: Room): boolean {
+        structure_updater.unique(room)
+        structure_updater.towers(room)
+        if(room.memory._static.W_ctrl && room.memory._static.W_ctrl[0])
+            return true
         return false
     },
     Chemist: function (room: Room): boolean {
+        structure_updater.labs(room)
         return false
     }
 }

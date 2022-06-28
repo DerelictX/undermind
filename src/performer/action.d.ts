@@ -34,6 +34,7 @@ type VirtualAction = {
     escape:     [pos:RoomPosition, range:number],
     prejudge_full:  [amount:number],
     prejudge_empty: [amount:number],
+    full_hits:      [target:Id<Structure>,amount:number],
 }
 
 type CachedArgs<T extends any[]> = {

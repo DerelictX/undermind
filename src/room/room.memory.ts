@@ -4,7 +4,8 @@ interface RoomMemory {
 
     _static:    Partial<StaticTaskPool>
     _collect:   {[k in keyof CollectTaskPool]?: PosedCreepTask<CollectAction>[]}
-    _consume:   {[k in keyof ConsumeTaskPool]?: PosedCreepTask<ConsumeAction&TargetedAction>[]}
+    _consume:   {[k in keyof ConsumeTaskPool]?: PosedCreepTask<ConsumeAction&WorkAction>[]}
+    _supply:    {[k in keyof ConsumeTaskPool]?: PosedCreepTask<"transfer"|"generateSafeMode">[]}
 
     _spawn:     {[R in GeneralistRole]: RoleSpawnLoop}
 }

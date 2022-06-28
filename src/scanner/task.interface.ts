@@ -34,10 +34,9 @@ interface CollectTaskPool {
 }
 
 interface ConsumeTaskPool {
-    T_src0:     PosedCreepTask<'transfer'|'repair'>[]
-    T_src1:     PosedCreepTask<'transfer'|'repair'>[]
-    T_src2:     PosedCreepTask<'transfer'|'repair'>[]
-    T_mnrl:     PosedCreepTask<'transfer'>[]
+    R_src0:     PosedCreepTask<'repair'>[]
+    R_src1:     PosedCreepTask<'repair'>[]
+    R_src2:     PosedCreepTask<'repair'>[]
 
     build:      PosedCreepTask<'build'>[]
     fortify:    PosedCreepTask<'repair'>[]
@@ -47,22 +46,30 @@ interface ConsumeTaskPool {
     repair:     PosedCreepTask<'repair'>[]
     anti_nuke:  PosedCreepTask<'repair'>[]
     downgraded: PosedCreepTask<'upgradeController'>[]
-    gen_safe:   PosedCreepTask<'generateSafeMode'>[]
+}
 
+interface SupplyTaskPool {
     T_ext:      PosedCreepTask<'transfer'>[]
     T_tower:    PosedCreepTask<'transfer'>[]
     T_ctrl:     PosedCreepTask<'transfer'>[]
+    
+    T_src0:     PosedCreepTask<'transfer'>[]
+    T_src1:     PosedCreepTask<'transfer'>[]
+    T_src2:     PosedCreepTask<'transfer'>[]
+    T_mnrl:     PosedCreepTask<'transfer'>[]
 
     T_boost:    PosedCreepTask<'transfer'>[]
     T_react:    PosedCreepTask<'transfer'>[]
     T_power:    PosedCreepTask<'transfer'>[]
+    
+    gen_safe:   PosedCreepTask<'generateSafeMode'>[]
 }
 
 interface StaticTaskPool {
     H_srcs:     PosedCreepTask<'harvest'>[]
-    T_src0:     PosedCreepTask<'transfer'|'repair'>[]
-    T_src1:     PosedCreepTask<'transfer'|'repair'>[]
-    T_src2:     PosedCreepTask<'transfer'|'repair'>[]
+    T_src0:     PosedCreepTask<'transfer'>[]
+    T_src1:     PosedCreepTask<'transfer'>[]
+    T_src2:     PosedCreepTask<'transfer'>[]
     W_srcs:     PosedCreepTask<'withdraw'>[]
 
     H_mnrl:     PosedCreepTask<'harvest'>[]

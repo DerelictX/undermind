@@ -54,7 +54,7 @@ export const structure_updater = {
         });
 
         for(let container of containers){
-            if(container.pos.findInRange(FIND_SOURCES,2)){
+            if(container.pos.findInRange(FIND_SOURCES,2).length){
                 room.memory.structures.containers.ins.push(container.id)
             } else room.memory.structures.containers.outs.push(container.id)
         }

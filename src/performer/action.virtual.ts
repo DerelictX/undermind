@@ -18,6 +18,12 @@ const performer:{[action in keyof VirtualAction]: VirtualPerformer<action>} = {
     prejudge_empty: function (creep: Creep | PowerCreep, args: VirtualAction['prejudge_empty']) {
         return creep.store.getUsedCapacity() > args[0] ? OK : ERR_NOT_ENOUGH_RESOURCES
     },
+
+    full_hits: function (creep: Creep | PowerCreep, args: [target: Id<Structure>, amount: number]): ScreepsReturnCode {
+        const target = Game.getObjectById(args[0])
+        if(!target) return ERR_NOT_FOUND
+        return target.hits < target.hitsMax ? OK : ERR_FULL
+    }
 }
 
 export const perform_virtual = function(creep:Creep | PowerCreep, behavior:ActionDescript<keyof VirtualAction>): ScreepsReturnCode {
@@ -28,6 +34,7 @@ export const perform_virtual = function(creep:Creep | PowerCreep, behavior:Actio
         case 'escape':          ret = performer[action](creep,behavior.args); break;
         case 'prejudge_full':
         case 'prejudge_empty':  ret = performer[action](creep,behavior.args); break;
+        case 'full_hits':       ret = performer[action](creep,behavior.args); break;
     }
     return ret
 }
