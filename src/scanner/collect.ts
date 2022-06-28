@@ -1,25 +1,4 @@
 export const collect_updater: TaskUpdater<CollectTaskPool> = {
-    W_srcs: function (room: Room) {
-        var tasks: PosedCreepTask<"withdraw">[] = []
-        const containers = room.memory.structures.containers.ins
-            .map(id => Game.getObjectById(id))
-            .filter(s => s && s.store.getUsedCapacity() >= 1200)
-        for (let container of containers) {
-            if (!container)
-                continue
-            var store: StorePropertiesOnly = container.store
-            var resourceType: keyof typeof store
-            for (resourceType in store) {
-                tasks.push({
-                    action: 'withdraw',
-                    args: [container.id, resourceType, container.store[resourceType]],
-                    pos: container.pos
-                })
-            }
-        }
-        return tasks
-    },
-
     loot: function (room: Room) {
         var tasks: PosedCreepTask<"withdraw">[] = []
         const hostile_stores: (AnyStoreStructure & AnyOwnedStructure)[] = room.find(FIND_HOSTILE_STRUCTURES, {
@@ -117,30 +96,6 @@ export const collect_updater: TaskUpdater<CollectTaskPool> = {
         }
         return tasks
     },
-    H_srcs: function (room: Room): PosedCreepTask<"harvest">[] {
-        var tasks: PosedCreepTask<"harvest">[] = []
-        const sources = room.find(FIND_SOURCES)
-        for (let source of sources) {
-            tasks.push({
-                action: 'harvest',
-                args: [source.id],
-                pos: source.pos
-            })
-        }
-        return tasks
-    },
-    H_mnrl: function (room: Room): PosedCreepTask<"harvest">[] {
-        var tasks: PosedCreepTask<"harvest">[] = []
-        const minerals = room.find(FIND_SOURCES)
-        for (let mineral of minerals) {
-            tasks.push({
-                action: 'harvest',
-                args: [mineral.id],
-                pos: mineral.pos
-            })
-        }
-        return tasks
-    },
     deposit: function (room: Room): PosedCreepTask<"harvest">[] {
         var tasks: PosedCreepTask<"harvest">[] = []
         const deposits = room.find(FIND_SOURCES)
@@ -156,37 +111,38 @@ export const collect_updater: TaskUpdater<CollectTaskPool> = {
     recycle: function (room: Room): PosedCreepTask<"dismantle">[] {
         return []
     },
+
+    H_srcs: function (room: Room): PosedCreepTask<"harvest">[] {
+        if(!room.memory._static.H_srcs) return []
+        return room.memory._static.H_srcs
+    },
     H_src0: function (room: Room): PosedCreepTask<"harvest">[] {
-        const source = room.find(FIND_SOURCES)[0]
-        if(!source) return []
-        return [{
-            action: 'harvest',
-            args: [source.id],
-            pos: source.pos
-        }]
+        if(!room.memory._static.H_srcs || room.memory._static.H_srcs[0]) return []
+        return [room.memory._static.H_srcs[0]]
     },
     H_src1: function (room: Room): PosedCreepTask<"harvest">[] {
-        const source = room.find(FIND_SOURCES)[1]
-        if(!source) return []
-        return [{
-            action: 'harvest',
-            args: [source.id],
-            pos: source.pos
-        }]
+        if(!room.memory._static.H_srcs || room.memory._static.H_srcs[1]) return []
+        return [room.memory._static.H_srcs[1]]
     },
     H_src2: function (room: Room): PosedCreepTask<"harvest">[] {
-        const source = room.find(FIND_SOURCES)[2]
-        if(!source) return []
-        return [{
-            action: 'harvest',
-            args: [source.id],
-            pos: source.pos
-        }]
+        if(!room.memory._static.H_srcs || room.memory._static.H_srcs[2]) return []
+        return [room.memory._static.H_srcs[2]]
+    },
+    H_mnrl: function (room: Room): PosedCreepTask<"harvest">[] {
+        if(!room.memory._static.H_mnrl) return []
+        return room.memory._static.H_mnrl
+    },
+    
+    W_srcs: function (room: Room): PosedCreepTask<"withdraw">[] {
+        if(!room.memory._static.W_srcs) return []
+        return room.memory._static.W_srcs
     },
     W_mnrl: function (room: Room): PosedCreepTask<"withdraw">[] {
-        return []
+        if(!room.memory._static.W_mnrl) return []
+        return room.memory._static.W_mnrl
     },
     W_ctrl: function (room: Room): PosedCreepTask<"withdraw">[] {
-        return []
+        if(!room.memory._static.W_ctrl) return []
+        return room.memory._static.W_ctrl
     }
 }

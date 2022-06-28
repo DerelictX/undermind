@@ -2,11 +2,11 @@
 interface RoomMemory {
     structures: RoomStructureList
 
-    _static:    Partial<CachedPool<StaticTaskPool>>
-    _consume:   Partial<CachedPool<ConsumeTaskPool>>
-    _collect:   Partial<CachedPool<CollectTaskPool>>
+    _static:    Partial<StaticTaskPool>
+    _collect:   {[k in keyof CollectTaskPool]?: PosedCreepTask<CollectAction>[]}
+    _consume:   {[k in keyof ConsumeTaskPool]?: PosedCreepTask<ConsumeAction&TargetedAction>[]}
 
-    _spawn:  {[R in GeneralistRole]: RoleSpawnLoop}
+    _spawn:     {[R in GeneralistRole]: RoleSpawnLoop}
 }
 
 type RoleSpawnLoop = {

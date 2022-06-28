@@ -1,20 +1,27 @@
-const static_updater = {
-    source: function (room: Room): StaticBehavior[] {
-        var tasks: StaticBehavior[] = []
+export const static_updater = {
+    sources: function (room:Room,pool:Partial<StaticTaskPool>) {
+        pool.H_srcs = []
+        pool.W_srcs = []
+        var T_srcs: PosedCreepTask<"repair" | "transfer">[][] = [[],[],[]]
         const sources = room.find(FIND_SOURCES)
-        for(let source of sources) {
+        for(let i in sources) {
+            const source = sources[i]
+            pool.H_srcs.push({
+                action: 'harvest',
+                args: [source.id],
+                pos: source.pos
+            })
             const container:StructureContainer|null = source.pos.findClosestByRange(FIND_STRUCTURES,{
                 filter: {structureType: STRUCTURE_CONTAINER}
             })
             if(!container || !container.pos.isNearTo(source)) continue
-            let task: StaticBehavior = {
-                bhvr_name: "static",
-                pos: container.pos,
-                range:  0,
-                input:  [{action:'harvest',args:[source.id]}],
-                output: [{action:'repair',args:[container.id]}]
-            }
+            pool.W_srcs.push({
+                action: 'withdraw',
+                args: [container.id, 'energy', container.store['energy']],
+                pos: container.pos
+            })
             
+            T_srcs[i] = [{action:'repair',args:[container.id],pos:container.pos}]
             const near_structs:AnyStoreStructure[] = container.pos.findInRange(FIND_STRUCTURES,1,{
                 filter: (structure) => {
                     if(structure.structureType == STRUCTURE_CONTAINER
@@ -27,62 +34,71 @@ const static_updater = {
             })
             near_structs.sort((a, b) => a.store.getCapacity('energy') - b.store.getCapacity('energy'))
             for(let struct of near_structs){
-                task.output.push({action:'transfer',args:[struct.id,'energy']})
+                T_srcs[i].push({action:'transfer',args:[struct.id,'energy'],pos:struct.pos})
             }
-            tasks.push(task)
         }
-        return tasks
+        pool.T_src0 = T_srcs[0]
+        pool.T_src1 = T_srcs[1]
+        pool.T_src2 = T_srcs[2]
     },
-    mineral: function (room: Room): StaticBehavior[] {
-        var tasks: StaticBehavior[] = []
-        const minerals = room.find(FIND_MINERALS,{
+
+    mineral: function (room:Room,pool:Partial<StaticTaskPool>) {
+        pool.H_mnrl = []
+        const mineral = room.find(FIND_MINERALS,{
             filter: (mineral) => mineral.mineralAmount > 0
                 && room.storage && room.storage.store[mineral.mineralType] < 100000
-        })
-        for(let mineral of minerals) {
-            const container:StructureContainer|null = mineral.pos.findClosestByRange(FIND_STRUCTURES,{
-                filter: {structureType: STRUCTURE_CONTAINER}
-            })
-            if(!container || !container.pos.isNearTo(mineral) || container.store.getFreeCapacity() == 0)
-                continue
-            let task: StaticBehavior = {
-                bhvr_name: "static",
-                pos: container.pos,
-                range:  0,
-                input:  [{action:'harvest',args:[mineral.id]}],
-                output: [{action:'transfer',args:[container.id,mineral.mineralType]}]
-            }
-            if(task) tasks.push(task)
-        }
-        return tasks
+        })[0]
+        if(!mineral) return
+        const extractor:StructureExtractor|null = mineral.pos.findClosestByRange(FIND_MY_STRUCTURES,
+                {filter: {structureType: STRUCTURE_EXTRACTOR}})
+        const container:StructureContainer|null = mineral.pos.findClosestByRange(FIND_STRUCTURES,
+                {filter: {structureType: STRUCTURE_CONTAINER}})
+        if(!extractor || !container || !container.pos.isNearTo(mineral) || container.store.getFreeCapacity() == 0)
+            return
+        
+        pool.H_mnrl = [{action:'harvest',args:[mineral.id],pos: mineral.pos}]
+        pool.T_mnrl = [{action:'transfer',args:[container.id,mineral.mineralType],pos:container.pos}]
+        pool.W_mnrl = [{action:'withdraw',args:[container.id,mineral.mineralType],pos:container.pos}]
     },
-    upgrade: function (room: Room): StaticBehavior[] {
-        const controller = room.controller;
-        if(!controller || !controller.my) return []
-        let task: StaticBehavior = {
-            bhvr_name: "static",
-            pos: controller.pos,
-            range:  3,
-            input:  [],
-            output: [{action:'upgradeController',args:[controller.id]}]
-        }
+
+    controller: function (room:Room,pool:Partial<StaticTaskPool>) {
+        pool.W_ctrl = []
+        pool.U_ctrl = []
+        const controller = room.controller
+        if(!controller || !controller.my) return
+        pool.U_ctrl = [{action:'upgradeController',args:[controller.id],pos:controller.pos}]
+
         const energy_structs: AnyStoreStructure[] = controller.pos.findInRange(FIND_STRUCTURES,3,{
             filter: structure => structure.structureType == STRUCTURE_CONTAINER
                 || structure.structureType == STRUCTURE_STORAGE
                 || structure.structureType == STRUCTURE_TERMINAL
                 || structure.structureType == STRUCTURE_LINK
         })
-        if(!energy_structs[0]) return []
+        if(!energy_structs[0]) return
         energy_structs.sort((a, b) => a.store.getCapacity('energy') - b.store.getCapacity('energy'))
         for(let struct of energy_structs){
-            task.input.push({action:'withdraw',args:[struct.id,'energy']})
+            pool.W_ctrl.push({action:'withdraw',args:[struct.id,'energy'],pos:struct.pos})
         }
-        return [task]
     },
-    reserve: function (room: Room): PosedCreepTasks<'reserveController'> {
-        throw new Error("Function not implemented.")
-    },
-    siege: function (room: Room): PosedCreepTasks<"dismantle"> {
-        throw new Error("Function not implemented.")
+}
+
+const lazy_energy = function(creep:Creep,fb:FlowBehavior){
+    if(!Memory.rooms[fb.fromRoom]) return
+    const structures = Memory.rooms[fb.fromRoom].structures
+    let ids:Id<AnyStoreStructure>[] = structures.containers.ins
+    ids = ids.concat(structures.links.outs)
+    
+    let stores:AnyStoreStructure[] = []
+    for(let id of ids){
+        const store = Game.getObjectById(id)
+        if(store && store.store['energy'] > creep.store.getFreeCapacity())
+            stores.push(store)
+    }
+
+    const source = creep.pos.findClosestByRange(stores)
+    if(!source) return
+    let collect: ActionDescript<'withdraw'> = {
+        action: 'withdraw',
+        args:   [source.id,'energy']
     }
 }

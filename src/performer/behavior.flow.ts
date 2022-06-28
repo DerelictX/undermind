@@ -84,7 +84,6 @@ const find_consume = function(creep:Creep,fb:FlowBehavior){
         fb.consume.push(parse_posed_task(task))
         pool.shift()
     }
-    
 }
 
 const find_collect = function(creep:Creep,fb:FlowBehavior){
@@ -148,27 +147,6 @@ const lazy_storage = function(fb:FlowBehavior) {
             last_collect.args[2] = (last_collect.args[2] && collect.args[2])
                 ? (last_collect.args[2] + collect.args[2]) : undefined
         } else fb.collect.push(parse_posed_task(collect))
-    }
-}
-
-const lazy_energy = function(creep:Creep,fb:FlowBehavior){
-    if(!Memory.rooms[fb.fromRoom]) return
-    const structures = Memory.rooms[fb.fromRoom].structures
-    let ids:Id<AnyStoreStructure>[] = structures.containers.ins
-    ids = ids.concat(structures.links.outs)
-    
-    let stores:AnyStoreStructure[] = []
-    for(let id of ids){
-        const store = Game.getObjectById(id)
-        if(store && store.store['energy'] > creep.store.getFreeCapacity())
-            stores.push(store)
-    }
-
-    const source = creep.pos.findClosestByRange(stores)
-    if(!source) return
-    let collect: ActionDescript<'withdraw'> = {
-        action: 'withdraw',
-        args:   [source.id,'energy']
     }
 }
 

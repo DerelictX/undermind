@@ -1,21 +1,38 @@
+import { static_updater } from "@/scanner/static"
 import { body_generator, default_body_config } from "./config.body"
 
 const spawn_handler: {[r in GeneralistRole]:(room:Room) => boolean} = {
     HS0: function (room: Room): boolean {
-        return true
+        static_updater['sources'](room,room.memory._static)
+        if(room.memory._static.H_srcs && room.memory._static.H_srcs[0])
+            return true
+        return false
     },
     HS1: function (room: Room): boolean {
-        return true
+        static_updater['sources'](room,room.memory._static)
+        if(room.memory._static.H_srcs && room.memory._static.H_srcs[1])
+            return true
+        return false
     },
     HS2: function (room: Room): boolean {
+        static_updater['sources'](room,room.memory._static)
+        if(room.memory._static.H_srcs && room.memory._static.H_srcs[2])
+            return true
         return false
     },
     HM: function (room: Room): boolean {
+        static_updater['mineral'](room,room.memory._static)
+        if(room.memory._static.H_mnrl && room.memory._static.H_mnrl[0])
+            return true
         return false
     },
     Up: function (room: Room): boolean {
+        static_updater['controller'](room,room.memory._static)
+        if(room.memory._static.W_ctrl && room.memory._static.W_ctrl[0])
+            return true
         return false
     },
+    
     HD: function (room: Room): boolean {
         return false
     },
@@ -25,6 +42,7 @@ const spawn_handler: {[r in GeneralistRole]:(room:Room) => boolean} = {
     Ma: function (room: Room): boolean {
         return true
     },
+
     Co: function (room: Room): boolean {
         return false
     },

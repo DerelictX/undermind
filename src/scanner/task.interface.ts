@@ -3,20 +3,13 @@ type TaskUpdater<T extends {[P in keyof T]: PosedCreepTask<TargetedAction>[]}> =
     [P in keyof T]: (room:Room) => T[P]
 }
 
-type CachedPool<T extends {[P in keyof T]: PosedCreepTask<TargetedAction>[]}> =
-    T extends {[P in keyof T]: PosedCreepTask<CollectAction&TargetedAction>[]}
-            ? {[P in keyof T]: PosedCreepTask<CollectAction&TargetedAction>[]} :
-    T extends {[P in keyof T]: PosedCreepTask<ConsumeAction&TargetedAction>[]}
-            ? {[P in keyof T]: PosedCreepTask<ConsumeAction&TargetedAction>[]} :
-    {[P in keyof T]: PosedCreepTask<TargetedAction>[]}
-
 type ResFlow = [
     from:   keyof CollectTaskPool,
     to:     keyof ConsumeTaskPool]
-| [ from:   'lazy' | keyof CollectTaskPool,
+| [ from:   keyof CollectTaskPool | 'lazy',
     to:     keyof ConsumeTaskPool]
 | [ from:   keyof CollectTaskPool,
-    to:     'lazy' | keyof ConsumeTaskPool]
+    to:     keyof ConsumeTaskPool | 'lazy']
 
 type PosedCreepTask<T extends TargetedAction> =
     {pos: RoomPosition} & ActionDescript<T>
@@ -66,6 +59,20 @@ interface ConsumeTaskPool {
 }
 
 interface StaticTaskPool {
-    reserve:    PosedCreepTask<'reserveController'>[]
-    siege:      PosedCreepTask<'dismantle'>[]
+    H_srcs:     PosedCreepTask<'harvest'>[]
+    T_src0:     PosedCreepTask<'transfer'|'repair'>[]
+    T_src1:     PosedCreepTask<'transfer'|'repair'>[]
+    T_src2:     PosedCreepTask<'transfer'|'repair'>[]
+    W_srcs:     PosedCreepTask<'withdraw'>[]
+
+    H_mnrl:     PosedCreepTask<'harvest'>[]
+    T_mnrl:     PosedCreepTask<'transfer'>[]
+    W_mnrl:     PosedCreepTask<'withdraw'>[]
+
+    W_ctrl:     PosedCreepTask<'withdraw'>[]
+    U_ctrl:     PosedCreepTask<'upgradeController'>[]
+    
+    R_ctrl:     PosedCreepTask<'reserveController'>[]
+    A_ctrl:     PosedCreepTask<'attackController'>[]
+    A_core:     PosedCreepTask<'attack'>[]
 }

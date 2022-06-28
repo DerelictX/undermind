@@ -11,6 +11,7 @@ export const consume_updater: TaskUpdater<ConsumeTaskPool> = {
         }))
         return tasks
     },
+
     repair: function (room: Room) {
         var tasks: PosedCreepTask<"repair">[] = []
         const damaged = room.find(FIND_MY_STRUCTURES, {
@@ -93,6 +94,7 @@ export const consume_updater: TaskUpdater<ConsumeTaskPool> = {
         }
         return tasks
     },
+
     U_ctrl: function (room: Room) {
         var tasks: PosedCreepTask<"upgradeController">[] = []
         const controller = room.controller
@@ -109,6 +111,7 @@ export const consume_updater: TaskUpdater<ConsumeTaskPool> = {
 
     T_ext: function (room: Room) {
         var tasks: PosedCreepTask<'transfer'>[] = []
+        if(room.energyAvailable == room.energyCapacityAvailable) return []
         const extensions: (AnyStoreStructure & AnyOwnedStructure)[] = room.find(FIND_MY_STRUCTURES, {
             filter: (structure) => {
                 if (structure.structureType == STRUCTURE_EXTENSION
@@ -236,60 +239,21 @@ export const consume_updater: TaskUpdater<ConsumeTaskPool> = {
         }
         return tasks
     },
+    
     T_src0: function (room: Room): PosedCreepTask<"repair" | "transfer">[] {
-        const source = room.find(FIND_SOURCES)[0]
-        const container:StructureContainer|null = source.pos.findClosestByRange(FIND_STRUCTURES,{
-            filter: {structureType: STRUCTURE_CONTAINER}
-        })
-        if(!container || !container.pos.isNearTo(source)) return []
-        let tasks: PosedCreepTask<"repair" | "transfer">[] = [
-            {action:'repair',args:[container.id],pos:container.pos}
-        ]
-        const near_structs:AnyStoreStructure[] = container.pos.findInRange(FIND_STRUCTURES,1,{
-            filter: (structure) => {
-                if(structure.structureType == STRUCTURE_CONTAINER
-                    || structure.structureType == STRUCTURE_STORAGE
-                    || structure.structureType == STRUCTURE_TERMINAL
-                    || structure.structureType == STRUCTURE_LINK)
-                    return true
-                return false
-            }
-        })
-        near_structs.sort((a, b) => a.store.getCapacity('energy') - b.store.getCapacity('energy'))
-        for(let struct of near_structs){
-            tasks.push({action:'transfer',args:[struct.id,'energy'],pos:struct.pos})
-        }
-        return tasks
+        if(!room.memory._static.T_src0) return []
+        return room.memory._static.T_src0
     },
     T_src1: function (room: Room): PosedCreepTask<"repair" | "transfer">[] {
-        const source = room.find(FIND_SOURCES)[1]
-        const container:StructureContainer|null = source.pos.findClosestByRange(FIND_STRUCTURES,{
-            filter: {structureType: STRUCTURE_CONTAINER}
-        })
-        if(!container || !container.pos.isNearTo(source)) return []
-        let tasks: PosedCreepTask<"repair" | "transfer">[] = [
-            {action:'repair',args:[container.id],pos:container.pos}
-        ]
-        const near_structs:AnyStoreStructure[] = container.pos.findInRange(FIND_STRUCTURES,1,{
-            filter: (structure) => {
-                if(structure.structureType == STRUCTURE_CONTAINER
-                    || structure.structureType == STRUCTURE_STORAGE
-                    || structure.structureType == STRUCTURE_TERMINAL
-                    || structure.structureType == STRUCTURE_LINK)
-                    return true
-                return false
-            }
-        })
-        near_structs.sort((a, b) => a.store.getCapacity('energy') - b.store.getCapacity('energy'))
-        for(let struct of near_structs){
-            tasks.push({action:'transfer',args:[struct.id,'energy'],pos:struct.pos})
-        }
-        return tasks
+        if(!room.memory._static.T_src1) return []
+        return room.memory._static.T_src1
     },
     T_src2: function (room: Room): PosedCreepTask<"repair" | "transfer">[] {
-        return []
+        if(!room.memory._static.T_src2) return []
+        return room.memory._static.T_src2
     },
     T_mnrl: function (room: Room): PosedCreepTask<"transfer">[] {
-        return []
+        if(!room.memory._static.T_mnrl) return []
+        return room.memory._static.T_mnrl
     }
 }

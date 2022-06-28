@@ -56,13 +56,13 @@ const memory_inspector: {[k in keyof RoomMemory]:
             Ch: spawn_loop
         }
     },
+    _collect: function (room: Room): void {
+        room.memory._collect = {}
+    },
     _consume: function (room: Room): void {
         room.memory._consume = {}
     },
     _static: function (room: Room): void {
         room.memory._static = {}
     },
-    _collect: function (room: Room): void {
-        room.memory._collect = {}
-    }
 }

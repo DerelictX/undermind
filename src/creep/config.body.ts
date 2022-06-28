@@ -80,7 +80,7 @@ export const default_body_config: {[R in GeneralistRole]:
     Up: {generator: "W2cM", workload: 3},
     HD: {generator: "WCM", workload: 4},
 
-    Bu: {generator: "WCM", workload: 4},
+    Bu: {generator: "WCM", workload: 6},
     Ma: {generator: "WCM", workload: 4},
     Co: {generator: "C2M", workload: 4},
     Su: {generator: "C2M", workload: 4},
