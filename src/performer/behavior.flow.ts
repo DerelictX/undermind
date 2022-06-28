@@ -4,7 +4,6 @@ import { TASK_COMPLETE, TASK_DOING, TASK_FAILED } from "./behavior.any"
 import { perform_callback } from "./behavior.callback"
 
 export const perfrom_flow = function(creep:Creep,fb:FlowBehavior){
-    creep.say(fb.state)
     if(fb.state == 'idle'){
         const flow = change_flow(fb)
         if(!flow) return TASK_DOING
@@ -151,11 +150,7 @@ const lazy_storage = function(fb:FlowBehavior) {
 }
 
 const parse_posed_task = function(posed:PosedCreepTask<TargetedAction>):CallbackBehavior<TargetedAction>{
-    var root: CallbackBehavior<TargetedAction> = {...{bhvr_name:'callbackful'},...posed}
-    const move: CallbackBehavior<'approach'> = {...{bhvr_name:'callbackful'},
-            ...{action:"approach",args:[posed.pos,1]}}
-    move[ERR_TIRED] = TASK_DOING
-    root[ERR_NOT_IN_RANGE] = move
+    const root: CallbackBehavior<TargetedAction> = {...{bhvr_name:'callbackful'},...posed}
     switch(root.action){
         case 'withdraw':
         case 'transfer':
@@ -171,5 +166,9 @@ const parse_posed_task = function(posed:PosedCreepTask<TargetedAction>):Callback
             root[ERR_NOT_FOUND] = TASK_COMPLETE
             break
     }
+    const move: CallbackBehavior<'approach'> = {...{bhvr_name:'callbackful'},
+            ...{action:"approach",args:[posed.pos,1]}}
+    move[ERR_TIRED] = TASK_DOING
+    root[ERR_NOT_IN_RANGE] = move
     return root
 }

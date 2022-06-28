@@ -20,7 +20,7 @@ const performer:{[action in keyof VirtualAction]: VirtualPerformer<action>} = {
     },
 }
 
-export const perform_virtual = function(creep:Creep, behavior:ActionDescript<keyof VirtualAction>): ScreepsReturnCode {
+export const perform_virtual = function(creep:Creep | PowerCreep, behavior:ActionDescript<keyof VirtualAction>): ScreepsReturnCode {
     const action = behavior.action
     let ret: ScreepsReturnCode
     switch(action){

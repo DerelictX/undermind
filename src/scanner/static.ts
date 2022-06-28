@@ -1,3 +1,5 @@
+import _ from "lodash"
+
 export const static_updater = {
     sources: function (room:Room,pool:Partial<StaticTaskPool>) {
         pool.H_srcs = []
@@ -102,3 +104,5 @@ const lazy_energy = function(creep:Creep,fb:FlowBehavior){
         args:   [source.id,'energy']
     }
 }
+
+_.assign(global, {static_updater:static_updater})

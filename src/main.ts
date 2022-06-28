@@ -2,14 +2,16 @@ import { structure_updater } from "./room/structure.updater";
 import { operator_run } from "./power_creep/operator";
 import { body_generator } from "./creep/config.body";
 import { inspector_memory } from "./room/memory.inspector";
-import { spawn_loop } from "./creep/spawn_loop";
+import { spawn_loop } from "./creep/handler.spawn";
 import { spawn_run } from "./structure/spawn";
 import { tower_run } from "./structure/tower";
 import { perform_any } from "./performer/behavior.any";
+import { static_updater } from "./scanner/static";
 
 export const loop = function () {
 
     if(false){
+        static_updater
         structure_updater
         body_generator
     }
@@ -17,16 +19,16 @@ export const loop = function () {
     //ROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOMS
     if(!Memory.owned_rooms)
         Memory.owned_rooms = []
-    for(let room_name of Memory.owned_rooms){
-        const room = Game.rooms[room_name];
-        if(!room)continue
+    for(let name of Memory.owned_rooms){
         try{
+            const room = Game.rooms[name];
+            if(!room)continue
             inspector_memory(room)
             spawn_loop(room)
             spawn_run(room)
             tower_run(room)
         }catch(error){
-            console.log(room.name +':' + error);
+            console.log(name +':' + error);
         }
     }
 

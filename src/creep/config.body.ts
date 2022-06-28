@@ -76,8 +76,8 @@ export const default_body_config: {[R in GeneralistRole]:
     HS0: {generator: "W2cM", workload: 3},
     HS1: {generator: "W2cM", workload: 3},
     HS2: {generator: "W2cM", workload: 3},
-    HM: {generator: "W2cM", workload: 3},
-    Up: {generator: "W2cM", workload: 3},
+    HM: {generator: "W2cM", workload: 7},
+    Up: {generator: "W2cM", workload: 5},
     HD: {generator: "WCM", workload: 4},
 
     Bu: {generator: "WCM", workload: 6},
