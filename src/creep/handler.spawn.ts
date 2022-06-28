@@ -2,54 +2,54 @@ import { static_updater } from "@/scanner/static"
 import { body_generator, default_body_config } from "./config.body"
 
 const spawn_handler: {[r in GeneralistRole]:(room:Room) => boolean} = {
-    HS0: function (room: Room): boolean {
+    HarvesterSource0: function (room: Room): boolean {
         static_updater['sources'](room,room.memory._static)
         if(room.memory._static.H_srcs && room.memory._static.H_srcs[0])
             return true
         return false
     },
-    HS1: function (room: Room): boolean {
+    HarvesterSource1: function (room: Room): boolean {
         static_updater['sources'](room,room.memory._static)
         if(room.memory._static.H_srcs && room.memory._static.H_srcs[1])
             return true
         return false
     },
-    HS2: function (room: Room): boolean {
+    HarvesterSource2: function (room: Room): boolean {
         static_updater['sources'](room,room.memory._static)
         if(room.memory._static.H_srcs && room.memory._static.H_srcs[2])
             return true
         return false
     },
-    HM: function (room: Room): boolean {
+    HarvesterMineral: function (room: Room): boolean {
         static_updater['mineral'](room,room.memory._static)
         if(room.memory._static.H_mnrl && room.memory._static.H_mnrl[0])
             return true
         return false
     },
-    Up: function (room: Room): boolean {
+    Upgrader: function (room: Room): boolean {
         static_updater['controller'](room,room.memory._static)
         if(room.memory._static.W_ctrl && room.memory._static.W_ctrl[0])
             return true
         return false
     },
     
-    HD: function (room: Room): boolean {
+    HarvesterDeposit: function (room: Room): boolean {
         return false
     },
-    Bu: function (room: Room): boolean {
+    Builder: function (room: Room): boolean {
         return true
     },
-    Ma: function (room: Room): boolean {
+    Maintainer: function (room: Room): boolean {
         return true
     },
 
-    Co: function (room: Room): boolean {
+    Collector: function (room: Room): boolean {
         return false
     },
-    Su: function (room: Room): boolean {
+    Supplier: function (room: Room): boolean {
         return false
     },
-    Ch: function (room: Room): boolean {
+    Chemist: function (room: Room): boolean {
         return false
     }
 }

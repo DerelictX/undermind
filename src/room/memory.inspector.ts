@@ -43,17 +43,17 @@ const memory_inspector: {[k in keyof RoomMemory]:
             queued: 0
         }
         room.memory._spawn = {
-            HS0: spawn_loop,
-            HS1: spawn_loop,
-            HS2: spawn_loop,
-            HM: spawn_loop,
-            Up: spawn_loop,
-            HD: spawn_loop,
-            Bu: spawn_loop,
-            Ma: spawn_loop,
-            Co: spawn_loop,
-            Su: spawn_loop,
-            Ch: spawn_loop
+            HarvesterSource0:   spawn_loop,
+            HarvesterSource1:   spawn_loop,
+            HarvesterSource2:   spawn_loop,
+            HarvesterMineral:   spawn_loop,
+            Upgrader:           spawn_loop,
+            HarvesterDeposit:   spawn_loop,
+            Builder:            spawn_loop,
+            Maintainer:         spawn_loop,
+            Collector:          spawn_loop,
+            Supplier:           spawn_loop,
+            Chemist:            spawn_loop
         }
     },
     _collect: function (room: Room): void {
