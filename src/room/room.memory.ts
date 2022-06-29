@@ -3,11 +3,11 @@ interface RoomMemory {
     structures: RoomStructureList
 
     _static:    Partial<StaticTaskPool>
-    _collect:   {[k in keyof CollectTaskPool]?: PosedCreepTask<CollectAction>[]}
+    _collect:   {[k in keyof DynamicTaskPool]?: PosedCreepTask<CollectAction>[]}
     _consume:   {[k in keyof ConsumeTaskPool]?: PosedCreepTask<ConsumeAction&WorkAction>[]}
     _supply:    {[k in keyof ConsumeTaskPool]?: PosedCreepTask<"transfer"|"generateSafeMode">[]}
 
-    _spawn:     {[R in GeneralistRole]: RoleSpawnLoop}
+    _spawn:     {[R in EnergyRole]: RoleSpawnLoop}
 }
 
 type RoleSpawnLoop = {

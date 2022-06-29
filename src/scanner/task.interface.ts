@@ -1,85 +1,75 @@
 
-type TaskUpdater<T extends {[P in keyof T]: PosedCreepTask<TargetedAction>[]}> = {
+type TaskUpdater<T extends {[P in keyof T]: Posed<PrimitiveDescript<TargetedAction>>[]}> = {
     [P in keyof T]: (room:Room) => T[P]
 }
 
-type ResFlow = [
-    from:   keyof CollectTaskPool,
-    to:     keyof ConsumeTaskPool]
-| [ from:   keyof CollectTaskPool | 'lazy',
-    to:     keyof ConsumeTaskPool]
-| [ from:   keyof CollectTaskPool,
-    to:     keyof ConsumeTaskPool | 'lazy']
+type Posed<T extends PrimitiveDescript<TargetedAction>> = {pos: RoomPosition} & T
 
 type PosedCreepTask<T extends TargetedAction> =
-    {pos: RoomPosition} & ActionDescript<T>
+    Posed<PrimitiveDescript<T>>
 
-interface CollectTaskPool {
-    H_src0:     PosedCreepTask<'harvest'>[]
-    H_src1:     PosedCreepTask<'harvest'>[]
-    H_src2:     PosedCreepTask<'harvest'>[]
-    H_mnrl:     PosedCreepTask<'harvest'>[]
+type FilterPoolKey<T extends WorkAction|CarryAction, R extends ResourceConstant> =
+    ValueTypes<{[K in keyof DynamicTaskPool]: 
+        DynamicTaskPool[K] extends RestrictedPrimitiveDescript<T,R>[] ? K : never}>
 
-    H_srcs:     PosedCreepTask<'harvest'>[]
-    deposit:    PosedCreepTask<'harvest'>[]
-    recycle:    PosedCreepTask<'dismantle'>[]
+interface DynamicTaskPool {
+    H_src0:     Posed<RestrictedPrimitiveDescript<'harvest','energy'>>[]
+    H_src1:     Posed<RestrictedPrimitiveDescript<'harvest','energy'>>[]
+    H_src2:     Posed<RestrictedPrimitiveDescript<'harvest','energy'>>[]
+    H_mnrl:     Posed<PrimitiveDescript<'harvest'>>[]
+
+    H_srcs:     Posed<RestrictedPrimitiveDescript<'harvest','energy'>>[]
+    deposit:    Posed<PrimitiveDescript<'harvest'>>[]
+    recycle:    Posed<PrimitiveDescript<'dismantle'>>[]
     
-    W_srcs:     PosedCreepTask<'withdraw'>[]
-    W_mnrl:     PosedCreepTask<'withdraw'>[]
-    W_ctrl:     PosedCreepTask<'withdraw'>[]
+    W_srcs:     Posed<RestrictedPrimitiveDescript<'withdraw','energy'>>[]
+    W_mnrl:     Posed<PrimitiveDescript<'withdraw'>>[]
+    W_ctrl:     Posed<RestrictedPrimitiveDescript<'withdraw','energy'>>[]
     
-    loot:       PosedCreepTask<'withdraw'>[]
-    sweep:      PosedCreepTask<'withdraw'|'pickup'>[]
-    compound:   PosedCreepTask<'withdraw'>[]
-}
+    loot:       Posed<PrimitiveDescript<'withdraw'>>[]
+    sweep:      Posed<PrimitiveDescript<'withdraw'|'pickup'>>[]
+    compound:   Posed<PrimitiveDescript<'withdraw'>>[]
 
-interface ConsumeTaskPool {
-    R_src0:     PosedCreepTask<'repair'>[]
-    R_src1:     PosedCreepTask<'repair'>[]
-    R_src2:     PosedCreepTask<'repair'>[]
-
-    build:      PosedCreepTask<'build'>[]
-    fortify:    PosedCreepTask<'repair'>[]
-    decayed:    PosedCreepTask<'repair'>[]
-    U_ctrl:     PosedCreepTask<'upgradeController'>[]
+    build:      Posed<PrimitiveDescript<'build'>>[]
+    fortify:    Posed<PrimitiveDescript<'repair'>>[]
+    decayed:    Posed<PrimitiveDescript<'repair'>>[]
+    U_ctrl:     Posed<PrimitiveDescript<'upgradeController'>>[]
     
-    repair:     PosedCreepTask<'repair'>[]
-    anti_nuke:  PosedCreepTask<'repair'>[]
-    downgraded: PosedCreepTask<'upgradeController'>[]
-}
+    repair:     Posed<PrimitiveDescript<'repair'>>[]
+    anti_nuke:  Posed<PrimitiveDescript<'repair'>>[]
+    downgraded: Posed<PrimitiveDescript<'upgradeController'>>[]
 
-interface SupplyTaskPool {
-    T_ext:      PosedCreepTask<'transfer'>[]
-    T_tower:    PosedCreepTask<'transfer'>[]
-    T_ctrl:     PosedCreepTask<'transfer'>[]
+    T_ext:      Posed<RestrictedPrimitiveDescript<'transfer','energy'>>[]
+    T_tower:    Posed<RestrictedPrimitiveDescript<'transfer','energy'>>[]
+    T_ctrl:     Posed<RestrictedPrimitiveDescript<'transfer','energy'>>[]
     
-    T_src0:     PosedCreepTask<'transfer'>[]
-    T_src1:     PosedCreepTask<'transfer'>[]
-    T_src2:     PosedCreepTask<'transfer'>[]
-    T_mnrl:     PosedCreepTask<'transfer'>[]
+    T_src0:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]
+    T_src1:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]
+    T_src2:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]
+    T_mnrl:     Posed<PrimitiveDescript<'transfer'>>[]
 
-    T_boost:    PosedCreepTask<'transfer'>[]
-    T_react:    PosedCreepTask<'transfer'>[]
-    T_power:    PosedCreepTask<'transfer'>[]
+    T_boost:    Posed<PrimitiveDescript<'transfer'>>[]
+    T_react:    Posed<PrimitiveDescript<'transfer'>>[]
+    T_power:    Posed<PrimitiveDescript<'transfer'>>[]
     
-    gen_safe:   PosedCreepTask<'generateSafeMode'>[]
+    gen_safe:   Posed<PrimitiveDescript<'generateSafeMode'>>[]
 }
 
 interface StaticTaskPool {
-    H_srcs:     PosedCreepTask<'harvest'>[]
-    T_src0:     PosedCreepTask<'transfer'>[]
-    T_src1:     PosedCreepTask<'transfer'>[]
-    T_src2:     PosedCreepTask<'transfer'>[]
-    W_srcs:     PosedCreepTask<'withdraw'>[]
+    H_srcs:     Posed<RestrictedPrimitiveDescript<'harvest','energy'>>[]
+    T_src0:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]
+    T_src1:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]
+    T_src2:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]
+    W_srcs:     Posed<RestrictedPrimitiveDescript<'withdraw','energy'>>[]
 
-    H_mnrl:     PosedCreepTask<'harvest'>[]
-    T_mnrl:     PosedCreepTask<'transfer'>[]
-    W_mnrl:     PosedCreepTask<'withdraw'>[]
+    H_mnrl:     Posed<PrimitiveDescript<'harvest'>>[]
+    T_mnrl:     Posed<PrimitiveDescript<'transfer'>>[]
+    W_mnrl:     Posed<PrimitiveDescript<'withdraw'>>[]
 
-    W_ctrl:     PosedCreepTask<'withdraw'>[]
-    U_ctrl:     PosedCreepTask<'upgradeController'>[]
+    W_ctrl:     Posed<RestrictedPrimitiveDescript<'withdraw','energy'>>[]
+    U_ctrl:     Posed<PrimitiveDescript<'upgradeController'>>[]
     
-    R_ctrl:     PosedCreepTask<'reserveController'>[]
-    A_ctrl:     PosedCreepTask<'attackController'>[]
-    A_core:     PosedCreepTask<'attack'>[]
+    R_ctrl:     Posed<PrimitiveDescript<'reserveController'>>[]
+    A_ctrl:     Posed<PrimitiveDescript<'attackController'>>[]
+    A_core:     Posed<PrimitiveDescript<'attack'>>[]
 }

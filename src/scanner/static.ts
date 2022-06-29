@@ -4,10 +4,9 @@ export const static_updater = {
     sources: function (room:Room,pool:Partial<StaticTaskPool>) {
         pool.H_srcs = []
         pool.W_srcs = []
-        var T_srcs: PosedCreepTask<"transfer">[][] = [[],[],[]]
+        var T_srcs: Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[][] = [[],[],[]]
         const sources = room.find(FIND_SOURCES)
         for(let i in sources) {
-            T_srcs[i] = []
             const source = sources[i]
             pool.H_srcs.push({
                 action: 'harvest',
@@ -18,6 +17,11 @@ export const static_updater = {
                 filter: {structureType: STRUCTURE_CONTAINER}
             })
             if(!container || !container.pos.isNearTo(source)) continue
+            T_srcs[i].push({
+                action: 'repair',
+                args: [container.id],
+                pos: container.pos
+            })
             pool.W_srcs.push({
                 action: 'withdraw',
                 args: [container.id, 'energy', container.store['energy']],
@@ -99,7 +103,7 @@ const lazy_energy = function(creep:Creep,fb:FlowBehavior){
 
     const source = creep.pos.findClosestByRange(stores)
     if(!source) return
-    let collect: ActionDescript<'withdraw'> = {
+    let collect: PrimitiveDescript<'withdraw'> = {
         action: 'withdraw',
         args:   [source.id,'energy']
     }

@@ -23,9 +23,9 @@ interface FlowBehavior {
 
     fromRoom:   string
     toRoom:     string
-    priority:   ResFlow[]
+    priority:   CarrierRole
 }
 
 type CallbackBehavior<T extends AnyAction> = T extends AnyAction ? {
     [R in ScreepsReturnCode] ?: CallbackBehavior<AnyAction> | TaskReturnCode
-} & {bhvr_name: "callbackful"} & ActionDescript<T> : never
+} & {bhvr_name: "callbackful"} & PrimitiveDescript<T> : never

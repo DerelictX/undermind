@@ -1,22 +1,43 @@
+type WorkerPriority = [
+    from:   FilterPoolKey<  (WorkAction|CarryAction)&CollectAction, 'energy'>[],
+    to:     FilterPoolKey<  (WorkAction|CarryAction)&ConsumeAction, 'energy'>[]
+]
 
-const priority: {[role in GeneralistRole]:ResFlow[]} = {    
-    HarvesterSource0:   [['H_src0','R_src0']],
-    HarvesterSource1:   [['H_src1','R_src1']],
-    HarvesterSource2:   [['H_src2','R_src2']],
-    HarvesterMineral:   [['H_mnrl','T_mnrl']],
-    HarvesterDeposit:   [['deposit','lazy']],
-    Upgrader:           [['W_ctrl','U_ctrl']],
+type CarrierPriority = [
+    from:   FilterPoolKey<  (WorkAction|CarryAction)&CollectAction, ResourceConstant>|'storage',
+    to:     FilterPoolKey<  (WorkAction|CarryAction)&ConsumeAction, ResourceConstant>|'storage',
+][]
 
-    Builder:    [['W_srcs','repair'],   ['W_srcs','anti_nuke'], ['W_srcs','build'],
-                ['W_srcs','fortify'],   ['W_srcs','U_ctrl'],    ['H_srcs','build'],],
-    Maintainer: [['W_srcs','repair'],   ['lazy','downgraded'], ['W_srcs','decayed'], ['lazy','U_ctrl']],
-
-    Collector:  [['W_srcs','T_ctrl'], ['W_srcs','lazy'],  ['sweep','lazy'],   ['loot','lazy']],
-    Supplier:   [['W_srcs','T_ext'],  ['W_srcs','T_tower'], ['W_srcs','T_ctrl'],  ['lazy','T_power']],
-    Chemist:    [['lazy','T_boost'],['lazy','T_react'], ['compound','lazy'],['W_mnrl','lazy']]
+const transport_priority: {[role in EnergyRole]:WorkerPriority} = {
+    HarvesterSource0: [['H_src0'], ['T_src0']],
+    HarvesterSource1: [['H_src1'], ['T_src1']],
+    HarvesterSource2: [['H_src2'], ['T_src2']],
+    Upgrader: [['W_ctrl'], ['U_ctrl']],
+    Builder: [
+        ['W_srcs', 'H_srcs'],
+        ['repair', 'anti_nuke', 'build', 'fortify', 'U_ctrl']
+    ],
+    Maintainer: [
+        ['W_srcs', 'H_srcs'],
+        ['repair', 'downgraded', 'decayed', 'U_ctrl']
+    ],
+    Collector: [
+        ['W_srcs'],
+        ['T_ctrl', 'T_tower', 'T_ext']],
+    Supplier: [
+        ['W_srcs'],
+        ['T_ext', 'T_tower', 'T_ctrl']]
 }
 
-export const default_generalist_behavior = function(role:GeneralistRole,
+const priority: {[role in CarrierRole]:CarrierPriority} = {
+    HarvesterMineral: [['H_mnrl', 'T_mnrl']],
+    HarvesterDeposit: [['deposit', 'storage']],
+    Collector: [['W_srcs', 'T_ctrl'], ['W_srcs', 'storage'], ['sweep', 'storage'], ['loot', 'storage']],
+    Supplier: [['W_srcs', 'T_ext'], ['W_srcs', 'T_tower'], ['W_srcs', 'T_ctrl'], ['storage', 'T_power']],
+    Chemist: [['storage','T_boost'], ['storage','T_react'], ['compound','storage'], ['W_mnrl','storage']]
+}
+
+export const default_generalist_behavior = function(role:CarrierRole,
         fromRoom:string,toRoom:string): FlowBehavior {
     return {
         bhvr_name:  "flow",
@@ -26,6 +47,6 @@ export const default_generalist_behavior = function(role:GeneralistRole,
         current:    priority[role][0],
         fromRoom:   fromRoom,
         toRoom:     toRoom,
-        priority:   priority[role]
+        priority:   role
     }
 }

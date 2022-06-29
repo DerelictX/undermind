@@ -2,7 +2,7 @@ import { structure_updater } from "@/room/structure.updater"
 import { static_updater } from "@/scanner/static"
 import { body_generator, default_body_config } from "./config.body"
 
-const spawn_handler: {[r in GeneralistRole]:(room:Room) => boolean} = {
+const spawn_handler: {[r in EnergyRole]:(room:Room) => boolean} = {
     HarvesterSource0: function (room: Room): boolean {
         static_updater['sources'](room,room.memory._static)
         if(room.memory._static.H_srcs && room.memory._static.H_srcs[0])
@@ -64,7 +64,7 @@ const spawn_handler: {[r in GeneralistRole]:(room:Room) => boolean} = {
 
 
 export const spawn_loop = function(room: Room) {
-    var role_name: GeneralistRole
+    var role_name: EnergyRole
     for(role_name in room.memory._spawn){
         const spawn = room.memory._spawn[role_name]
         

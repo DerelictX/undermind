@@ -7,7 +7,7 @@ export const spawn_run = function(room: Room) {
     const spawn = room.find(FIND_MY_SPAWNS).find(spawn => !spawn.spawning)
     if(!spawn)return
 
-    let role_name: GeneralistRole
+    let role_name: EnergyRole
     for(role_name in room.memory._spawn){
         const spawn_loop = room.memory._spawn[role_name]
         if(spawn_loop.queued == 1){

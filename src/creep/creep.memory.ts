@@ -19,7 +19,11 @@ interface CreepMemory {
 
 type CreepClassName = 'generalist'|'specialist'|'carrier'|'fighter'
 
-type GeneralistRole =
+type EnergyRole =
     |"HarvesterSource0"|"HarvesterSource1"|"HarvesterSource2"
-    |"HarvesterMineral"|"Upgrader"|"HarvesterDeposit"
-    |"Builder"|"Maintainer"|"Collector"|"Supplier"|"Chemist"
+    |"Upgrader"|"Builder"|"Maintainer"
+    |"Collector"|"Supplier"
+
+type CarrierRole =
+    |"HarvesterMineral"|"HarvesterDeposit"
+    |"Collector"|"Supplier"|"Chemist"

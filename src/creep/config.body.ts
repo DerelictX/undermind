@@ -70,7 +70,7 @@ export const body_generator:{[c in body_generator_name]:
 }
 _.assign(global, {body_generator:body_generator})
 
-export const default_body_config: {[R in GeneralistRole]:
+export const default_body_config: {[R in EnergyRole]:
     {generator:body_generator_name ,workload:number}
 } = {
     HarvesterSource0:   {generator: "W2cM", workload: 3},

@@ -42,10 +42,32 @@ type CachedArgs<T extends any[]> = {
         ? Id<T[P]> : T[P];
 }
 
-type ActionDescript<T extends AnyAction> = T extends PrimitiveAction ? {
+type PrimitiveDescript<T extends PrimitiveAction> = T extends PrimitiveAction ? {
     action: T
     args:   CachedArgs<Parameters<Creep[T]>>
-} : T extends keyof VirtualAction ? {
+} : never
+
+type RestrictedPrimitiveDescript<T extends WorkAction|CarryAction,Res extends ResourceConstant> =
+        T extends WorkAction|CarryAction ? {
+    action: T
+    args:CachedArgs<
+        T extends "harvest"
+            ? [target: ("energy" extends Res ? Source : never)
+            | (MineralConstant extends Res ? Mineral : never)
+            | (DepositConstant extends Res ? Deposit : never)]
+        : T extends Exclude<WorkAction,"harvest">
+            ? Res extends "energy" ? Parameters<Creep[T]> : never
+        : T extends "withdraw"|"transfer"
+            ? [target: Parameters<Creep[T]>[0], resourceType: Res, amount?: Parameters<Creep[T]>[2]]
+        : T extends "drop"
+            ? [resourceType: Res, amount?: Parameters<Creep[T]>[1]]
+        : T extends "pickup" ? [target: Resource<Res>]
+        : T extends "generateSafeMode"
+            ? Res extends "G" ? Parameters<Creep[T]> : never
+        : never>
+} : never
+
+type VirtualDescript<T extends keyof VirtualAction> = T extends keyof VirtualAction ? {
     action: T
     args:   VirtualAction[T]
-} : never;
+} : never

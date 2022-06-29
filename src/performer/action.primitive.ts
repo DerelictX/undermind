@@ -103,7 +103,7 @@ const performer:{[action in PrimitiveAction]:PrimitivePerformer<action>} = {
     }
 }
 
-export const perform_primitive = function(creep:Creep, behavior:ActionDescript<PrimitiveAction>): ScreepsReturnCode {
+export const perform_primitive = function(creep:Creep, behavior:PrimitiveDescript<PrimitiveAction>): ScreepsReturnCode {
     const action = behavior.action
     let ret: ScreepsReturnCode
     switch(action){

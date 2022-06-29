@@ -1,5 +1,3 @@
-import { collect_updater } from "@/scanner/collect"
-import { consume_updater } from "@/scanner/consume"
 import { TASK_COMPLETE, TASK_DOING, TASK_FAILED } from "./behavior.any"
 import { perform_callback } from "./behavior.callback"
 
