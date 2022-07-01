@@ -2,38 +2,38 @@ import { structure_updater } from "@/room/structure.updater"
 import { static_updater } from "@/scanner/static"
 import { body_generator, default_body_config } from "./config.body"
 
-const spawn_handler: {[r in EnergyRole]:(room:Room) => boolean} = {
+const spawn_handler: {[r in AnyRole]:(room:Room) => boolean} = {
     HarvesterSource0: function (room: Room): boolean {
-        static_updater['sources'](room,room.memory._static)
-        if(room.memory._static.H_srcs && room.memory._static.H_srcs[0])
+        static_updater['sources'](room, room.memory._static)
+        if (room.memory._static.H_srcs && room.memory._static.H_srcs[0])
             return true
         return false
     },
     HarvesterSource1: function (room: Room): boolean {
-        static_updater['sources'](room,room.memory._static)
-        if(room.memory._static.H_srcs && room.memory._static.H_srcs[1])
+        static_updater['sources'](room, room.memory._static)
+        if (room.memory._static.H_srcs && room.memory._static.H_srcs[1])
             return true
         return false
     },
     HarvesterSource2: function (room: Room): boolean {
-        static_updater['sources'](room,room.memory._static)
-        if(room.memory._static.H_srcs && room.memory._static.H_srcs[2])
+        static_updater['sources'](room, room.memory._static)
+        if (room.memory._static.H_srcs && room.memory._static.H_srcs[2])
             return true
         return false
     },
     HarvesterMineral: function (room: Room): boolean {
-        static_updater['mineral'](room,room.memory._static)
-        if(room.memory._static.H_mnrl && room.memory._static.H_mnrl[0])
+        static_updater['mineral'](room, room.memory._static)
+        if (room.memory._static.H_mnrl && room.memory._static.H_mnrl[0])
             return true
         return false
     },
     Upgrader: function (room: Room): boolean {
-        static_updater['controller'](room,room.memory._static)
-        if(room.memory._static.W_ctrl && room.memory._static.W_ctrl[0])
+        static_updater['controller'](room, room.memory._static)
+        if (room.memory._static.W_ctrl && room.memory._static.W_ctrl[0])
             return true
         return false
     },
-    
+
     HarvesterDeposit: function (room: Room): boolean {
         return false
     },
@@ -52,13 +52,16 @@ const spawn_handler: {[r in EnergyRole]:(room:Room) => boolean} = {
     Supplier: function (room: Room): boolean {
         structure_updater.unique(room)
         structure_updater.towers(room)
-        if(room.memory._static.W_ctrl && room.memory._static.W_ctrl[0])
+        if (room.memory._static.W_ctrl && room.memory._static.W_ctrl[0])
             return true
         return false
     },
     Chemist: function (room: Room): boolean {
         structure_updater.labs(room)
         return false
+    },
+    EnergySupplier: function (room: Room): boolean {
+        throw new Error("Function not implemented.")
     }
 }
 

@@ -1,14 +1,6 @@
-type WorkerPriority = [
-    from:   FilterPoolKey<  (WorkAction|CarryAction)&CollectAction, 'energy'>[],
-    to:     FilterPoolKey<  (WorkAction|CarryAction)&ConsumeAction, 'energy'>[]
-]
+type EnWorkerPriority = [from: EnSource[], to: EnSink[]]
 
-type CarrierPriority = [
-    from:   FilterPoolKey<  (WorkAction|CarryAction)&CollectAction, ResourceConstant>|'storage',
-    to:     FilterPoolKey<  (WorkAction|CarryAction)&ConsumeAction, ResourceConstant>|'storage',
-][]
-
-const transport_priority: {[role in EnergyRole]:WorkerPriority} = {
+const work_priority: {[role in EnergyRole]:EnWorkerPriority} = {
     HarvesterSource0: [['H_src0'], ['T_src0']],
     HarvesterSource1: [['H_src1'], ['T_src1']],
     HarvesterSource2: [['H_src2'], ['T_src2']],
@@ -21,17 +13,12 @@ const transport_priority: {[role in EnergyRole]:WorkerPriority} = {
         ['W_srcs', 'H_srcs'],
         ['repair', 'downgraded', 'decayed', 'U_ctrl']
     ],
-    Collector: [
-        ['W_srcs'],
-        ['T_ctrl', 'T_tower', 'T_ext']],
-    Supplier: [
+    EnergySupplier: [
         ['W_srcs'],
         ['T_ext', 'T_tower', 'T_ctrl']]
 }
 
-const priority: {[role in CarrierRole]:CarrierPriority} = {
-    HarvesterMineral: [['H_mnrl', 'T_mnrl']],
-    HarvesterDeposit: [['deposit', 'storage']],
+export const carry_priority: {[role in CarrierRole]:ResFlow[]} = {
     Collector: [['W_srcs', 'T_ctrl'], ['W_srcs', 'storage'], ['sweep', 'storage'], ['loot', 'storage']],
     Supplier: [['W_srcs', 'T_ext'], ['W_srcs', 'T_tower'], ['W_srcs', 'T_ctrl'], ['storage', 'T_power']],
     Chemist: [['storage','T_boost'], ['storage','T_react'], ['compound','storage'], ['W_mnrl','storage']]
@@ -44,7 +31,7 @@ export const default_generalist_behavior = function(role:CarrierRole,
         state:      "idle",
         collect:    [],
         consume:    [],
-        current:    priority[role][0],
+        current:    carry_priority[role][0],
         fromRoom:   fromRoom,
         toRoom:     toRoom,
         priority:   role

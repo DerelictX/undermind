@@ -70,19 +70,20 @@ export const body_generator:{[c in body_generator_name]:
 }
 _.assign(global, {body_generator:body_generator})
 
-export const default_body_config: {[R in EnergyRole]:
+export const default_body_config: {[R in AnyRole]:
     {generator:body_generator_name ,workload:number}
 } = {
-    HarvesterSource0:   {generator: "W2cM", workload: 3},
-    HarvesterSource1:   {generator: "W2cM", workload: 3},
-    HarvesterSource2:   {generator: "W2cM", workload: 3},
-    HarvesterMineral:   {generator: "W2cM", workload: 7},
-    HarvesterDeposit:   {generator: "WCM", workload: 4},
+    HarvesterSource0: { generator: "W2cM", workload: 3 },
+    HarvesterSource1: { generator: "W2cM", workload: 3 },
+    HarvesterSource2: { generator: "W2cM", workload: 3 },
+    HarvesterMineral: { generator: "W2cM", workload: 7 },
+    HarvesterDeposit: { generator: "WCM", workload: 4 },
 
-    Upgrader:   {generator: "W2cM", workload: 5},
-    Builder:    {generator: "WCM", workload: 6},
-    Maintainer: {generator: "WCM", workload: 4},
-    Collector:  {generator: "C2M", workload: 4},
-    Supplier:   {generator: "C2M", workload: 4},
-    Chemist:    {generator: "C2M", workload: 4},
+    Upgrader: { generator: "W2cM", workload: 5 },
+    Builder: { generator: "WCM", workload: 6 },
+    Maintainer: { generator: "WCM", workload: 4 },
+    Collector: { generator: "C2M", workload: 4 },
+    Supplier: { generator: "C2M", workload: 4 },
+    Chemist: { generator: "C2M", workload: 4 },
+    EnergySupplier: { generator: "C2M", workload: 4 },
 }

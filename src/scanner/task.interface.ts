@@ -16,10 +16,10 @@ interface DynamicTaskPool {
     H_src0:     Posed<RestrictedPrimitiveDescript<'harvest','energy'>>[]
     H_src1:     Posed<RestrictedPrimitiveDescript<'harvest','energy'>>[]
     H_src2:     Posed<RestrictedPrimitiveDescript<'harvest','energy'>>[]
-    H_mnrl:     Posed<PrimitiveDescript<'harvest'>>[]
+    H_mnrl:     Posed<RestrictedPrimitiveDescript<'harvest',MineralConstant>>[]
 
     H_srcs:     Posed<RestrictedPrimitiveDescript<'harvest','energy'>>[]
-    deposit:    Posed<PrimitiveDescript<'harvest'>>[]
+    deposit:    Posed<RestrictedPrimitiveDescript<'harvest',DepositConstant>>[]
     recycle:    Posed<PrimitiveDescript<'dismantle'>>[]
     
     W_srcs:     Posed<RestrictedPrimitiveDescript<'withdraw','energy'>>[]
@@ -46,7 +46,7 @@ interface DynamicTaskPool {
     T_src0:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]
     T_src1:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]
     T_src2:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]
-    T_mnrl:     Posed<PrimitiveDescript<'transfer'>>[]
+    T_mnrl:     Posed<RestrictedPrimitiveDescript<'transfer',MineralConstant>>[]
 
     T_boost:    Posed<PrimitiveDescript<'transfer'>>[]
     T_react:    Posed<PrimitiveDescript<'transfer'>>[]
@@ -62,8 +62,8 @@ interface StaticTaskPool {
     T_src2:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]
     W_srcs:     Posed<RestrictedPrimitiveDescript<'withdraw','energy'>>[]
 
-    H_mnrl:     Posed<PrimitiveDescript<'harvest'>>[]
-    T_mnrl:     Posed<PrimitiveDescript<'transfer'>>[]
+    H_mnrl:     Posed<RestrictedPrimitiveDescript<'harvest',MineralConstant>>[]
+    T_mnrl:     Posed<RestrictedPrimitiveDescript<'transfer',MineralConstant>>[]
     W_mnrl:     Posed<PrimitiveDescript<'withdraw'>>[]
 
     W_ctrl:     Posed<RestrictedPrimitiveDescript<'withdraw','energy'>>[]
@@ -73,3 +73,11 @@ interface StaticTaskPool {
     A_ctrl:     Posed<PrimitiveDescript<'attackController'>>[]
     A_core:     Posed<PrimitiveDescript<'attack'>>[]
 }
+
+type EnSource = FilterPoolKey<(WorkAction|CarryAction)&CollectAction,'energy'>
+type EnSink =   FilterPoolKey<(WorkAction|CarryAction)&ConsumeAction,'energy'>
+
+type ResFlow = [
+    from:   FilterPoolKey<CarryAction&CollectAction,ResourceConstant>|'storage',
+    to:     FilterPoolKey<CarryAction&ConsumeAction,ResourceConstant>|'storage',
+]

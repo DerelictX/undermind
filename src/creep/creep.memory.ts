@@ -18,12 +18,15 @@ interface CreepMemory {
 }
 
 type CreepClassName = 'generalist'|'specialist'|'carrier'|'fighter'
+type AnyRole = |EnergyRole|CarrierRole|MineralWorker
 
 type EnergyRole =
     |"HarvesterSource0"|"HarvesterSource1"|"HarvesterSource2"
-    |"Upgrader"|"Builder"|"Maintainer"
-    |"Collector"|"Supplier"
+    |"Upgrader"|"Builder"|"Maintainer"|'EnergySupplier'
 
 type CarrierRole =
-    |"HarvesterMineral"|"HarvesterDeposit"
     |"Collector"|"Supplier"|"Chemist"
+
+type MineralWorker = |'HarvesterMineral'|'HarvesterDeposit'
+
+type StoreLessRole = |'Reserver'

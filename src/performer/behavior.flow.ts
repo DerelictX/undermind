@@ -1,3 +1,5 @@
+import { carry_priority } from "@/creep/config.behavior"
+import { posed_task_updater } from "@/scanner/dynamic"
 import { TASK_COMPLETE, TASK_DOING, TASK_FAILED } from "./behavior.any"
 import { perform_callback } from "./behavior.callback"
 
@@ -46,19 +48,19 @@ export const perfrom_flow = function(creep:Creep,fb:FlowBehavior){
 }
 
 const change_flow = function(fb:FlowBehavior) {
-    const collect = Memory.rooms[fb.fromRoom]._collect
-    const consume = Memory.rooms[fb.toRoom]._consume
-    for(let flow of fb.priority){
-        if(flow[0] != 'lazy' && !collect[flow[0]]?.length) {
-            collect[flow[0]] = collect_updater[flow[0]](Game.rooms[fb.fromRoom])
+    const pool = Memory.rooms[fb.fromRoom]._dynamic
+    for(let flow of carry_priority[fb.priority]){
+        if(flow[0] != 'storage' && !pool[flow[0]]?.length) {
+            pool[flow[0]] = posed_task_updater[flow[0]](Game.rooms[fb.fromRoom])
         }
-        if(flow[0] != 'lazy' && !collect[flow[0]]?.length) {
+        if(flow[0] != 'storage' && !pool[flow[0]]?.length) {
             continue
         }
-        if(flow[1] != 'lazy' && !consume[flow[1]]?.length) {
-            consume[flow[1]] = consume_updater[flow[1]](Game.rooms[fb.toRoom])
+        if(flow[1] != 'storage' && !pool[flow[1]]?.length) {
+            const dsfa = posed_task_updater[flow[1]](Game.rooms[fb.toRoom])
+            pool[flow[1]] = posed_task_updater[flow[1]](Game.rooms[fb.toRoom])
         }
-        if(flow[1] != 'lazy' && !consume[flow[1]]?.length) {
+        if(flow[1] != 'storage' && !pool[flow[1]]?.length) {
             continue
         }
         console.log('\t' + flow)
@@ -68,8 +70,8 @@ const change_flow = function(fb:FlowBehavior) {
 }
 
 const find_consume = function(creep:Creep,fb:FlowBehavior){
-    const consume = Memory.rooms[fb.toRoom]._consume
-    if(fb.current[1] == 'lazy'){
+    const consume = Memory.rooms[fb.toRoom]._dynamic
+    if(fb.current[1] == 'storage'){
         lazy_restock(creep,fb)
         return
     }
@@ -111,8 +113,8 @@ const find_consume = function(creep:Creep,fb:FlowBehavior){
 }
 
 const find_collect = function(creep:Creep,fb:FlowBehavior){
-    const collect = Memory.rooms[fb.fromRoom]._collect
-    if(fb.current[0] == 'lazy'){
+    const collect = Memory.rooms[fb.fromRoom]._dynamic
+    if(fb.current[0] == 'storage'){
         if(!fb.consume.length)
             find_consume(creep,fb)
         lazy_storage(fb)
@@ -191,29 +193,19 @@ const lazy_storage = function(fb:FlowBehavior) {
     }
 }
 
-const parse_posed_task = function(posed:PosedCreepTask<TargetedAction>):CallbackBehavior<TargetedAction>{
+const parse_posed_task = function(posed:PosedCreepTask<TargetedAction>):CallbackBehavior<AnyAction>{
     const root: CallbackBehavior<TargetedAction> = {...{bhvr_name:'callbackful'},...posed}
+    const move: CallbackBehavior<'approach'> = {...{bhvr_name:'callbackful'},
+            ...{action:"approach",args:[posed.pos,1]}}
     switch(root.action){
         case 'withdraw':
         case 'transfer':
         case 'pickup':
+        case 'generateSafeMode':
             root[OK] = TASK_COMPLETE
+            root[ERR_NOT_IN_RANGE] = move
             break
-        case 'harvest':
-            root[ERR_TIRED] = TASK_DOING
-        case 'dismantle':
-            root[OK] = {...{bhvr_name:'callbackful'},...{action:"prejudge_full",args:[0]}}
-            break
-        case 'build':
-            root[ERR_NOT_FOUND] = TASK_COMPLETE
-            break
-        case 'repair':
-            root[OK] = {...{bhvr_name:'callbackful'},...{action:"full_hits",args:[root.args[0],0]}}
-            break
+        default: throw new Error("Unexpected state.")
     }
-    const move: CallbackBehavior<'approach'> = {...{bhvr_name:'callbackful'},
-            ...{action:"approach",args:[posed.pos,1]}}
-    move[ERR_TIRED] = TASK_DOING
-    root[ERR_NOT_IN_RANGE] = move
     return root
 }

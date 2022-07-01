@@ -98,9 +98,9 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         }
         return tasks
     },
-    deposit: function (room: Room): PosedCreepTask<"harvest">[] {
-        var tasks: PosedCreepTask<"harvest">[] = []
-        const deposits = room.find(FIND_SOURCES)
+    deposit: function (room: Room) {
+        var tasks: Posed<RestrictedPrimitiveDescript<'harvest',DepositConstant>>[] = []
+        const deposits = room.find(FIND_DEPOSITS)
         for (let deposit of deposits) {
             tasks.push({
                 action: 'harvest',
@@ -130,7 +130,7 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         if(!room.memory._static.H_srcs || !room.memory._static.H_srcs[2]) return []
         return [room.memory._static.H_srcs[2]]
     },
-    H_mnrl: function (room: Room): PosedCreepTask<"harvest">[] {
+    H_mnrl: function (room: Room) {
         if(!room.memory._static.H_mnrl) return []
         return room.memory._static.H_mnrl
     },
@@ -320,7 +320,7 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         if(!room.memory._static.T_src2) return []
         return room.memory._static.T_src2
     },
-    T_mnrl: function (room: Room): PosedCreepTask<"transfer">[] {
+    T_mnrl: function (room: Room) {
         if(!room.memory._static.T_mnrl) return []
         return room.memory._static.T_mnrl
     },

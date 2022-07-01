@@ -3,9 +3,7 @@ interface RoomMemory {
     structures: RoomStructureList
 
     _static:    Partial<StaticTaskPool>
-    _collect:   {[k in keyof DynamicTaskPool]?: PosedCreepTask<CollectAction>[]}
-    _consume:   {[k in keyof ConsumeTaskPool]?: PosedCreepTask<ConsumeAction&WorkAction>[]}
-    _supply:    {[k in keyof ConsumeTaskPool]?: PosedCreepTask<"transfer"|"generateSafeMode">[]}
+    _dynamic:   {[k in keyof DynamicTaskPool]?: PosedCreepTask<TargetedAction>[]}
 
     _spawn:     {[R in EnergyRole]: RoleSpawnLoop}
 }

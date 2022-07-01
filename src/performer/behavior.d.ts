@@ -17,8 +17,8 @@ interface FlowBehavior {
     bhvr_name:  "flow"
     
     state:      "collect"|"consume"|"idle"
-    collect:    CallbackBehavior<TargetedAction>[]
-    consume:    CallbackBehavior<TargetedAction>[]
+    collect:    CallbackBehavior<AnyAction>[]
+    consume:    CallbackBehavior<AnyAction>[]
     current:    ResFlow
 
     fromRoom:   string
@@ -28,4 +28,4 @@ interface FlowBehavior {
 
 type CallbackBehavior<T extends AnyAction> = T extends AnyAction ? {
     [R in ScreepsReturnCode] ?: CallbackBehavior<AnyAction> | TaskReturnCode
-} & {bhvr_name: "callbackful"} & PrimitiveDescript<T> : never
+} & {bhvr_name: "callbackful"} & AnyDescript<T> : never

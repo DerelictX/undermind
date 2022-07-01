@@ -30,6 +30,8 @@ const performer:{[action in PrimitiveAction]:PrimitivePerformer<action>} = {
     generateSafeMode: function (creep: Creep, args: [target: Id<StructureController>]) {
         const target = Game.getObjectById(args[0])
         if(!target) return ERR_NOT_FOUND
+
+        if(creep.store['G'] < 1000) return ERR_NOT_ENOUGH_RESOURCES
         return creep.generateSafeMode(target);
     },
     withdraw: function (creep: Creep, args: [
@@ -57,6 +59,8 @@ const performer:{[action in PrimitiveAction]:PrimitivePerformer<action>} = {
     pickup: function (creep: Creep, args: [target: Id<Resource<ResourceConstant>>]) {
         const target = Game.getObjectById(args[0])
         if(!target) return ERR_NOT_FOUND
+
+        if(creep.store.getFreeCapacity() == 0) return ERR_FULL
         return creep.pickup(target);
     },
     drop: function (creep: Creep, args: [

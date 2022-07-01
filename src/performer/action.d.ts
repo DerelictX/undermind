@@ -42,6 +42,11 @@ type CachedArgs<T extends any[]> = {
         ? Id<T[P]> : T[P];
 }
 
+type AnyDescript<T extends AnyAction> =
+    T extends PrimitiveAction ? PrimitiveDescript<T> :
+    T extends keyof VirtualAction ? VirtualDescript<T> :
+    never
+
 type PrimitiveDescript<T extends PrimitiveAction> = T extends PrimitiveAction ? {
     action: T
     args:   CachedArgs<Parameters<Creep[T]>>
