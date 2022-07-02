@@ -1,6 +1,6 @@
 type EnWorkerPriority = [from: EnSource[], to: EnSink[]]
 
-const work_priority: {[role in EnergyRole]:EnWorkerPriority} = {
+export const work_priority: {[role in EnergyRole]:EnWorkerPriority} = {
     HarvesterSource0: [['H_src0'], ['T_src0']],
     HarvesterSource1: [['H_src1'], ['T_src1']],
     HarvesterSource2: [['H_src2'], ['T_src2']],
@@ -24,10 +24,10 @@ export const carry_priority: {[role in CarrierRole]:ResFlow[]} = {
     Chemist: [['storage','T_boost'], ['storage','T_react'], ['compound','storage'], ['W_mnrl','storage']]
 }
 
-export const default_generalist_behavior = function(role:CarrierRole,
-        fromRoom:string,toRoom:string): FlowBehavior {
+const init_carrier_behavior = function(role:CarrierRole,
+        fromRoom:string,toRoom:string): CarrierMemory {
     return {
-        bhvr_name:  "flow",
+        bhvr_name:  "carrier",
         state:      "idle",
         collect:    [],
         consume:    [],
@@ -35,5 +35,59 @@ export const default_generalist_behavior = function(role:CarrierRole,
         fromRoom:   fromRoom,
         toRoom:     toRoom,
         priority:   role
+    }
+}
+
+const init_worker_behavior = function(role:EnergyRole,
+            fromRoom:string,toRoom:string): WorkerMemory {
+    return {
+        bhvr_name:  "worker",
+        state:      "collect",
+        collect:    [],
+        consume:    [],
+        fromRoom:   fromRoom,
+        toRoom:     toRoom,
+        priority:   role
+    }
+}
+
+type class_memory_initializer = {
+    [r in CarrierRole]: (fromRoom:string, toRoom:string) => CarrierMemory
+} & {
+    [r in EnergyRole]: (fromRoom:string, toRoom:string) => WorkerMemory
+}
+
+export const class_memory_initializer: class_memory_initializer = {
+    Collector: function (fromRoom: string, toRoom: string): CarrierMemory {
+        return init_carrier_behavior('Collector',fromRoom,toRoom)
+    },
+    Supplier: function (fromRoom: string, toRoom: string): CarrierMemory {
+        return init_carrier_behavior('Supplier',fromRoom,toRoom)
+    },
+    Chemist: function (fromRoom: string, toRoom: string): CarrierMemory {
+        return init_carrier_behavior('Chemist',fromRoom,toRoom)
+    },
+
+    HarvesterSource0: function (fromRoom: string, toRoom: string): WorkerMemory {
+        return init_worker_behavior('HarvesterSource0',fromRoom,toRoom)
+    },
+    HarvesterSource1: function (fromRoom: string, toRoom: string): WorkerMemory {
+        return init_worker_behavior('HarvesterSource1',fromRoom,toRoom)
+    },
+    HarvesterSource2: function (fromRoom: string, toRoom: string): WorkerMemory {
+        return init_worker_behavior('HarvesterSource2',fromRoom,toRoom)
+    },
+    Upgrader: function (fromRoom: string, toRoom: string): WorkerMemory {
+        return init_worker_behavior('Upgrader',fromRoom,toRoom)
+    },
+    
+    Builder: function (fromRoom: string, toRoom: string): WorkerMemory {
+        return init_worker_behavior('Builder',fromRoom,toRoom)
+    },
+    Maintainer: function (fromRoom: string, toRoom: string): WorkerMemory {
+        return init_worker_behavior('Maintainer',fromRoom,toRoom)
+    },
+    EnergySupplier: function (fromRoom: string, toRoom: string): WorkerMemory {
+        return init_worker_behavior('EnergySupplier',fromRoom,toRoom)
     }
 }

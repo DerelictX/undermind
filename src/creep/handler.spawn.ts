@@ -61,7 +61,7 @@ const spawn_handler: {[r in AnyRole]:(room:Room) => boolean} = {
         return false
     },
     EnergySupplier: function (room: Room): boolean {
-        throw new Error("Function not implemented.")
+        return false
     }
 }
 

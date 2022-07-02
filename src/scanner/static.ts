@@ -52,7 +52,7 @@ export const static_updater = {
         pool.H_mnrl = []
         const mineral = room.find(FIND_MINERALS,{
             filter: (mineral) => mineral.mineralAmount > 0
-                && room.storage && room.storage.store[mineral.mineralType] < 100000
+                && room.storage && room.storage.store[mineral.mineralType] < 60000
         })[0]
         if(!mineral) return
         const extractor:StructureExtractor|null = mineral.pos.findClosestByRange(FIND_MY_STRUCTURES,
@@ -86,27 +86,6 @@ export const static_updater = {
             pool.W_ctrl.push({action:'withdraw',args:[struct.id,'energy'],pos:struct.pos})
         }
     },
-}
-
-const lazy_energy = function(creep:Creep,fb:FlowBehavior){
-    if(!Memory.rooms[fb.fromRoom]) return
-    const structures = Memory.rooms[fb.fromRoom].structures
-    let ids:Id<AnyStoreStructure>[] = structures.containers.ins
-    ids = ids.concat(structures.links.outs)
-    
-    let stores:AnyStoreStructure[] = []
-    for(let id of ids){
-        const store = Game.getObjectById(id)
-        if(store && store.store['energy'] > creep.store.getFreeCapacity())
-            stores.push(store)
-    }
-
-    const source = creep.pos.findClosestByRange(stores)
-    if(!source) return
-    let collect: PrimitiveDescript<'withdraw'> = {
-        action: 'withdraw',
-        args:   [source.id,'energy']
-    }
 }
 
 _.assign(global, {static_updater:static_updater})

@@ -1,9 +1,9 @@
 import { carry_priority } from "@/creep/config.behavior"
 import { posed_task_updater } from "@/scanner/dynamic"
-import { TASK_COMPLETE, TASK_DOING, TASK_FAILED } from "./behavior.any"
-import { perform_callback } from "./behavior.callback"
+import { TASK_COMPLETE, TASK_DOING, TASK_FAILED } from "../performer/behavior.any"
+import { perform_callback } from "../performer/behavior.callback"
 
-export const perfrom_flow = function(creep:Creep,fb:FlowBehavior){
+export const run_carrier = function(creep:Creep,fb:CarrierMemory){
     console.log(creep.name)
     if(fb.state == 'idle'){
         const flow = change_flow(fb)
@@ -47,7 +47,7 @@ export const perfrom_flow = function(creep:Creep,fb:FlowBehavior){
     return TASK_FAILED
 }
 
-const change_flow = function(fb:FlowBehavior) {
+const change_flow = function(fb:CarrierMemory) {
     const pool = Memory.rooms[fb.fromRoom]._dynamic
     for(let flow of carry_priority[fb.priority]){
         if(flow[0] != 'storage' && !pool[flow[0]]?.length) {
@@ -69,7 +69,7 @@ const change_flow = function(fb:FlowBehavior) {
     return null
 }
 
-const find_consume = function(creep:Creep,fb:FlowBehavior){
+const find_consume = function(creep:Creep,fb:CarrierMemory){
     const consume = Memory.rooms[fb.toRoom]._dynamic
     if(fb.current[1] == 'storage'){
         lazy_restock(creep,fb)
@@ -112,7 +112,7 @@ const find_consume = function(creep:Creep,fb:FlowBehavior){
     }
 }
 
-const find_collect = function(creep:Creep,fb:FlowBehavior){
+const find_collect = function(creep:Creep,fb:CarrierMemory){
     const collect = Memory.rooms[fb.fromRoom]._dynamic
     if(fb.current[0] == 'storage'){
         if(!fb.consume.length)
@@ -149,7 +149,7 @@ const find_collect = function(creep:Creep,fb:FlowBehavior){
     }
 }
 
-const lazy_restock = function(creep:Creep,fb:FlowBehavior) {
+const lazy_restock = function(creep:Creep,fb:CarrierMemory) {
     const toRoom = Game.rooms[fb.toRoom]
     if(!toRoom) return
     let storage:AnyStoreStructure|undefined = toRoom.storage
@@ -169,7 +169,7 @@ const lazy_restock = function(creep:Creep,fb:FlowBehavior) {
     }
 }
 
-const lazy_storage = function(fb:FlowBehavior) {
+const lazy_storage = function(fb:CarrierMemory) {
     const storage = Game.rooms[fb.fromRoom].storage
     if(!storage) return
     for(let consume of fb.consume){

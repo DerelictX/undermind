@@ -7,6 +7,8 @@ import { spawn_run } from "./structure/spawn";
 import { tower_run } from "./structure/tower";
 import { perform_any } from "./performer/behavior.any";
 import { static_updater } from "./scanner/static";
+import { run_carrier } from "./creep/role.carrier";
+import { run_worker } from "./creep/role.worker";
 
 export const loop = function () {
 
@@ -33,24 +35,32 @@ export const loop = function () {
     }
 
     //CREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEPS
-    for(var name in Memory.creeps) {
+    for(let name in Memory.creeps) {
         try{
             const creep = Game.creeps[name]
             if(!creep){
                 delete Memory.creeps[name];
                 continue
             }
-            if(creep.spawning)
-                continue
-            if(creep.memory.behavior)
-                perform_any(creep,creep.memory.behavior)
+            if(creep.spawning) continue
+            
+            const _class = creep.memory._class
+            switch(_class.bhvr_name){
+                case 'carrier':
+                    run_carrier(creep,_class)
+                    break
+                case 'worker':
+                    run_worker(creep,_class)
+                    break
+                default: throw new Error("Unexpected state.")
+            }
         }catch(error){
             console.log(name + ':' + error + '');
         }
     }
 
     //POOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOWWWWWWWEEEEEEEERRRRRRRRR
-    for(var name in Game.powerCreeps){
+    for(let name in Game.powerCreeps){
         try{
             const powerCreep = Game.powerCreeps[name]
             if(!powerCreep.shard)

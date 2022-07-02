@@ -1,5 +1,5 @@
+import { class_memory_initializer } from "@/creep/config.behavior";
 import { body_generator, default_body_config } from "@/creep/config.body";
-import { default_generalist_behavior } from "@/creep/config.behavior";
 
 export const spawn_run = function(room: Room) {
     if(room.energyAvailable < 300)
@@ -27,7 +27,7 @@ export const spawn_run = function(room: Room) {
                     + spawn_loop.interval + 10
                     
                 Memory.creeps[creep_name] = {
-                    behavior:   default_generalist_behavior(role_name,room.name,room.name)
+                    _class: class_memory_initializer[role_name](room.name,room.name)
                 }
                 return
             } else {
