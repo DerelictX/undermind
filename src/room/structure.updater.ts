@@ -69,9 +69,9 @@ export const structure_updater = {
         });
 
         for(let link of links){
-            if(link.pos.findInRange(FIND_STRUCTURES,2,{filter: {structureType: STRUCTURE_STORAGE}})){
+            if(link.pos.findInRange(FIND_MY_STRUCTURES,2,{filter: {structureType: STRUCTURE_STORAGE}}).length){
                 room.memory.structures.links.nexus.push(link.id)
-            } else if(link.pos.findInRange(FIND_SOURCES,2)){
+            } else if(link.pos.findInRange(FIND_SOURCES,2).length){
                 room.memory.structures.links.ins.push(link.id)
             } else room.memory.structures.links.outs.push(link.id)
         }

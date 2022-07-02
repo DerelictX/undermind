@@ -3,7 +3,6 @@ import _ from "lodash"
 export const static_updater = {
     sources: function (room:Room,pool:Partial<StaticTaskPool>) {
         pool.H_srcs = []
-        pool.W_srcs = []
         var T_srcs: Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[][] = [[],[],[]]
         const sources = room.find(FIND_SOURCES)
         for(let i in sources) {
@@ -20,11 +19,6 @@ export const static_updater = {
             T_srcs[i].push({
                 action: 'repair',
                 args: [container.id],
-                pos: container.pos
-            })
-            pool.W_srcs.push({
-                action: 'withdraw',
-                args: [container.id, 'energy', container.store['energy']],
                 pos: container.pos
             })
             

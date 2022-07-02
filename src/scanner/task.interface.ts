@@ -60,7 +60,6 @@ interface StaticTaskPool {
     T_src0:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]
     T_src1:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]
     T_src2:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]
-    W_srcs:     Posed<RestrictedPrimitiveDescript<'withdraw','energy'>>[]
 
     H_mnrl:     Posed<RestrictedPrimitiveDescript<'harvest',MineralConstant>>[]
     T_mnrl:     Posed<RestrictedPrimitiveDescript<'transfer',MineralConstant>>[]

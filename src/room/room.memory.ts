@@ -5,7 +5,7 @@ interface RoomMemory {
     _static:    Partial<StaticTaskPool>
     _dynamic:   {[k in keyof DynamicTaskPool]?: PosedCreepTask<TargetedAction>[]}
 
-    _spawn:     {[R in EnergyRole]: RoleSpawnLoop}
+    _spawn:     {[R in AnyRole]: RoleSpawnLoop}
 }
 
 type RoleSpawnLoop = {

@@ -51,16 +51,14 @@ const memory_inspector: {[k in keyof RoomMemory]:
             HarvesterDeposit:   spawn_loop,
             Builder:            spawn_loop,
             Maintainer:         spawn_loop,
+            EnergySupplier:     spawn_loop,
             Collector:          spawn_loop,
             Supplier:           spawn_loop,
             Chemist:            spawn_loop
         }
     },
-    _collect: function (room: Room): void {
-        room.memory._collect = {}
-    },
-    _consume: function (room: Room): void {
-        room.memory._consume = {}
+    _dynamic: function (room: Room): void {
+        room.memory._dynamic = {}
     },
     _static: function (room: Room): void {
         room.memory._static = {}

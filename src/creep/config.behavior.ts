@@ -80,7 +80,7 @@ export const class_memory_initializer: class_memory_initializer = {
     Upgrader: function (fromRoom: string, toRoom: string): WorkerMemory {
         return init_worker_behavior('Upgrader',fromRoom,toRoom)
     },
-    
+
     Builder: function (fromRoom: string, toRoom: string): WorkerMemory {
         return init_worker_behavior('Builder',fromRoom,toRoom)
     },

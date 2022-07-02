@@ -9,6 +9,7 @@ import { perform_any } from "./performer/behavior.any";
 import { static_updater } from "./scanner/static";
 import { run_carrier } from "./creep/role.carrier";
 import { run_worker } from "./creep/role.worker";
+import { link_run } from "./structure/link";
 
 export const loop = function () {
 
@@ -29,6 +30,7 @@ export const loop = function () {
             spawn_loop(room)
             spawn_run(room)
             tower_run(room)
+            link_run(room)
         }catch(error){
             console.log(name +':' + error);
         }

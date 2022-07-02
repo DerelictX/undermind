@@ -43,16 +43,21 @@ const spawn_handler: {[r in AnyRole]:(room:Room) => boolean} = {
     Maintainer: function (room: Room): boolean {
         return true
     },
+    EnergySupplier: function (room: Room): boolean {
+        return true
+    },
 
     Collector: function (room: Room): boolean {
         structure_updater.containers(room)
         structure_updater.links(room)
-        return true
+        if(room.storage?.my)
+            return true
+        return false
     },
     Supplier: function (room: Room): boolean {
         structure_updater.unique(room)
         structure_updater.towers(room)
-        if (room.memory._static.W_ctrl && room.memory._static.W_ctrl[0])
+        if(room.storage?.my)
             return true
         return false
     },
@@ -60,32 +65,29 @@ const spawn_handler: {[r in AnyRole]:(room:Room) => boolean} = {
         structure_updater.labs(room)
         return false
     },
-    EnergySupplier: function (room: Room): boolean {
-        return false
-    }
 }
 
 
 export const spawn_loop = function(room: Room) {
-    var role_name: EnergyRole
+    var role_name: AnyRole
     for(role_name in room.memory._spawn){
         const spawn = room.memory._spawn[role_name]
         
         if(spawn.reload_time > Game.time)
             continue
-        room.memory._spawn[role_name].reload_time = Game.time + 1500
-        if(room.memory._spawn[role_name].interval < 200)
-            room.memory._spawn[role_name].interval = 200
+        spawn.reload_time = Game.time + spawn.interval
+        if(spawn.interval < 200)
+            spawn.interval = 200
 
         if(spawn_handler[role_name](room))
-            room.memory._spawn[role_name].queued = 1
+            spawn.queued = 1
             
-        if(room.memory._spawn[role_name].body_parts.length == 0){
+        if(spawn.body_parts.length == 0){
             const generator = body_generator[default_body_config[role_name].generator]
             let workload = default_body_config[role_name].workload
-            room.memory._spawn[role_name].body_parts = generator(
+            spawn.body_parts = generator(
                 room.energyAvailable,workload)
         }
-        room.memory._spawn[role_name].boost_queue = []
+        spawn.boost_queue = []
     }
 }

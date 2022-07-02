@@ -116,36 +116,64 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
 
     H_srcs: function (room: Room) {
         if(!room.memory._static.H_srcs) return []
-        return room.memory._static.H_srcs
+        var tasks: Posed<RestrictedPrimitiveDescript<'harvest','energy'>>[] = []
+        for(let task of room.memory._static.H_srcs){
+            if(Game.getObjectById(task.args[0])?.energy)
+                tasks.push(task)
+        }
+        return tasks
     },
     H_src0: function (room: Room) {
         if(!room.memory._static.H_srcs || !room.memory._static.H_srcs[0]) return []
-        return [room.memory._static.H_srcs[0]]
+        return [room.memory._static.H_srcs[0]].slice()
     },
     H_src1: function (room: Room) {
         if(!room.memory._static.H_srcs || !room.memory._static.H_srcs[1]) return []
-        return [room.memory._static.H_srcs[1]]
+        return [room.memory._static.H_srcs[1]].slice()
     },
     H_src2: function (room: Room) {
         if(!room.memory._static.H_srcs || !room.memory._static.H_srcs[2]) return []
-        return [room.memory._static.H_srcs[2]]
+        return [room.memory._static.H_srcs[2]].slice()
     },
     H_mnrl: function (room: Room) {
         if(!room.memory._static.H_mnrl) return []
-        return room.memory._static.H_mnrl
+        return room.memory._static.H_mnrl.slice()
     },
     
     W_srcs: function (room: Room) {
-        if(!room.memory._static.W_srcs) return []
-        return room.memory._static.W_srcs
+        var tasks: Posed<RestrictedPrimitiveDescript<'withdraw','energy'>>[] = []
+        const containers = room.memory.structures.containers.ins
+                .map(id => Game.getObjectById(id))
+        for(let container of containers){
+            if(container && container.store['energy'] >= 800){
+                tasks.push({
+                    action: 'withdraw',
+                    args:   [container.id,'energy'],
+                    pos:    container.pos
+                })
+            }
+        }
+        /*
+        const links = room.memory.structures.links.outs
+                .map(id => Game.getObjectById(id))
+        for(let link of links){
+            if(link && link.store['energy'] >= 600){
+                tasks.push({
+                    action: 'withdraw',
+                    args:   [link.id,'energy'],
+                    pos:    link.pos
+                })
+            }
+        }*/
+        return tasks
     },
     W_mnrl: function (room: Room): PosedCreepTask<"withdraw">[] {
         if(!room.memory._static.W_mnrl) return []
-        return room.memory._static.W_mnrl
+        return room.memory._static.W_mnrl.slice()
     },
     W_ctrl: function (room: Room) {
         if(!room.memory._static.W_ctrl) return []
-        return room.memory._static.W_ctrl
+        return room.memory._static.W_ctrl.slice()
     },
 
     build: function (room: Room) {
@@ -310,19 +338,19 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
     },
     T_src0: function (room: Room) {
         if(!room.memory._static.T_src0) return []
-        return room.memory._static.T_src0
+        return room.memory._static.T_src0.slice()
     },
     T_src1: function (room: Room) {
         if(!room.memory._static.T_src1) return []
-        return room.memory._static.T_src1
+        return room.memory._static.T_src1.slice()
     },
     T_src2: function (room: Room) {
         if(!room.memory._static.T_src2) return []
-        return room.memory._static.T_src2
+        return room.memory._static.T_src2.slice()
     },
     T_mnrl: function (room: Room) {
         if(!room.memory._static.T_mnrl) return []
-        return room.memory._static.T_mnrl
+        return room.memory._static.T_mnrl.slice()
     },
     T_boost: function (room: Room): PosedCreepTask<"transfer">[] {
         const labs = room.memory.structures.labs

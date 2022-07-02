@@ -7,7 +7,7 @@ export const spawn_run = function(room: Room) {
     const spawn = room.find(FIND_MY_SPAWNS).find(spawn => !spawn.spawning)
     if(!spawn)return
 
-    let role_name: EnergyRole
+    let role_name: AnyRole
     for(role_name in room.memory._spawn){
         const spawn_loop = room.memory._spawn[role_name]
         if(spawn_loop.queued == 1){
@@ -25,7 +25,9 @@ export const spawn_run = function(room: Room) {
                 room.memory._spawn[role_name].queued = 0
                 room.memory._spawn[role_name].reload_time = Game.time
                     + spawn_loop.interval + 10
-                    
+                if(role_name == 'HarvesterDeposit' || role_name == 'HarvesterMineral'){
+                    break
+                }
                 Memory.creeps[creep_name] = {
                     _class: class_memory_initializer[role_name](room.name,room.name)
                 }
