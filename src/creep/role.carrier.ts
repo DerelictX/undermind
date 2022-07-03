@@ -6,6 +6,11 @@ import { perform_callback } from "../performer/behavior.callback"
 export const run_carrier = function(creep:Creep,fb:CarrierMemory){
     console.log(creep.name)
     if(fb.state == 'idle'){
+        if(creep.store.getUsedCapacity()){
+            lazy_restock(creep,fb)
+            fb.state = 'consume'
+            return TASK_DOING
+        }
         const flow = change_flow(fb)
         if(!flow) return TASK_DOING
         fb.current = flow
