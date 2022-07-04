@@ -58,7 +58,6 @@ export const static_updater = {
         
         pool.H_mnrl = [{action:'harvest',args:[mineral.id],pos: mineral.pos}]
         pool.T_mnrl = [{action:'transfer',args:[container.id,mineral.mineralType],pos:container.pos}]
-        pool.W_mnrl = [{action:'withdraw',args:[container.id,mineral.mineralType],pos:container.pos}]
     },
 
     controller: function (room:Room,pool:Partial<StaticTaskPool>) {

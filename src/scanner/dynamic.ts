@@ -1,6 +1,25 @@
 import { reactions } from "@/structure/lab"
 
 export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
+    W_cntn: function (room: Room) {
+        var tasks: Posed<PrimitiveDescript<'withdraw'>>[] = []
+        const containers = room.memory.structures.containers.ins
+            .map(id => Game.getObjectById(id))
+        for (let container of containers) {
+            if (!container || container.store.getUsedCapacity() < 1200)
+                continue
+            var store: StorePropertiesOnly = container.store
+            var resourceType: keyof typeof store
+            for (resourceType in store) {
+                tasks.push({
+                    action: 'withdraw',
+                    args: [container.id, resourceType],
+                    pos: container.pos
+                })
+            }
+        }
+        return tasks
+    },
     loot: function (room: Room) {
         var tasks: PosedCreepTask<"withdraw">[] = []
         const hostile_stores: (AnyStoreStructure & AnyOwnedStructure)[] = room.find(FIND_HOSTILE_STRUCTURES, {
@@ -11,8 +30,7 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
                 return false
             }
         })
-        for (let i in hostile_stores) {
-            const hostile_store = hostile_stores[i]
+        for (let hostile_store of hostile_stores) {
             var store: StorePropertiesOnly = hostile_store.store
             var resourceType: keyof typeof store
             for (resourceType in store) {
@@ -99,7 +117,7 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         return tasks
     },
     deposit: function (room: Room) {
-        var tasks: Posed<RestrictedPrimitiveDescript<'harvest',DepositConstant>>[] = []
+        var tasks: Posed<RestrictedPrimitiveDescript<'harvest', DepositConstant>>[] = []
         const deposits = room.find(FIND_DEPOSITS)
         for (let deposit of deposits) {
             tasks.push({
@@ -115,64 +133,73 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
     },
 
     H_srcs: function (room: Room) {
-        if(!room.memory._static.H_srcs) return []
-        var tasks: Posed<RestrictedPrimitiveDescript<'harvest','energy'>>[] = []
-        for(let task of room.memory._static.H_srcs){
-            if(Game.getObjectById(task.args[0])?.energy)
+        if (!room.memory._static.H_srcs)
+            return []
+        var tasks: Posed<RestrictedPrimitiveDescript<'harvest', 'energy'>>[] = []
+        for (let task of room.memory._static.H_srcs) {
+            if (Game.getObjectById(task.args[0])?.energy)
                 tasks.push(task)
         }
         return tasks
     },
     H_src0: function (room: Room) {
-        if(!room.memory._static.H_srcs || !room.memory._static.H_srcs[0]) return []
+        if (!room.memory._static.H_srcs || !room.memory._static.H_srcs[0])
+            return []
         return [room.memory._static.H_srcs[0]].slice()
     },
     H_src1: function (room: Room) {
-        if(!room.memory._static.H_srcs || !room.memory._static.H_srcs[1]) return []
+        if (!room.memory._static.H_srcs || !room.memory._static.H_srcs[1])
+            return []
         return [room.memory._static.H_srcs[1]].slice()
     },
     H_src2: function (room: Room) {
-        if(!room.memory._static.H_srcs || !room.memory._static.H_srcs[2]) return []
+        if (!room.memory._static.H_srcs || !room.memory._static.H_srcs[2])
+            return []
         return [room.memory._static.H_srcs[2]].slice()
     },
     H_mnrl: function (room: Room) {
-        if(!room.memory._static.H_mnrl) return []
+        if (!room.memory._static.H_mnrl)
+            return []
         return room.memory._static.H_mnrl.slice()
     },
-    
-    W_srcs: function (room: Room) {
-        var tasks: Posed<RestrictedPrimitiveDescript<'withdraw','energy'>>[] = []
+
+    W_ener: function (room: Room) {
+        var tasks: Posed<RestrictedPrimitiveDescript<'withdraw', 'energy'>>[] = []
+        const storage = room.storage
+        if (storage && storage.store['energy'] >= 10000) {
+            tasks.push({
+                action: 'withdraw',
+                args: [storage.id, 'energy'],
+                pos: storage.pos
+            })
+        }
         const containers = room.memory.structures.containers.ins
-                .map(id => Game.getObjectById(id))
-        for(let container of containers){
-            if(container && container.store['energy'] >= 800){
+            .map(id => Game.getObjectById(id))
+        for (let container of containers) {
+            if (container && container.store['energy'] >= 800) {
                 tasks.push({
                     action: 'withdraw',
-                    args:   [container.id,'energy'],
-                    pos:    container.pos
+                    args: [container.id, 'energy'],
+                    pos: container.pos
                 })
             }
         }
-        /*
         const links = room.memory.structures.links.outs
-                .map(id => Game.getObjectById(id))
-        for(let link of links){
-            if(link && link.store['energy'] >= 600){
+            .map(id => Game.getObjectById(id))
+        for (let link of links) {
+            if (link && link.store['energy'] >= 600) {
                 tasks.push({
                     action: 'withdraw',
-                    args:   [link.id,'energy'],
-                    pos:    link.pos
+                    args: [link.id, 'energy'],
+                    pos: link.pos
                 })
             }
-        }*/
+        }
         return tasks
     },
-    W_mnrl: function (room: Room): PosedCreepTask<"withdraw">[] {
-        if(!room.memory._static.W_mnrl) return []
-        return room.memory._static.W_mnrl.slice()
-    },
     W_ctrl: function (room: Room) {
-        if(!room.memory._static.W_ctrl) return []
+        if (!room.memory._static.W_ctrl)
+            return []
         return room.memory._static.W_ctrl.slice()
     },
 
@@ -225,27 +252,32 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
 
     fortify: function (room: Room) {
         var tasks: PosedCreepTask<"repair">[] = []
-        var wallHits = room.memory.structures.wall_hits - 1000
+        var wallHits = room.memory.structures.wall_hits
         let walls = room.find(FIND_STRUCTURES, {
             filter: (structure) => {
                 if (structure.hits > structure.hitsMax - 10000)
                     return false
                 if (structure.structureType == STRUCTURE_RAMPART)
-                    return structure.hits < wallHits && structure.my
+                    return structure.my
                 if (structure.structureType == STRUCTURE_WALL)
-                    return structure.hits < wallHits
+                    return true
                 return false
             }
         })
-        walls.forEach(s => tasks.push({
-            action: 'repair',
-            args: [s.id],
-            pos: s.pos
-        }))
-        if (walls.find(s => s.hits < wallHits * 0.9))
-            wallHits * 0.95
-        if (!walls.length)
-            wallHits += 30000
+
+        for (let wall of walls) {
+            if (wall.hits <= wallHits) {
+                if (wall.hits < wallHits * 0.9)
+                    wallHits * 0.95
+                tasks.push({
+                    action: 'repair',
+                    args: [wall.id],
+                    pos: wall.pos
+                })
+            }
+            else
+                wallHits += 3000
+        }
         if (wallHits >= 100000 && wallHits <= 100000000)
             room.memory.structures.wall_hits = wallHits
         return tasks
@@ -282,9 +314,10 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         }
         return tasks
     },
-    T_ext: function (room: Room): Posed<RestrictedPrimitiveDescript<'transfer','energy'>>[] {
-        var tasks: Posed<RestrictedPrimitiveDescript<'transfer','energy'>>[] = []
-        if(room.energyAvailable == room.energyCapacityAvailable) return []
+    T_ext: function (room: Room): Posed<RestrictedPrimitiveDescript<'transfer', 'energy'>>[] {
+        var tasks: Posed<RestrictedPrimitiveDescript<'transfer', 'energy'>>[] = []
+        if (room.energyAvailable == room.energyCapacityAvailable)
+            return []
         const extensions: (AnyStoreStructure & AnyOwnedStructure)[] = room.find(FIND_MY_STRUCTURES, {
             filter: (structure) => {
                 if (structure.structureType == STRUCTURE_EXTENSION
@@ -304,8 +337,8 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         }
         return tasks
     },
-    T_tower: function (room: Room): Posed<RestrictedPrimitiveDescript<'transfer','energy'>>[] {
-        var tasks: Posed<RestrictedPrimitiveDescript<'transfer','energy'>>[] = []
+    T_tower: function (room: Room): Posed<RestrictedPrimitiveDescript<'transfer', 'energy'>>[] {
+        var tasks: Posed<RestrictedPrimitiveDescript<'transfer', 'energy'>>[] = []
         const towers = room.memory.structures.towers
             .map(id => Game.getObjectById(id))
             .filter(s => s && s.store.getFreeCapacity('energy') >= 400)
@@ -320,8 +353,8 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         }
         return tasks
     },
-    T_ctrl: function (room: Room):Posed<RestrictedPrimitiveDescript<'transfer','energy'>>[] {
-        var tasks: Posed<RestrictedPrimitiveDescript<'transfer','energy'>>[] = []
+    T_ctrl: function (room: Room): Posed<RestrictedPrimitiveDescript<'transfer', 'energy'>>[] {
+        var tasks: Posed<RestrictedPrimitiveDescript<'transfer', 'energy'>>[] = []
         const containers = room.memory.structures.containers.outs
             .map(id => Game.getObjectById(id))
             .filter(s => s && s.store.getFreeCapacity('energy') >= 1200)
@@ -337,19 +370,23 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         return tasks
     },
     T_src0: function (room: Room) {
-        if(!room.memory._static.T_src0) return []
+        if (!room.memory._static.T_src0)
+            return []
         return room.memory._static.T_src0.slice()
     },
     T_src1: function (room: Room) {
-        if(!room.memory._static.T_src1) return []
+        if (!room.memory._static.T_src1)
+            return []
         return room.memory._static.T_src1.slice()
     },
     T_src2: function (room: Room) {
-        if(!room.memory._static.T_src2) return []
+        if (!room.memory._static.T_src2)
+            return []
         return room.memory._static.T_src2.slice()
     },
     T_mnrl: function (room: Room) {
-        if(!room.memory._static.T_mnrl) return []
+        if (!room.memory._static.T_mnrl)
+            return []
         return room.memory._static.T_mnrl.slice()
     },
     T_boost: function (room: Room): PosedCreepTask<"transfer">[] {
@@ -402,16 +439,14 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         return tasks
     },
     T_power: function (room: Room): PosedCreepTask<"transfer">[] {
-        if (!room.memory.structures.power_spawn)
-            return []
+        if (!room.memory.structures.power_spawn) return []
         const power_spawn = Game.getObjectById(room.memory.structures.power_spawn)
-        if (!power_spawn)
-            return []
+        if (!power_spawn) return []
         var tasks: PosedCreepTask<'transfer'>[] = []
         if (power_spawn.store['energy'] <= 3000) {
             tasks.push({
                 action: 'transfer',
-                args: [power_spawn.id, 'energy', power_spawn.store.getFreeCapacity('energy')],
+                args: [power_spawn.id, 'energy'],
                 pos: power_spawn.pos
             })
         }
@@ -424,6 +459,27 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         }
         return tasks
     },
+    T_nuker: function (room: Room): Posed<{ action: "transfer"; args: [target: Id<Structure<StructureConstant> | AnyCreep>, resourceType: ResourceConstant, amount?: number | undefined] }>[] {
+        if (!room.memory.structures.nuker) return []
+        const nuker = Game.getObjectById(room.memory.structures.nuker)
+        if (!nuker) return []
+        var tasks: PosedCreepTask<'transfer'>[] = []
+        if (nuker.store['energy'] <= 300000) {
+            tasks.push({
+                action: 'transfer',
+                args: [nuker.id, 'energy'],
+                pos: nuker.pos
+            })
+        }
+        if (nuker.store['G'] <= 5000) {
+            tasks.push({
+                action: 'transfer',
+                args: [nuker.id, 'G', nuker.store.getFreeCapacity('G')],
+                pos: nuker.pos
+            })
+        }
+        return tasks
+    },
     gen_safe: function (room: Room): PosedCreepTask<"generateSafeMode">[] {
         const controller = room.controller
         if (controller && controller.my && controller.level > 2 && controller.safeModeAvailable == 0) {
@@ -432,6 +488,8 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
                 args: [controller.id],
                 pos: controller.pos
             }]
-        } else return []
-    }
+        }
+        else
+            return []
+    },
 }
