@@ -5,14 +5,17 @@ interface RoomMemory {
     _static:    Partial<StaticTaskPool>
     _dynamic:   {[k in keyof DynamicTaskPool]?: PosedCreepTask<TargetedAction>[]}
 
-    _spawn:     {[R in AnyRole]: RoleSpawnLoop}
+    _spawn_loop:    {[R in AnyRole]: RoleSpawnLoop}
+    _spawn_queue:   SpawnTask[]
 }
 
-type RoleSpawnLoop = {
-    body_parts:     BodyPartConstant[]
-    boost_queue:    MineralBoostConstant[]
-    queued:         number
-} & Looper
+type RoleSpawnLoop = Looper
+type SpawnTask = {
+    role_name:  AnyRole
+    workload:   number
+    movecost:   number
+    _class:     CreepMemory['_class']
+}[]
 
 interface RoomStructureList {
     factory?:       Id<StructureFactory>|null

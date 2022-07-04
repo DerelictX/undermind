@@ -2,92 +2,85 @@ import { structure_updater } from "@/room/structure.updater"
 import { static_updater } from "@/scanner/static"
 import { body_generator, default_body_config } from "./config.body"
 
-const spawn_handler: {[r in AnyRole]:(room:Room) => boolean} = {
-    HarvesterSource0: function (room: Room): boolean {
+const spawn_handler: {[r in AnyRole]:(room:Room) => number} = {
+    HarvesterSource0: function (room: Room): number {
         static_updater['sources'](room, room.memory._static)
         if (room.memory._static.H_srcs && room.memory._static.H_srcs[0])
-            return true
-        return false
+            return 6
+        return 0
     },
-    HarvesterSource1: function (room: Room): boolean {
+    HarvesterSource1: function (room: Room): number {
         static_updater['sources'](room, room.memory._static)
         if (room.memory._static.H_srcs && room.memory._static.H_srcs[1])
-            return true
-        return false
+            return 6
+        return 0
     },
-    HarvesterSource2: function (room: Room): boolean {
+    HarvesterSource2: function (room: Room): number {
         static_updater['sources'](room, room.memory._static)
         if (room.memory._static.H_srcs && room.memory._static.H_srcs[2])
-            return true
-        return false
+            return 6
+        return 0
     },
-    HarvesterMineral: function (room: Room): boolean {
+    HarvesterMineral: function (room: Room): number {
         static_updater['mineral'](room, room.memory._static)
         if (room.memory._static.H_mnrl && room.memory._static.H_mnrl[0])
-            return true
-        return false
+            return 16
+        return 0
     },
-    Upgrader: function (room: Room): boolean {
+    Upgrader: function (room: Room): number {
         static_updater['controller'](room, room.memory._static)
         if (room.memory._static.W_ctrl && room.memory._static.W_ctrl[0])
-            return true
-        return false
+            return 10
+        return 0
     },
 
-    HarvesterDeposit: function (room: Room): boolean {
-        return false
+    HarvesterDeposit: function (room: Room): number {
+        return 0
     },
-    Builder: function (room: Room): boolean {
-        return true
+    Builder: function (room: Room): number {
+        return 6
     },
-    Maintainer: function (room: Room): boolean {
-        return true
+    Maintainer: function (room: Room): number {
+        return 4
     },
-    EnergySupplier: function (room: Room): boolean {
-        return true
+    EnergySupplier: function (room: Room): number {
+        return 12
     },
 
-    Collector: function (room: Room): boolean {
+    Collector: function (room: Room): number {
         structure_updater.containers(room)
         structure_updater.links(room)
         if(room.storage?.my)
-            return true
-        return false
+            return 12
+        return 0
     },
-    Supplier: function (room: Room): boolean {
+    Supplier: function (room: Room): number {
         structure_updater.unique(room)
         structure_updater.towers(room)
         if(room.storage?.my)
-            return true
-        return false
+            return 12
+        return 0
     },
-    Chemist: function (room: Room): boolean {
+    Chemist: function (room: Room): number {
         structure_updater.labs(room)
-        return false
+        return 0
     },
 }
 
 
 export const spawn_loop = function(room: Room) {
     var role_name: AnyRole
-    for(role_name in room.memory._spawn){
-        const spawn = room.memory._spawn[role_name]
-        
+    for(role_name in room.memory._spawn_loop){
+        const spawn = room.memory._spawn_loop[role_name]
         if(spawn.reload_time > Game.time)
             continue
-        spawn.reload_time = Game.time + spawn.interval
-        if(spawn.interval < 200)
-            spawn.interval = 200
 
-        if(spawn_handler[role_name](room))
+        const workload = spawn_handler[role_name](room)       
+        if(workload){
+            spawn.reload_time = Game.time + spawn.interval
             spawn.queued = 1
-            
-        if(spawn.body_parts.length == 0){
-            const generator = body_generator[default_body_config[role_name].generator]
-            let workload = default_body_config[role_name].workload
-            spawn.body_parts = generator(
-                room.energyAvailable,workload)
+        } else {
+            spawn.reload_time = Game.time + 400
         }
-        spawn.boost_queue = []
     }
 }

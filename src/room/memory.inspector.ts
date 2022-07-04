@@ -34,15 +34,12 @@ const memory_inspector: {[k in keyof RoomMemory]:
             wall_hits: wallHits
         }
     },
-    _spawn: function (room: Room) {
+    _spawn_loop: function (room: Room) {
         const spawn_loop: RoleSpawnLoop = {
             reload_time: Game.time + 10,
             interval: 1500,
-            body_parts: [],
-            boost_queue: [],
-            queued: 0
         }
-        room.memory._spawn = {
+        room.memory._spawn_loop = {
             HarvesterSource0:   spawn_loop,
             HarvesterSource1:   spawn_loop,
             HarvesterSource2:   spawn_loop,
@@ -56,6 +53,9 @@ const memory_inspector: {[k in keyof RoomMemory]:
             Supplier:           spawn_loop,
             Chemist:            spawn_loop
         }
+    },
+    _spawn_queue: function (room: Room) {
+        room.memory._spawn_queue = []
     },
     _dynamic: function (room: Room): void {
         room.memory._dynamic = {}
