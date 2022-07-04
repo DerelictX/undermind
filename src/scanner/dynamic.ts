@@ -163,7 +163,7 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         return room.memory._static.H_mnrl.slice()
     },
 
-    W_ener: function (room: Room) {
+    W_energy: function (room: Room) {
         var tasks: Posed<RestrictedPrimitiveDescript<'withdraw', 'energy'>>[] = []
         const storage = room.storage
         if (storage && storage.store['energy'] >= 10000) {
@@ -353,11 +353,11 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         }
         return tasks
     },
-    T_ctrl: function (room: Room): Posed<RestrictedPrimitiveDescript<'transfer', 'energy'>>[] {
+    T_cntn: function (room: Room): Posed<RestrictedPrimitiveDescript<'transfer', 'energy'>>[] {
         var tasks: Posed<RestrictedPrimitiveDescript<'transfer', 'energy'>>[] = []
         const containers = room.memory.structures.containers.outs
             .map(id => Game.getObjectById(id))
-            .filter(s => s && s.store.getFreeCapacity('energy') >= 1200)
+            .filter(s => s && s.store.getFreeCapacity('energy') >= 1000)
         for (let container of containers) {
             if (!container)
                 continue
@@ -464,14 +464,14 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         const nuker = Game.getObjectById(room.memory.structures.nuker)
         if (!nuker) return []
         var tasks: PosedCreepTask<'transfer'>[] = []
-        if (nuker.store['energy'] <= 300000) {
+        if (nuker.store.getFreeCapacity('energy')) {
             tasks.push({
                 action: 'transfer',
                 args: [nuker.id, 'energy'],
                 pos: nuker.pos
             })
         }
-        if (nuker.store['G'] <= 5000) {
+        if (nuker.store.getFreeCapacity('G')) {
             tasks.push({
                 action: 'transfer',
                 args: [nuker.id, 'G', nuker.store.getFreeCapacity('G')],

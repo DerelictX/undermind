@@ -25,13 +25,12 @@ interface DynamicTaskPool {
     T_mnrl:     Posed<RestrictedPrimitiveDescript<'transfer',MineralConstant>>[]
     deposit:    Posed<RestrictedPrimitiveDescript<'harvest',DepositConstant>>[]
     //controller
-    T_ctrl:     Posed<RestrictedPrimitiveDescript<'transfer','energy'>>[]
     W_ctrl:     Posed<RestrictedPrimitiveDescript<'withdraw','energy'>>[]
     U_ctrl:     Posed<PrimitiveDescript<'upgradeController'>>[]
     //get energy
     H_srcs:     Posed<RestrictedPrimitiveDescript<'harvest','energy'>>[]
     recycle:    Posed<PrimitiveDescript<'dismantle'>>[]
-    W_ener:     Posed<RestrictedPrimitiveDescript<'withdraw','energy'>>[]
+    W_energy:   Posed<RestrictedPrimitiveDescript<'withdraw','energy'>>[]
     //consume energy
     build:      Posed<PrimitiveDescript<'build'>>[]
     fortify:    Posed<PrimitiveDescript<'repair'>>[]
@@ -41,6 +40,7 @@ interface DynamicTaskPool {
     downgraded: Posed<PrimitiveDescript<'upgradeController'>>[]
     T_ext:      Posed<RestrictedPrimitiveDescript<'transfer','energy'>>[]
     T_tower:    Posed<RestrictedPrimitiveDescript<'transfer','energy'>>[]
+    T_cntn:     Posed<RestrictedPrimitiveDescript<'transfer','energy'>>[]
     //collect
     W_cntn:     Posed<PrimitiveDescript<'withdraw'>>[]
     loot:       Posed<PrimitiveDescript<'withdraw'>>[]
@@ -73,7 +73,6 @@ interface StaticTaskPool {
 
 type EnSource = FilterPoolKey<(WorkAction|CarryAction)&CollectAction,'energy'>
 type EnSink =   FilterPoolKey<(WorkAction|CarryAction)&ConsumeAction,'energy'>
-
 type ResFlow = [
     from:   FilterPoolKey<CarryAction&CollectAction,ResourceConstant>|'storage',
     to:     FilterPoolKey<CarryAction&ConsumeAction,ResourceConstant>|'storage']

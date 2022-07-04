@@ -6,21 +6,21 @@ export const work_priority: {[role in EnergyRole]:EnWorkerPriority} = {
     HarvesterSource2: [['H_src2'], ['T_src2']],
     Upgrader: [['W_ctrl'], ['U_ctrl']],
     Builder: [
-        ['W_ener', 'H_srcs'],
+        ['W_energy', 'H_srcs'],
         ['repair', 'anti_nuke', 'build', 'fortify', 'U_ctrl']],
     Maintainer: [
-        ['W_ener', 'H_srcs'],
+        ['W_energy', 'H_srcs'],
         ['repair', 'downgraded', 'decayed', 'U_ctrl']],
     EnergySupplier: [
-        ['W_ener'],
-        ['T_ext', 'T_tower', 'T_ctrl']]
+        ['W_energy'],
+        ['T_ext', 'T_tower', 'T_cntn']]
 }
 
 export const carry_priority: {[role in CarrierRole]:ResFlow[]} = {
     Collector: [
         ['W_cntn', 'storage'], ['sweep', 'storage'], ['loot', 'storage']],
     Supplier: [
-        ['W_ener', 'T_ext'], ['W_ener', 'T_tower'],
+        ['W_energy', 'T_ext'], ['W_energy', 'T_tower'],
         ['storage', 'T_power'], ['storage', 'T_nuker']],
     Chemist: [
         ['storage','T_boost'], ['storage','T_react'], ['compound','storage']]
