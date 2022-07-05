@@ -1,5 +1,6 @@
 import { structure_updater } from "@/room/structure.updater"
 import { static_updater } from "@/scanner/static"
+import { class_memory_initializer } from "./config.behavior"
 import { body_generator, default_body_config } from "./config.body"
 
 const spawn_handler: {[r in AnyRole]:(room:Room) => number} = {
@@ -71,16 +72,24 @@ const spawn_handler: {[r in AnyRole]:(room:Room) => number} = {
 export const spawn_loop = function(room: Room) {
     var role_name: AnyRole
     for(role_name in room.memory._spawn_loop){
-        const spawn = room.memory._spawn_loop[role_name]
-        if(spawn.reload_time > Game.time)
+        const spawn_loop = room.memory._spawn_loop[role_name]
+        if(spawn_loop.reload_time > Game.time)
             continue
-
+        if(role_name == 'HarvesterDeposit' || role_name == 'HarvesterMineral')
+            continue
         const workload = spawn_handler[role_name](room)       
         if(workload){
-            spawn.reload_time = Game.time + spawn.interval
-            spawn.queued = 1
-        } else {
-            spawn.reload_time = Game.time + 400
+            spawn_loop.reload_time = Game.time + 400
+            continue
         }
+
+        spawn_loop.reload_time = Game.time + spawn_loop.interval
+        const spawn_room = room.name
+        Memory.rooms[spawn_room]._spawn_queue.push({
+            room_name:  room.name,
+            role_name:  role_name,
+            workload:   workload,
+            _class:     class_memory_initializer[role_name](spawn_room,room.name)
+        })
     }
 }

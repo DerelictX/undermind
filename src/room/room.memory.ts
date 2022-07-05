@@ -11,11 +11,11 @@ interface RoomMemory {
 
 type RoleSpawnLoop = Looper
 type SpawnTask = {
+    room_name:  string
     role_name:  AnyRole
     workload:   number
-    movecost:   number
     _class:     CreepMemory['_class']
-}[]
+}
 
 interface RoomStructureList {
     factory?:       Id<StructureFactory>|null

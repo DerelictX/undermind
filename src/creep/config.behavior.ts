@@ -54,42 +54,42 @@ const init_worker_behavior = function(role:EnergyRole,
 }
 
 type class_memory_initializer = {
-    [r in CarrierRole]: (fromRoom:string, toRoom:string) => CarrierMemory
+    [r in CarrierRole]: (spawnRoom:string, requestRoom:string) => CarrierMemory
 } & {
-    [r in EnergyRole]: (fromRoom:string, toRoom:string) => WorkerMemory
+    [r in EnergyRole]: (spawnRoom:string, requestRoom:string) => WorkerMemory
 }
 
 export const class_memory_initializer: class_memory_initializer = {
-    Collector: function (fromRoom: string, toRoom: string): CarrierMemory {
-        return init_carrier_behavior('Collector',fromRoom,toRoom)
+    Collector: function (spawnRoom:string, requestRoom:string): CarrierMemory {
+        return init_carrier_behavior('Collector',requestRoom,spawnRoom)
     },
-    Supplier: function (fromRoom: string, toRoom: string): CarrierMemory {
-        return init_carrier_behavior('Supplier',fromRoom,toRoom)
+    Supplier: function (spawnRoom:string, requestRoom:string): CarrierMemory {
+        return init_carrier_behavior('Supplier',spawnRoom,requestRoom)
     },
-    Chemist: function (fromRoom: string, toRoom: string): CarrierMemory {
-        return init_carrier_behavior('Chemist',fromRoom,toRoom)
-    },
-
-    HarvesterSource0: function (fromRoom: string, toRoom: string): WorkerMemory {
-        return init_worker_behavior('HarvesterSource0',fromRoom,toRoom)
-    },
-    HarvesterSource1: function (fromRoom: string, toRoom: string): WorkerMemory {
-        return init_worker_behavior('HarvesterSource1',fromRoom,toRoom)
-    },
-    HarvesterSource2: function (fromRoom: string, toRoom: string): WorkerMemory {
-        return init_worker_behavior('HarvesterSource2',fromRoom,toRoom)
-    },
-    Upgrader: function (fromRoom: string, toRoom: string): WorkerMemory {
-        return init_worker_behavior('Upgrader',fromRoom,toRoom)
+    Chemist: function (spawnRoom:string, requestRoom:string): CarrierMemory {
+        return init_carrier_behavior('Chemist',requestRoom,requestRoom)
     },
 
-    Builder: function (fromRoom: string, toRoom: string): WorkerMemory {
-        return init_worker_behavior('Builder',fromRoom,toRoom)
+    HarvesterSource0: function (spawnRoom:string, requestRoom:string): WorkerMemory {
+        return init_worker_behavior('HarvesterSource0',requestRoom,requestRoom)
     },
-    Maintainer: function (fromRoom: string, toRoom: string): WorkerMemory {
-        return init_worker_behavior('Maintainer',fromRoom,toRoom)
+    HarvesterSource1: function (spawnRoom:string, requestRoom:string): WorkerMemory {
+        return init_worker_behavior('HarvesterSource1',requestRoom,requestRoom)
     },
-    EnergySupplier: function (fromRoom: string, toRoom: string): WorkerMemory {
-        return init_worker_behavior('EnergySupplier',fromRoom,toRoom)
+    HarvesterSource2: function (spawnRoom:string, requestRoom:string): WorkerMemory {
+        return init_worker_behavior('HarvesterSource2',requestRoom,requestRoom)
+    },
+    Upgrader: function (spawnRoom:string, requestRoom:string): WorkerMemory {
+        return init_worker_behavior('Upgrader',requestRoom,requestRoom)
+    },
+
+    Builder: function (spawnRoom:string, requestRoom:string): WorkerMemory {
+        return init_worker_behavior('Builder',spawnRoom,requestRoom)
+    },
+    Maintainer: function (spawnRoom:string, requestRoom:string): WorkerMemory {
+        return init_worker_behavior('Maintainer',spawnRoom,requestRoom)
+    },
+    EnergySupplier: function (spawnRoom:string, requestRoom:string): WorkerMemory {
+        return init_worker_behavior('EnergySupplier',requestRoom,spawnRoom)
     }
 }
