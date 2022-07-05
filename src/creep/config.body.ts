@@ -1,89 +1,131 @@
-import _ from "lodash"
+import _, { ceil } from "lodash"
 
-type body_generator_name = "WCM" | "W2M" | "W2cM" | "C2M" | "ClM"
+type body_generator_name =
+    | "WCM" | "W2cM" | "W2M" | "C2M"
+    | "WCM2" | "WcM" | "WM" | "CM"
+    | "ClM" | "AM" | "HM" | "RM"
 
 export const body_generator:{[c in body_generator_name]:
-    (energy_cost:number,workload:number)=>BodyPartConstant[]
+    (workload:number)=>BodyPartConstant[]
 } = {
-    WCM:function(energy_cost:number,workload:number){
-        const yy = BODYPART_COST[WORK] + BODYPART_COST[CARRY] + BODYPART_COST[MOVE]
-        const xx = Math.min(energy_cost/yy,50/3,workload)
-        if(xx < 1) return []
-        let ret:BodyPartConstant[] = []
-        for(let i = 1; i <= xx; i++)
+    WCM: function (workload: number) {
+        let ret: BodyPartConstant[] = []
+        for (let i = 1; i <= workload; i++)
             ret.push(WORK)
-        for(let i = 1; i <= xx; i++)
+        for (let i = 1; i <= workload; i++)
             ret.push(CARRY)
-        for(let i = 1; i <= xx; i++)
+        for (let i = 1; i <= workload; i++)
             ret.push(MOVE)
         return ret
     },
-    W2M:function(energy_cost:number,workload:number){
-        const yy = BODYPART_COST[WORK] * 2 + BODYPART_COST[MOVE]
-        const xx = Math.min(energy_cost/yy,50/3,workload)
-        if(xx < 1) return []
-        let ret:BodyPartConstant[] = []
-        for(let i = 1; i <= xx; i++){
+    W2M: function (workload: number) {
+        let ret: BodyPartConstant[] = []
+        for (let i = 1; i <= workload; i++)
             ret.push(WORK)
-            ret.push(WORK)
-        }
-        for(let i = 1; i <= xx; i++)
+        for (let i = 1; i <= ceil(workload / 2); i++)
             ret.push(MOVE)
         return ret
     },
-    W2cM:function(energy_cost:number,workload:number){
-        const yy = BODYPART_COST[WORK] * 2 + BODYPART_COST[MOVE]
-        const xx = Math.min((energy_cost-BODYPART_COST[CARRY])/yy,49/3,workload)
-        if(xx < 1) return []
-        let ret:BodyPartConstant[] = []
-        for(let i = 1; i <= xx; i++){
+    W2cM: function (workload: number) {
+        let ret: BodyPartConstant[] = []
+        for (let i = 1; i <= workload; i++)
             ret.push(WORK)
-            ret.push(WORK)
-        }
         ret.push(CARRY)
-        for(let i = 1; i <= xx; i++)
+        for (let i = 1; i <= ceil(workload / 2); i++)
             ret.push(MOVE)
         return ret
     },
-    C2M:function(energy_cost:number,workload:number){
-        const yy = BODYPART_COST[CARRY] * 2 + BODYPART_COST[MOVE]
-        const xx = Math.min(energy_cost/yy,50/3,workload)
-        if(xx < 1) return []
-        let ret:BodyPartConstant[] = []
-        for(let i = 1; i <= 2 * xx; i++)
+    C2M: function (workload: number) {
+        let ret: BodyPartConstant[] = []
+        for (let i = 1; i <= workload; i++)
             ret.push(CARRY)
-        for(let i = 1; i <= xx; i++)
+        for (let i = 1; i <= ceil(workload / 2); i++)
             ret.push(MOVE)
         return ret
     },
-    ClM:function(energy_cost:number,workload:number){
-        const yy = BODYPART_COST[CLAIM] + BODYPART_COST[MOVE]
-        const xx = Math.min(energy_cost/yy,50/2,workload)
-        if(xx < 1) return []
-        let ret:BodyPartConstant[] = []
-        for(let i = 1; i <= xx; i++)
+    WCM2: function (workload: number): BodyPartConstant[] {
+        let ret: BodyPartConstant[] = []
+        for (let i = 1; i <= workload; i++)
+            ret.push(WORK)
+        for (let i = 1; i <= workload; i++)
+            ret.push(CARRY)
+        for (let i = 1; i <= workload * 2; i++)
+            ret.push(MOVE)
+        return ret
+    },
+    WcM: function (workload: number): BodyPartConstant[] {
+        let ret: BodyPartConstant[] = []
+        for (let i = 1; i <= workload; i++)
+            ret.push(WORK)
+        ret.push(CARRY)
+        for (let i = 1; i <= workload; i++)
+            ret.push(MOVE)
+        return ret
+    },
+    ClM: function (workload: number) {
+        let ret: BodyPartConstant[] = []
+        for (let i = 1; i <= workload; i++)
             ret.push(CLAIM)
-        for(let i = 1; i <= xx; i++)
+        for (let i = 1; i <= workload; i++)
             ret.push(MOVE)
         return ret
     },
+    WM: function (workload: number): BodyPartConstant[] {
+        let ret: BodyPartConstant[] = []
+        for (let i = 1; i <= workload; i++)
+            ret.push(WORK)
+        for (let i = 1; i <= workload; i++)
+            ret.push(MOVE)
+        return ret
+    },
+    CM: function (workload: number): BodyPartConstant[] {
+        let ret: BodyPartConstant[] = []
+        for (let i = 1; i <= workload; i++)
+            ret.push(CARRY)
+        for (let i = 1; i <= workload; i++)
+            ret.push(MOVE)
+        return ret
+    },
+    AM: function (workload: number): BodyPartConstant[] {
+        let ret: BodyPartConstant[] = []
+        for (let i = 1; i <= workload; i++)
+            ret.push(ATTACK)
+        for (let i = 1; i <= workload; i++)
+            ret.push(MOVE)
+        return ret
+    },
+    HM: function (workload: number): BodyPartConstant[] {
+        let ret: BodyPartConstant[] = []
+        for (let i = 1; i <= workload; i++)
+            ret.push(HEAL)
+        for (let i = 1; i <= workload; i++)
+            ret.push(MOVE)
+        return ret
+    },
+    RM: function (workload: number): BodyPartConstant[] {
+        let ret: BodyPartConstant[] = []
+        for (let i = 1; i <= workload; i++)
+            ret.push(RANGED_ATTACK)
+        for (let i = 1; i <= workload; i++)
+            ret.push(MOVE)
+        return ret
+    }
 }
 _.assign(global, {body_generator:body_generator})
 
-export const default_body_config: {[R in AnyRole]:
-    {generator:body_generator_name}
-} = {
-    HarvesterSource0: { generator: "W2cM" },
-    HarvesterSource1: { generator: "W2cM" },
-    HarvesterSource2: { generator: "W2cM" },
-    HarvesterMineral: { generator: "W2cM" },
-    HarvesterDeposit: { generator: "WCM" },
+export const default_body_config: {[R in AnyRole]: body_generator_name} = {
+    HarvesterSource0: "W2cM",
+    HarvesterSource1: "W2cM",
+    HarvesterSource2: "W2cM",
+    HarvesterMineral: "W2cM",
+    HarvesterDeposit: "WCM",
+    
+    EnergySupplier: "C2M",
+    Upgrader: "W2cM",
+    Builder: "WCM",
+    Maintainer: "WCM",
 
-    Upgrader: { generator: "W2cM" },
-    Builder: { generator: "WCM" },
-    Maintainer: { generator: "WCM" },
-    Collector: { generator: "C2M" },
-    Supplier: { generator: "C2M" },
-    Chemist: { generator: "C2M" },
-    EnergySupplier: { generator: "C2M" },
+    Collector: "C2M",
+    Supplier: "C2M",
+    Chemist: "C2M",
 }

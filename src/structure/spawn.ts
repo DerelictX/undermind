@@ -1,4 +1,3 @@
-import { class_memory_initializer } from "@/creep/config.behavior";
 import { body_generator, default_body_config } from "@/creep/config.body";
 
 export const spawn_run = function(room: Room) {
@@ -11,8 +10,8 @@ export const spawn_run = function(room: Room) {
     room.memory._spawn_queue.shift()
 
     const role_name: AnyRole = spawn_task.role_name
-    const generator = body_generator[default_body_config[role_name].generator]
-    const body_parts = generator(room.energyAvailable, spawn_task.workload)
+    const generator = body_generator[default_body_config[role_name]]
+    const body_parts = generator(spawn_task.workload)
     const creep_name = role_name +'_'+ room.name +'_'+ Game.time % 10000
     
     const ret = spawn.spawnCreep(body_parts, creep_name)
