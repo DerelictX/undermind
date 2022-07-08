@@ -11,9 +11,9 @@ export const spawn_run = function(room: Room) {
 
     const role_name: AnyRole = spawn_task.role_name
     const generator = body_generator[default_body_config[role_name]]
-    const body_parts = generator(spawn_task.workload)
+    const body_parts = generator(spawn_task.workload, 2)
     const creep_name = role_name +'_'+ room.name +'T'+ Game.time % 10000
-    
+
     const ret = spawn.spawnCreep(body_parts, creep_name)
     const spawn_loop = Memory.rooms[spawn_task.room_name]._spawn_loop[role_name]
     if(ret == OK){

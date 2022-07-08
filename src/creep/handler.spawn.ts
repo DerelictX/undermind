@@ -1,7 +1,6 @@
 import { structure_updater } from "@/room/structure.updater"
 import { static_updater } from "@/scanner/static"
 import { class_memory_initializer } from "./config.behavior"
-import { body_generator, default_body_config } from "./config.body"
 
 const spawn_handler: {[r in AnyRole]:(room:Room) => number} = {
     HarvesterSource0: function (room: Room): number {
