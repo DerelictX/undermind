@@ -1,4 +1,5 @@
 import { body_generator, default_body_config } from "@/creep/config.body";
+import { ceil } from "lodash";
 
 export const spawn_run = function(room: Room) {
     if(room.energyAvailable < 300) return
@@ -11,11 +12,14 @@ export const spawn_run = function(room: Room) {
 
     const role_name: AnyRole = spawn_task.role_name
     const generator = body_generator[default_body_config[role_name]]
-    const body_parts = generator(spawn_task.workload, 2)
     const creep_name = role_name +'_'+ room.name +'T'+ Game.time % 10000
-
-    const ret = spawn.spawnCreep(body_parts, creep_name)
     const spawn_loop = Memory.rooms[spawn_task.room_name]._spawn_loop[role_name]
+
+    let ret = spawn.spawnCreep(generator(spawn_task.workload, 1), creep_name)
+    if(ret == ERR_NOT_ENOUGH_ENERGY){
+        ret = spawn.spawnCreep(generator(ceil(spawn_task.workload/2), 1), creep_name)
+    }
+
     if(ret == OK){
         spawn_loop.reload_time = Game.time + spawn_loop.interval + 10
         if(role_name == 'HarvesterDeposit' || role_name == 'HarvesterMineral')

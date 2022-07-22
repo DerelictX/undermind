@@ -38,7 +38,15 @@ const spawn_handler: {[r in AnyRole]:(room:Room) => number} = {
         return 0
     },
     Builder: function (room: Room): number {
-        return 6
+        const storage = room.storage
+        if(!storage){
+            if(room.find(FIND_MY_CONSTRUCTION_SITES).length)
+                return 6
+        } else {
+            if(storage.store.energy > 180000)
+                return 16
+        }
+        return 0
     },
     Maintainer: function (room: Room): number {
         return 4
