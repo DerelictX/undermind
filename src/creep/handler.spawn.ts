@@ -1,37 +1,45 @@
 import { structure_updater } from "@/room/structure.updater"
 import { static_updater } from "@/scanner/static"
-import { class_memory_initializer } from "./config.behavior"
+import { init_carrier_behavior, init_worker_behavior } from "./config.behavior"
 
-const spawn_handler: {[r in AnyRole]:(room:Room) => SpawnTask|null} = {
+type RoleImpl = Omit<SpawnTask,'_caller'>
+const spawn_handler: {[r in AnyRole]:(room:Room) => RoleImpl|null} = {
     HarvesterSource0: function (room: Room) {
         static_updater['sources'](room, room.memory._static)
-        if (room.memory._static.H_srcs && room.memory._static.H_srcs[0])
-            return 10
-        return null
+        if (!room.memory._static.H_srcs?.at(0)) return null
+        return {
+            _body:{generator:'Wc',workload:10},
+            _class:init_worker_behavior('HarvesterSource0',room.name,room.name)
+        }
     },
     HarvesterSource1: function (room: Room) {
         static_updater['sources'](room, room.memory._static)
-        if (room.memory._static.H_srcs && room.memory._static.H_srcs[1])
-            return 10
-        return null
+        if (!room.memory._static.H_srcs?.at(1)) return null
+        return {
+            _body:{generator:'Wc',workload:10},
+            _class:init_worker_behavior('HarvesterSource1',room.name,room.name)
+        }
     },
     HarvesterSource2: function (room: Room) {
         static_updater['sources'](room, room.memory._static)
-        if (room.memory._static.H_srcs && room.memory._static.H_srcs[2])
-            return 10
-        return null
+        if (!room.memory._static.H_srcs?.at(2)) return null
+        return {
+            _body:{generator:'Wc',workload:10},
+            _class:init_worker_behavior('HarvesterSource2',room.name,room.name)
+        }
     },
     HarvesterMineral: function (room: Room) {
         static_updater['mineral'](room, room.memory._static)
-        if (room.memory._static.H_mnrl && room.memory._static.H_mnrl[0])
-            return 15
+        if (!room.memory._static.H_mnrl?.at(0)) return null
         return null
     },
     Upgrader: function (room: Room) {
         static_updater['controller'](room, room.memory._static)
-        if (room.memory._static.W_ctrl && room.memory._static.W_ctrl[0])
-            return 10
-        return null
+        if (!room.memory._static.W_ctrl?.at(0)) return null
+        return {
+            _body:{generator:'Wc',workload:10},
+            _class:init_worker_behavior('Upgrader',room.name,room.name)
+        }
     },
 
     HarvesterDeposit: function (room: Room) {
@@ -40,36 +48,50 @@ const spawn_handler: {[r in AnyRole]:(room:Room) => SpawnTask|null} = {
     Builder: function (room: Room) {
         const storage = room.storage
         if(!storage){
-            if(room.find(FIND_MY_CONSTRUCTION_SITES).length)
-                return 8
+            if(!room.find(FIND_MY_CONSTRUCTION_SITES).length) return null
+            return {
+                _body:{generator:'WC',workload:12},
+                _class:init_worker_behavior('Builder',room.name,room.name)
+            }
         } else {
-            if(storage.store.energy > 180000)
-                return 24
+            if(storage.store.energy <= 180000) return null
+            return {
+                _body:{generator:'WC',workload:24},
+                _class:init_worker_behavior('Builder',room.name,room.name)
+            }
         }
-        return null
     },
     Maintainer: function (room: Room) {
-        return 8
+        return {
+            _body:{generator:'WC',workload:8},
+            _class:init_worker_behavior('Maintainer',room.name,room.name)
+        }
     },
     EnergySupplier: function (room: Room) {
-        if(room.storage?.my)
-            return null
-        return 12
+        if(!room.storage?.my) return null
+        return {
+            _body:{generator:'C',workload:12},
+            _class:init_worker_behavior('EnergySupplier',room.name,room.name)
+        }
     },
 
     Collector: function (room: Room) {
         structure_updater.containers(room)
         structure_updater.links(room)
-        if(room.storage?.my)
-            return 12
-        return null
+        if(!room.storage?.my) return null
+        return {
+            _body:{generator:'C',workload:12},
+            _class:init_carrier_behavior('Collector',room.name,room.name)
+        }
     },
     Supplier: function (room: Room) {
         structure_updater.unique(room)
         structure_updater.towers(room)
-        if(room.storage?.my)
-            return 12
-        return null
+        if(!room.storage?.my) return null
+        return {
+            _body:{generator:'C',workload:12},
+            _class:init_carrier_behavior('Supplier',room.name,room.name)
+        }
     },
     Chemist: function (room: Room) {
         structure_updater.labs(room)
@@ -85,14 +107,15 @@ export const spawn_loop = function(room: Room) {
         if(spawn_loop.reload_time > Game.time)
             continue
         
-        const spawn_task = spawn_handler[role_name](room)       
-        if(!spawn_task){
+        const role_impl = spawn_handler[role_name](room)
+        if(!role_impl){
             spawn_loop.reload_time = Game.time + 400
             continue
         }
 
         spawn_loop.reload_time = Game.time + spawn_loop.interval
         const spawn_room = room.name
-        Memory.rooms[spawn_room]._spawn_queue.push(spawn_task)
+        const caller = {_caller:{room_name:room.name,looper:role_name}}
+        Memory.rooms[spawn_room]._spawn_queue.push({...caller,...role_impl})
     }
 }
