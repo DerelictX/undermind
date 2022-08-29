@@ -4,7 +4,10 @@ type VirtualPerformer<T extends keyof VirtualAction>
 const performer:{[action in keyof VirtualAction]: VirtualPerformer<action>} = {
     approach: function (creep: Creep | PowerCreep, args: VirtualAction['approach']) {
         const pos = new RoomPosition(args[0].x, args[0].y, args[0].roomName)
-        return creep.pos.inRangeTo(pos, args[1]) ? OK : creep.moveTo(pos) //custom_move.moveTo(creep,pos)
+        if(creep.pos.inRangeTo(pos, args[1])) return OK
+        const ret = creep.moveTo(pos) //custom_move.moveTo(creep,pos)
+        if(ret == ERR_TIRED) return OK
+        return ret
     },
 
     escape: function (creep: Creep | PowerCreep, args: VirtualAction['escape']) {

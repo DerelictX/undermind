@@ -5,7 +5,7 @@ import { TASK_COMPLETE, TASK_DOING, TASK_FAILED } from "./behavior.any";
 export const perform_callback = function(creep:Creep, behavior:CallbackBehavior<AnyAction>): TaskReturnCode {
     let ret: ScreepsReturnCode
     let callback: CallbackBehavior<AnyAction> | TaskReturnCode | undefined = behavior
-    console.log(creep.name + ':\tcallbackful')
+    //console.log(creep.name + ':\tcallbackful')
     do{
         switch(callback.action){
             case 'approach':
@@ -16,7 +16,7 @@ export const perform_callback = function(creep:Creep, behavior:CallbackBehavior<
                 ret = perform_virtual(creep,callback); break;
             default: ret = perform_primitive(creep,callback)
         }
-        console.log('\t' + ret + ':\t' + callback.action)
+        //console.log('\t' + ret + ':\t' + callback.action)
         callback = callback[ret]
         if(callback == TASK_DOING || callback == TASK_COMPLETE || callback == TASK_FAILED)
             return callback

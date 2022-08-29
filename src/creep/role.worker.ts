@@ -5,12 +5,12 @@ import { work_priority } from "./config.behavior"
 
 export const run_worker = function(creep:Creep,fb:WorkerMemory){
     if(fb.state == 'collect'){
-        if(creep.store.getFreeCapacity('energy') == 0){
-            fb.state = 'consume'
-            return TASK_COMPLETE
-        }
         if(!fb.collect.length){
-            change_flow(fb)
+            if(creep.store.getFreeCapacity('energy') == 0){
+                fb.state = 'consume'
+                return TASK_COMPLETE
+            }
+            change_flow(creep,fb)
             if(!fb.collect.length) return TASK_COMPLETE
         }
         const ret = perform_callback(creep,fb.collect[0])
@@ -18,12 +18,12 @@ export const run_worker = function(creep:Creep,fb:WorkerMemory){
         return TASK_DOING
     }
     if(fb.state == 'consume'){
-        if(creep.store.getUsedCapacity('energy') == 0){
-            fb.state = 'collect'
-            return TASK_COMPLETE
-        }
         if(!fb.consume.length) {
-            change_flow(fb)
+            if(creep.store.getUsedCapacity('energy') == 0){
+                fb.state = 'collect'
+                return TASK_COMPLETE
+            }
+            change_flow(creep,fb)
             if(!fb.consume.length) return TASK_COMPLETE
         }
         const ret = perform_callback(creep,fb.consume[0])
@@ -33,7 +33,7 @@ export const run_worker = function(creep:Creep,fb:WorkerMemory){
     return TASK_FAILED
 }
 
-const change_flow = function(fb:WorkerMemory) {
+const change_flow = function(creep:Creep,fb:WorkerMemory) {
     const pool = Memory.rooms[fb.fromRoom]._dynamic
     const flow = work_priority[fb.priority]
     if(fb.state == 'collect'){
@@ -44,6 +44,7 @@ const change_flow = function(fb:WorkerMemory) {
             if(tasks && tasks.length) {
                 fb.collect.push(parse_posed_task(tasks[0]))
                 tasks.shift()
+                creep.say(source)
                 return
             }
         }
@@ -56,6 +57,7 @@ const change_flow = function(fb:WorkerMemory) {
             if(tasks && tasks.length) {
                 fb.consume.push(parse_posed_task(tasks[0]))
                 tasks.shift()
+                creep.say(sink)
                 return
             }
         }

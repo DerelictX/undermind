@@ -4,7 +4,7 @@ import { TASK_COMPLETE, TASK_DOING, TASK_FAILED } from "../performer/behavior.an
 import { perform_callback } from "../performer/behavior.callback"
 
 export const run_carrier = function(creep:Creep,fb:CarrierMemory){
-    console.log(creep.name)
+    //console.log(creep.name)
     if(fb.state == 'idle'){
         if(creep.store.getUsedCapacity()){
             lazy_restock(creep,fb)
@@ -68,7 +68,7 @@ const change_flow = function(fb:CarrierMemory) {
         if(flow[1] != 'storage' && !pool[flow[1]]?.length) {
             continue
         }
-        console.log('\t' + flow)
+        //console.log('\t' + flow)
         return flow
     }
     return null
@@ -84,7 +84,7 @@ const find_consume = function(creep:Creep,fb:CarrierMemory){
     const pool = consume[fb.current[1]]
     while(pool && pool.length && free > 0) {
         const task = pool[0]
-        console.log('\t' + JSON.stringify(task))
+        //console.log('\t' + JSON.stringify(task))
         if(task.action == 'transfer' && task.args[2]){
             if(free < task.args[2]){
                 task.args[2] -= free
@@ -129,7 +129,7 @@ const find_collect = function(creep:Creep,fb:CarrierMemory){
     const pool = collect[fb.current[0]]
     while(pool && pool.length && free > 0) {
         const task = pool[0]
-        console.log('\t' + JSON.stringify(task))
+        //console.log('\t' + JSON.stringify(task))
         if(task.action == 'withdraw' && task.args[2]){
             if(free < task.args[2]){
                 task.args[2] -= free

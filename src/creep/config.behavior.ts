@@ -10,7 +10,7 @@ export const work_priority: {[role in EnergyRole]:EnWorkerPriority} = {
         ['repair', 'anti_nuke', 'build', 'fortify', 'U_ctrl']],
     Maintainer: [
         ['W_energy', 'H_srcs'],
-        ['repair', 'downgraded', 'decayed', 'U_ctrl']],
+        ['repair', 'downgraded', 'decayed', 'fortify', 'U_ctrl']],
     EnergySupplier: [
         ['W_energy'],
         ['T_ext', 'T_tower', 'T_cntn']]

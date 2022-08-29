@@ -17,7 +17,6 @@ interface CreepMemory {
     }
 }
 
-type CreepClassName = 'generalist'|'specialist'|'carrier'|'fighter'
 type AnyRole = |EnergyRole|CarrierRole|MineralWorker
 type CreepClassMemory = CarrierMemory|WorkerMemory
 

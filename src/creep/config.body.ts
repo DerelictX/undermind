@@ -1,22 +1,18 @@
 import _, { ceil } from "lodash"
 
-type body_generator_name =
-    | "W" | "C" | "WC" | "Wc"
-    | "A" | "R" | "H" | "Cl"
-
 export const body_generator:{[c in body_generator_name]:
     (workload: number, mobility: number)=>BodyPartConstant[]
 } = {
     WC: function (workload: number, mobility: number): BodyPartConstant[] {
         var ret: BodyPartConstant[] = []
         ret = ret.concat(new Array(ceil(workload * 0.5)).fill(WORK))
-        ret = ret.concat(new Array(ceil(workload * 0.5)).fill(WORK))
+        ret = ret.concat(new Array(ceil(workload * 0.5)).fill(CARRY))
         return ret.concat(new Array(ceil(ret.length / mobility)).fill(MOVE))
     },
     Wc: function (workload: number, mobility: number): BodyPartConstant[] {
         var ret: BodyPartConstant[] = []
         ret = ret.concat(new Array(ceil(workload * 0.8)).fill(WORK))
-        ret = ret.concat(new Array(ceil(workload * 0.2)).fill(WORK))
+        ret = ret.concat(new Array(ceil(workload * 0.2)).fill(CARRY))
         return ret.concat(new Array(ceil(ret.length / mobility)).fill(MOVE))
     },
     Cl: function (workload: number, mobility: number): BodyPartConstant[] {
@@ -45,20 +41,3 @@ export const body_generator:{[c in body_generator_name]:
     }
 }
 _.assign(global, {body_generator:body_generator})
-
-export const default_body_config: {[R in AnyRole]: body_generator_name} = {
-    HarvesterSource0:   "Wc",
-    HarvesterSource1:   "Wc",
-    HarvesterSource2:   "Wc",
-    HarvesterMineral:   "Wc",
-    HarvesterDeposit:   "Wc",
-
-    Upgrader:       "Wc",
-    Builder:        "WC",
-    Maintainer:     "WC",
-    EnergySupplier: "C",
-
-    Collector:  "C",
-    Supplier:   "C",
-    Chemist:    "C",
-}

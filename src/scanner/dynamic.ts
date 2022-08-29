@@ -1,6 +1,11 @@
 import { reactions } from "@/structure/lab"
 
 export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
+    /**
+     * 从container取所有类型资源
+     * @param room 
+     * @returns 
+     */
     W_cntn: function (room: Room) {
         var tasks: Posed<PrimitiveDescript<'withdraw'>>[] = []
         const containers = room.memory.structures.containers.ins
@@ -20,6 +25,11 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         }
         return tasks
     },
+    /**
+     * 从敌方建筑抢资源
+     * @param room 
+     * @returns 
+     */
     loot: function (room: Room) {
         var tasks: PosedCreepTask<"withdraw">[] = []
         const hostile_stores: (AnyStoreStructure & AnyOwnedStructure)[] = room.find(FIND_HOSTILE_STRUCTURES, {
@@ -43,7 +53,11 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         }
         return tasks
     },
-
+    /**
+     * 清扫墓碑和废墟
+     * @param room 
+     * @returns 
+     */
     sweep: function (room: Room) {
         var tasks: PosedCreepTask<"withdraw">[] = []
         const tombstones: Tombstone[] = room.find(FIND_TOMBSTONES, {
@@ -81,7 +95,11 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         }
         return tasks
     },
-
+    /**
+     * 收集反应产物
+     * @param room 
+     * @returns 
+     */
     compound: function (room: Room) {
         var tasks: PosedCreepTask<"withdraw">[] = []
         const labs = room.memory.structures.labs
@@ -116,6 +134,11 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         }
         return tasks
     },
+    /**
+     * 挖过道
+     * @param room 
+     * @returns 
+     */
     deposit: function (room: Room) {
         var tasks: Posed<RestrictedPrimitiveDescript<'harvest', DepositConstant>>[] = []
         const deposits = room.find(FIND_DEPOSITS)
@@ -264,21 +287,24 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
                 return false
             }
         })
+        if(!walls.length) return []
 
         for (let wall of walls) {
             if (wall.hits <= wallHits) {
                 if (wall.hits < wallHits * 0.9)
-                    wallHits * 0.95
+                    wallHits *= 0.95
                 tasks.push({
                     action: 'repair',
                     args: [wall.id],
                     pos: wall.pos
                 })
             }
-            else
-                wallHits += 3000
         }
-        if (wallHits >= 100000 && wallHits <= 100000000)
+        if (!tasks.length) wallHits += 10000
+        
+        if (wallHits >= 100000 && wallHits <= 100000000){
+
+        }
             room.memory.structures.wall_hits = wallHits
         return tasks
     },
@@ -482,7 +508,7 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
     },
     gen_safe: function (room: Room): PosedCreepTask<"generateSafeMode">[] {
         const controller = room.controller
-        if (controller && controller.my && controller.level > 2 && controller.safeModeAvailable == 0) {
+        if (controller && controller.my && controller.level > 3 && controller.safeModeAvailable == 0) {
             return [{
                 action: 'generateSafeMode',
                 args: [controller.id],
