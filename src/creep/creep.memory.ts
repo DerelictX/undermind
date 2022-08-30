@@ -1,6 +1,6 @@
 
 interface CreepMemory {
-    _class: CreepClassMemory
+    _class: CarrierMemory|WorkerMemory
     _move?:{
         dest: {x:number,y:number,room:string},
         time: number,
@@ -18,7 +18,6 @@ interface CreepMemory {
 }
 
 type AnyRole = |EnergyRole|CarrierRole|MineralWorker
-type CreepClassMemory = CarrierMemory|WorkerMemory
 
 type EnergyRole =
     |"HarvesterSource0"|"HarvesterSource1"|"HarvesterSource2"

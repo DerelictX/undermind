@@ -35,7 +35,7 @@ const performer:{[action in PrimitiveAction]:PrimitivePerformer<action>} = {
         return creep.generateSafeMode(target);
     },
     withdraw: function (creep: Creep, args: [
-            target: Id<Structure<StructureConstant> | Tombstone | Ruin>,
+            target: Id<AnyStoreStructure | Tombstone | Ruin>,
             resourceType: ResourceConstant, amount?: number | undefined]) {
         const target = Game.getObjectById(args[0])
         if(!target) return ERR_NOT_FOUND
@@ -46,7 +46,7 @@ const performer:{[action in PrimitiveAction]:PrimitivePerformer<action>} = {
         return ret
     },
     transfer: function (creep: Creep, args: [
-            target: Id<Structure<StructureConstant> | AnyCreep>,
+            target: Id<AnyStoreStructure | AnyCreep>,
             resourceType: ResourceConstant, amount?: number | undefined]) {
         const target = Game.getObjectById(args[0])
         if(!target) return ERR_NOT_FOUND

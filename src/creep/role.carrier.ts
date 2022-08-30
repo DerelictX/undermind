@@ -199,18 +199,21 @@ const lazy_storage = function(fb:CarrierMemory) {
 }
 
 const parse_posed_task = function(posed:PosedCreepTask<TargetedAction>):CallbackBehavior<AnyAction>{
-    const root: CallbackBehavior<TargetedAction> = {...{bhvr_name:'callbackful'},...posed}
+    const main: CallbackBehavior<TargetedAction> = {...{bhvr_name:'callbackful'},...posed}
     const move: CallbackBehavior<'approach'> = {...{bhvr_name:'callbackful'},
             ...{action:"approach",args:[posed.pos,1]}}
-    switch(root.action){
+    main[OK] = TASK_COMPLETE
+    main[ERR_NOT_IN_RANGE] = move
+    switch(main.action){
         case 'withdraw':
-        case 'transfer':
         case 'pickup':
+            const prejudge: CallbackBehavior<'prejudge_full'> = {...{bhvr_name:'callbackful'},
+                    ...{action:"prejudge_full",args:[0]}}
+            prejudge[OK] = main
+            return prejudge
+        case 'transfer':
         case 'generateSafeMode':
-            root[OK] = TASK_COMPLETE
-            root[ERR_NOT_IN_RANGE] = move
-            break
+            return main
         default: throw new Error("Unexpected state.")
     }
-    return root
 }

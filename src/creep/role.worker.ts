@@ -5,32 +5,53 @@ import { work_priority } from "./config.behavior"
 
 export const run_worker = function(creep:Creep,fb:WorkerMemory){
     if(fb.state == 'collect'){
-        if(!fb.collect.length){
-            if(creep.store.getFreeCapacity('energy') == 0){
-                fb.state = 'consume'
-                return TASK_COMPLETE
-            }
-            change_flow(creep,fb)
-            if(!fb.collect.length) return TASK_COMPLETE
-        }
-        const ret = perform_callback(creep,fb.collect[0])
-        if(ret != TASK_DOING) fb.collect.shift()
-        return TASK_DOING
+        if(run_worker_collect(creep,fb) == TASK_COMPLETE)
+            run_worker_consume(creep,fb)
     }
-    if(fb.state == 'consume'){
-        if(!fb.consume.length) {
-            if(creep.store.getUsedCapacity('energy') == 0){
-                fb.state = 'collect'
-                return TASK_COMPLETE
-            }
-            change_flow(creep,fb)
-            if(!fb.consume.length) return TASK_COMPLETE
-        }
-        const ret = perform_callback(creep,fb.consume[0])
-        if(ret != TASK_DOING) fb.consume.shift()
-        return TASK_DOING
+    else if(fb.state == 'consume'){
+        if(run_worker_consume(creep,fb) == TASK_COMPLETE)
+            run_worker_collect(creep,fb)
     }
-    return TASK_FAILED
+}
+
+const run_worker_collect = function(creep:Creep,fb:WorkerMemory){
+    if(!fb.collect.length){
+        if(creep.store.getFreeCapacity('energy') == 0){
+            fb.state = 'consume'
+            return TASK_COMPLETE
+        }
+        change_flow(creep,fb)
+        if(!fb.collect.length) return TASK_DOING
+    }
+    const ret = perform_callback(creep,fb.collect[0])
+    if(ret != TASK_DOING) {
+        fb.collect.shift()
+        if(!fb.collect.length && creep.store.getFreeCapacity('energy') == 0){
+            fb.state = 'consume'
+            return TASK_COMPLETE
+        }
+    }
+    return TASK_DOING
+}
+
+const run_worker_consume = function(creep:Creep,fb:WorkerMemory){
+    if(!fb.consume.length) {
+        if(creep.store.getUsedCapacity('energy') == 0){
+            fb.state = 'collect'
+            return TASK_COMPLETE
+        }
+        change_flow(creep,fb)
+        if(!fb.consume.length) return TASK_DOING
+    }
+    const ret = perform_callback(creep,fb.consume[0])
+    if(ret != TASK_DOING) {
+        fb.consume.shift()
+        if(!fb.consume.length && creep.store.getUsedCapacity('energy') == 0){
+            fb.state = 'collect'
+            return TASK_COMPLETE
+        }
+    }
+    return TASK_DOING
 }
 
 const change_flow = function(creep:Creep,fb:WorkerMemory) {
@@ -65,30 +86,30 @@ const change_flow = function(creep:Creep,fb:WorkerMemory) {
 }
 
 const parse_posed_task = function(posed:PosedCreepTask<TargetedAction>):CallbackBehavior<AnyAction>{
-    const root: CallbackBehavior<TargetedAction> = {...{bhvr_name:'callbackful'},...posed}
+    const main: CallbackBehavior<TargetedAction> = {...{bhvr_name:'callbackful'},...posed}
     const move: CallbackBehavior<'approach'> = {...{bhvr_name:'callbackful'},
             ...{action:"approach",args:[posed.pos,1]}}
-    const full_store: CallbackBehavior<'prejudge_full'> = {...{bhvr_name:'callbackful'},
-            ...{action:"prejudge_full",args:[0]}}
-    switch(root.action){
+    main[ERR_NOT_IN_RANGE] = move
+    switch(main.action){
         case 'withdraw':
         case 'transfer':
         case 'pickup':
-            root[OK] = TASK_COMPLETE
-            break
+            main[OK] = TASK_COMPLETE
+            return main
         case 'harvest':
         case 'dismantle':
-            root[OK] = full_store
-            break
+            const prejudge: CallbackBehavior<'prejudge_full'> = {...{bhvr_name:'callbackful'},
+                    ...{action:"prejudge_full",args:[0]}}
+            prejudge[OK] = main
+            return prejudge
         case 'repair':
             const full_hits: CallbackBehavior<'full_hits'> = {...{bhvr_name:'callbackful'},
-                    ...{action:"full_hits",args:[root.args[0],0]}}
-            root[OK] = full_hits
+                    ...{action:"full_hits",args:[main.args[0],0]}}
+            main[OK] = full_hits
+            return main
         case 'build':
         case 'upgradeController':
-            break
-        default: throw new Error("Unexpected state: " + root.action)
+            return main
+        default: throw new Error("Unexpected state: " + main.action)
     }
-    root[ERR_NOT_IN_RANGE] = move
-    return root
 }

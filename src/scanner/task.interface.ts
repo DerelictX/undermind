@@ -43,6 +43,7 @@ interface DynamicTaskPool {
     T_cntn:     Posed<RestrictedPrimitiveDescript<'transfer','energy'>>[]
     //collect
     W_cntn:     Posed<PrimitiveDescript<'withdraw'>>[]
+    W_link:     Posed<RestrictedPrimitiveDescript<'withdraw','energy'>>[]
     loot:       Posed<PrimitiveDescript<'withdraw'>>[]
     sweep:      Posed<PrimitiveDescript<'withdraw'|'pickup'>>[]
     compound:   Posed<PrimitiveDescript<'withdraw'>>[]
