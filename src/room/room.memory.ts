@@ -1,49 +1,44 @@
+type ShadowedPick<T, K extends keyof T> = {
+    [P in K]: T[P];
+} & {
+    [P in Exclude<keyof T, K>]?: undefined
+}
 
 interface RoomMemory {
-    _static:    StaticTaskPool & RoomStructureList
+    _typed:     OwnedRoomMemory | ReservedRoomMemory | HighwayRoomMemory
     _dynamic:   {[k in keyof DynamicTaskPool]?: PosedCreepTask<TargetedAction>[]}
-
-    _spawn_loop:    {[R in AnyRole]: Looper}
-    _spawn_queue:   SpawnTask[]
 }
 
-type SpawnTask = {
-    _caller: {
-        room_name:  string
-        looper:     AnyRole
-    }
-    _body:  {
-        generator:  body_generator_name
-        workload:   number
-    }
-    _class:     CreepMemory['_class']
+type owned_room_role =
+    |"HarvesterSource0"|"HarvesterSource1"|'HarvesterMineral'
+    |"Upgrader"|"Builder"|"Maintainer"|'EnergySupplier'
+    |"Collector"|"Supplier"|"Chemist"
+interface OwnedRoomMemory {
+    _type:      'owned'
+    _struct:    RoomStructureList
+    _static:    ShadowedPick<FullTaskPool,keyof (OwnedTaskPool & SourceTaskPool & MineralTaskPool)>
+    _spawn:     SpawnTask[]
+    _looper:    ShadowedPick<{[R in AnyRole]: Looper},owned_room_role>
 }
 
-type body_generator_name =
-    | "W" | "C" | "WC" | "Wc"
-    | "A" | "R" | "H" | "Cl"
-
-interface RoomStructureList {
-    wall_hits:      number
-    towers:         Id<StructureTower>[]
-    links:          LinkConfig
-    labs:           LabConfig
-    
-    factory:       Id<StructureFactory>|null
-    power_spawn:   Id<StructurePowerSpawn>|null
-    nuker:         Id<StructureNuker>|null
-    observer:      Id<StructureObserver>|null
+type reserved_room_role =
+    |"HarvesterSource0"|"HarvesterSource1"|"HarvesterSource2"
+    |"Builder"|"Maintainer"|'EnergySupplier'
+    |"Collector"
+interface ReservedRoomMemory {
+    _type:      'reserved'
+    _struct?:   undefined
+    _static:    ShadowedPick<FullTaskPool,keyof (ReservedTaskPool & SourceTaskPool)>
+    _spawn:     string
+    _looper:    ShadowedPick<{[R in AnyRole]: Looper},reserved_room_role>
 }
 
-interface LinkConfig {
-    nexus:      Id<StructureLink>[]
-    ins:        Id<StructureLink>[]
-    outs:       Id<StructureLink>[]
-}
-
-interface LabConfig {
-    ins:        Id<StructureLab>[]
-    outs:       Id<StructureLab>[]
-    reaction:   MineralCompoundConstant|null
-    boosts:     MineralBoostConstant[]
+type highway_room_role =
+    |"HarvesterDeposit"|"Collector"
+interface HighwayRoomMemory {
+    _type:      'highway'
+    _struct?:   undefined
+    _static:    ShadowedPick<FullTaskPool,keyof HighwayTaskPool>
+    _spawn:     string
+    _looper:    ShadowedPick<{[R in AnyRole]: Looper},highway_room_role>
 }

@@ -41,9 +41,10 @@ export const operator_run = function(operator:PowerCreep){
     }
 
     if(operator.powers[PWR_OPERATE_LAB] && operator.powers[PWR_OPERATE_LAB].cooldown == 0){
+        if(operator.room.memory._typed._type != 'owned') return
         if(operator.store['ops'] < 100)
             return
-        const labs_out = operator.room.memory.structures.labs.outs;
+        const labs_out = operator.room.memory._typed._struct?.labs.outs;
         for(var id in labs_out){
             const lab = Game.getObjectById(labs_out[id])
             if(lab && (!lab.effects || !lab.effects[0]) && lab.cooldown > 0){

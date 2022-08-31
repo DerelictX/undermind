@@ -1,7 +1,6 @@
 export const tower_run = function(room: Room){
-    
-        if(!room.memory.structures)return
-        const towers = room.memory.structures.towers;
+        if(room.memory._typed._type != 'owned') return
+        const towers = room.memory._typed._struct.towers;
         var tower:StructureTower|null = Game.getObjectById(towers[0]);
         if(!tower)return
 

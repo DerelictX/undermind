@@ -1,7 +1,8 @@
 import _ from "lodash";
 
 export const lab_run = function(room: Room){
-    const labs = room.memory.structures.labs
+    if(room.memory._typed._type != 'owned') return
+    const labs = room.memory._typed._struct.labs
     const reaction = labs.reaction
     if(reaction){
         const labs_in0 = Game.getObjectById(labs.ins[0]);
@@ -25,13 +26,14 @@ export const lab_run = function(room: Room){
 }
 
 export const change_reaction = function(room:Room){
+    if(room.memory._typed._type != 'owned') return
     const storage = room.storage
     if(!storage || !storage.my)
         return
     const terminal = room.terminal
     if(!terminal || !terminal.my)
         return
-    room.memory.structures.labs.reaction = null
+    room.memory._typed._struct.labs.reaction = null
     
     for(let tier = 3; tier >= 0; tier--){
         const reacts = compound_tier[tier]
@@ -42,7 +44,7 @@ export const change_reaction = function(room:Room){
                 continue
             const reactants = reactions[reacts[i]] 
             if(terminal.store[reactants[0]] >= 1000 && terminal.store[reactants[1]] >= 1000){
-                room.memory.structures.labs.reaction = reacts[i]
+                room.memory._typed._struct.labs.reaction = reacts[i]
                 return
             }
         }

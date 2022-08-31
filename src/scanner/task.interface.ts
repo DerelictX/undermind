@@ -54,22 +54,6 @@ interface DynamicTaskPool {
     T_nuker:    Posed<PrimitiveDescript<'transfer'>>[]
 }
 
-interface StaticTaskPool {
-    H_srcs:     Posed<RestrictedPrimitiveDescript<'harvest','energy'>>[]
-    T_src0:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]
-    T_src1:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]
-    T_src2:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]
-
-    H_mnrl:     Posed<RestrictedPrimitiveDescript<'harvest',MineralConstant>>[]
-    T_mnrl:     Posed<RestrictedPrimitiveDescript<'transfer',MineralConstant>>[]
-
-    W_ctrl:     Posed<RestrictedPrimitiveDescript<'withdraw','energy'>>[]
-    U_ctrl:     Posed<PrimitiveDescript<'upgradeController'>>[]
-
-    W_cntn:     Posed<PrimitiveDescript<'withdraw'>>[]
-    T_cntn:     Posed<RestrictedPrimitiveDescript<'transfer','energy'>>[]
-}
-
 type EnSource = FilterPoolKey<(WorkAction|CarryAction)&CollectAction,'energy'>
 type EnSink =   FilterPoolKey<(WorkAction|CarryAction)&ConsumeAction,'energy'>
 type ResFlow = [

@@ -1,41 +1,44 @@
 import { structure_updater } from "@/room/structure.updater"
 import { static_updater } from "@/scanner/static"
+import _ from "lodash"
 import { init_carrier_behavior, init_worker_behavior } from "./config.behavior"
 
 type RoleImpl = Omit<SpawnTask,'_caller'>
 const spawn_handler: {[r in AnyRole]:(room:Room) => RoleImpl|null} = {
     HarvesterSource0: function (room: Room) {
-        static_updater['sources'](room, room.memory._static)
-        if (!room.memory._static.H_srcs?.at(0)) return null
+        static_updater['sources'](room)
+        if (!room.memory._typed._static.H_srcs?.at(0)) return null
         return {
             _body:{generator:'Wc',workload:10},
             _class:init_worker_behavior('HarvesterSource0',room.name,room.name)
         }
     },
     HarvesterSource1: function (room: Room) {
-        static_updater['sources'](room, room.memory._static)
-        if (!room.memory._static.H_srcs?.at(1)) return null
+        static_updater['sources'](room)
+        if (!room.memory._typed._static.H_srcs?.at(1)) return null
         return {
             _body:{generator:'Wc',workload:10},
             _class:init_worker_behavior('HarvesterSource1',room.name,room.name)
         }
     },
     HarvesterSource2: function (room: Room) {
-        static_updater['sources'](room, room.memory._static)
-        if (!room.memory._static.H_srcs?.at(2)) return null
+        static_updater['sources'](room)
+        if (!room.memory._typed._static.H_srcs?.at(2)) return null
         return {
             _body:{generator:'Wc',workload:10},
             _class:init_worker_behavior('HarvesterSource2',room.name,room.name)
         }
     },
     HarvesterMineral: function (room: Room) {
-        static_updater['mineral'](room, room.memory._static)
-        if (!room.memory._static.H_mnrl?.at(0)) return null
+        if(room.memory._typed._type != 'owned') return null
+        static_updater['mineral'](room)
+        if (!room.memory._typed._static.H_mnrl[0]) return null
         return null
     },
     Upgrader: function (room: Room) {
-        static_updater['controller'](room, room.memory._static)
-        if (!room.memory._static.W_ctrl?.at(0)) return null
+        if(room.memory._typed._type != 'owned') return null
+        static_updater['controller'](room)
+        if (!room.memory._typed._static.W_ctrl[0]) return null
         return {
             _body:{generator:'Wc',workload:10},
             _class:init_worker_behavior('Upgrader',room.name,room.name)
@@ -76,8 +79,7 @@ const spawn_handler: {[r in AnyRole]:(room:Room) => RoleImpl|null} = {
     },
 
     Collector: function (room: Room) {
-        static_updater.containers(room,room.memory._static)
-        structure_updater.links(room,room.memory._static)
+        static_updater.containers(room)
         if(!room.storage?.my) return null
         return {
             _body:{generator:'C',workload:12},
@@ -85,8 +87,10 @@ const spawn_handler: {[r in AnyRole]:(room:Room) => RoleImpl|null} = {
         }
     },
     Supplier: function (room: Room) {
-        structure_updater.unique(room,room.memory._static)
-        structure_updater.towers(room,room.memory._static)
+        if(room.memory._typed._type != 'owned') return null
+        structure_updater.towers(room,room.memory._typed._struct)
+        structure_updater.links(room,room.memory._typed._struct)
+        structure_updater.unique(room,room.memory._typed._struct)
         if(!room.storage?.my) return null
         return {
             _body:{generator:'C',workload:12},
@@ -94,28 +98,38 @@ const spawn_handler: {[r in AnyRole]:(room:Room) => RoleImpl|null} = {
         }
     },
     Chemist: function (room: Room) {
-        structure_updater.labs(room,room.memory._static)
+        if(room.memory._typed._type != 'owned') return null
+        structure_updater.labs(room,room.memory._typed._struct)
         return null
     },
 }
 
 
 export const spawn_loop = function(room: Room) {
-    var role_name: AnyRole
-    for(role_name in room.memory._spawn_loop){
-        const spawn_loop = room.memory._spawn_loop[role_name]
-        if(spawn_loop.reload_time > Game.time)
-            continue
-        
-        const role_impl = spawn_handler[role_name](room)
-        if(!role_impl){
-            spawn_loop.reload_time = Game.time + 400
-            continue
-        }
+    let _spawn = room.memory._typed._spawn
+    if(_.isString(_spawn)) {
+        if(!Memory.rooms[_spawn]) return
+        _spawn = Memory.rooms[_spawn]._typed._spawn
+        if(_.isString(_spawn)) return
+    }
+    switch(room.memory._typed._type) {
+        case 'owned':
+        case 'reserved':
+            let role_name: keyof typeof room.memory._typed._looper
+            for(role_name in room.memory._typed._looper){
+                const spawn_loop = room.memory._typed._looper[role_name]
+                if(!spawn_loop || spawn_loop.reload_time > Game.time)
+                    continue
+                
+                const role_impl = spawn_handler[role_name](room)
+                if(!role_impl){
+                    spawn_loop.reload_time = Game.time + 400
+                    continue
+                }
 
-        spawn_loop.reload_time = Game.time + spawn_loop.interval
-        const spawn_room = room.name
-        const caller = {_caller:{room_name:room.name,looper:role_name}}
-        Memory.rooms[spawn_room]._spawn_queue.push({...caller,...role_impl})
+                spawn_loop.reload_time = Game.time + spawn_loop.interval
+                const caller = {_caller:{room_name:room.name,looper:role_name}}
+                _spawn.push({...caller,...role_impl})
+            }
     }
 }
