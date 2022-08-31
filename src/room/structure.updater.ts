@@ -2,84 +2,62 @@ import _ from "lodash";
 
 export const structure_updater = {
 
-    all: function(room:Room) {
-        this.containers(room)
-        this.towers(room)
-        this.links(room)
-        this.labs(room)
-        this.unique(room)
-    },
-
-    unique: function(room:Room) {
+    unique: function(room:Room,pool:RoomStructureList) {
         //factory
-        room.memory.structures.factory = null
+        pool.factory = null
         const factory = room.find(FIND_MY_STRUCTURES,{
             filter: {structureType: STRUCTURE_FACTORY}
         })[0];
         if(factory instanceof StructureFactory)
-            room.memory.structures.factory = factory.id
+            pool.factory = factory.id
 
         //nuker
-        room.memory.structures.nuker = null
+        pool.nuker = null
         const nuker = room.find(FIND_MY_STRUCTURES,{
             filter: {structureType: STRUCTURE_NUKER}
         })[0];
         if(nuker instanceof StructureNuker)
-            room.memory.structures.nuker = nuker.id
+            pool.nuker = nuker.id
 
         //power_spawn
-        room.memory.structures.power_spawn = null
+        pool.power_spawn = null
         const power_spawn = room.find(FIND_MY_STRUCTURES,{
             filter: {structureType: STRUCTURE_POWER_SPAWN}
         })[0];
         if(power_spawn instanceof StructurePowerSpawn)
-            room.memory.structures.power_spawn = power_spawn.id
-        else room.memory.structures.power_spawn = null
+            pool.power_spawn = power_spawn.id
+        else pool.power_spawn = null
 
         //observer
-        room.memory.structures.observer = null
+        pool.observer = null
         const observer = room.find(FIND_MY_STRUCTURES,{
             filter: {structureType: STRUCTURE_OBSERVER}
         })[0];
         if(observer instanceof StructureObserver)
-            room.memory.structures.observer = observer.id
-        else room.memory.structures.observer = null
+            pool.observer = observer.id
+        else pool.observer = null
     },
 
-    containers: function(room:Room){
-        room.memory.structures.containers.ins = []
-        room.memory.structures.containers.outs = []
-        const containers:StructureContainer[] = room.find(FIND_STRUCTURES,{
-            filter: {structureType: STRUCTURE_CONTAINER}
-        });
-
-        for(let container of containers){
-            if(container.pos.findInRange(FIND_SOURCES,2).length){
-                room.memory.structures.containers.ins.push(container.id)
-            } else room.memory.structures.containers.outs.push(container.id)
-        }
-    },
-
-    links: function(room:Room){
-        room.memory.structures.links.nexus = []
-        room.memory.structures.links.ins = []
-        room.memory.structures.links.outs = []
+    links: function(room:Room,pool:RoomStructureList){
+        pool.links.nexus = []
+        pool.links.ins = []
+        pool.links.outs = []
         const links:StructureLink[] = room.find(FIND_MY_STRUCTURES,{
             filter: {structureType: STRUCTURE_LINK}
         });
 
         for(let link of links){
             if(link.pos.findInRange(FIND_MY_STRUCTURES,2,{filter: {structureType: STRUCTURE_STORAGE}}).length){
-                room.memory.structures.links.nexus.push(link.id)
+                pool.links.nexus.push(link.id)
             } else if(link.pos.findInRange(FIND_SOURCES,2).length){
-                room.memory.structures.links.ins.push(link.id)
-            } else room.memory.structures.links.outs.push(link.id)
+                pool.links.ins.push(link.id)
+            } else pool.links.outs.push(link.id)
         }
     },
 
-    labs: function(room:Room){
-        room.memory.structures.labs.ins = []
-        room.memory.structures.labs.outs = []
+    labs: function(room:Room,pool:RoomStructureList){
+        pool.labs.ins = []
+        pool.labs.outs = []
         const labs:StructureLab[] = room.find(FIND_MY_STRUCTURES,{
             filter: {structureType: STRUCTURE_LAB}
         });
@@ -93,19 +71,19 @@ export const structure_updater = {
         }
     
         for(let i in labs){
-            if(labs.length > 3 && near_num[i] == labs.length && room.memory.structures.labs.ins.length < 2)
-                room.memory.structures.labs.ins.push(labs[i].id)
-            else room.memory.structures.labs.outs.push(labs[i].id)
+            if(labs.length > 3 && near_num[i] == labs.length && pool.labs.ins.length < 2)
+                pool.labs.ins.push(labs[i].id)
+            else pool.labs.outs.push(labs[i].id)
         }
     },
 
-    towers: function(room:Room){
-        room.memory.structures.towers = []
+    towers: function(room:Room,pool:RoomStructureList){
+        pool.towers = []
         const towers:StructureTower[] = room.find(FIND_MY_STRUCTURES,{
             filter: {structureType: STRUCTURE_TOWER}
         });
         for(let i in towers){
-            room.memory.structures.towers.push(towers[i].id)
+            pool.towers.push(towers[i].id)
         }
     }
 }

@@ -9,33 +9,8 @@ export const inspector_memory = function (room: Room) {
 const memory_inspector: {[k in keyof RoomMemory]:
     (room: Room) => void
 } = {
-    structures: function (room: Room) {
-        let wallHits = 100000
-        if (room.controller) {
-            wallHits += room.controller.level * 100000
-        }
-        room.memory.structures = {
-            towers: [],
-            links: {
-                nexus: [],
-                ins: [],
-                outs: []
-            },
-            containers: {
-                ins: [],
-                outs: []
-            },
-            labs: {
-                ins: [],
-                outs: [],
-                reaction: null,
-                boosts: []
-            },
-            wall_hits: wallHits
-        }
-    },
     _spawn_loop: function (room: Room) {
-        const spawn_loop: RoleSpawnLoop = {
+        const spawn_loop: Looper = {
             reload_time: Game.time + 10,
             interval: 1500,
         }
@@ -61,6 +36,41 @@ const memory_inspector: {[k in keyof RoomMemory]:
         room.memory._dynamic = {}
     },
     _static: function (room: Room): void {
-        room.memory._static = {}
+        let wallHits = 100000
+        if (room.controller) {
+            wallHits += room.controller.level * 100000
+        }
+        room.memory._static = {
+            towers: [],
+            links: {
+                nexus: [],
+                ins: [],
+                outs: []
+            },
+            labs: {
+                ins: [],
+                outs: [],
+                reaction: null,
+                boosts: []
+            },
+            wall_hits: wallHits,
+
+            factory: null,
+            power_spawn: null,
+            nuker: null,
+            observer: null,
+
+            H_srcs:     [],
+            T_src0:     [],
+            T_src1:     [],
+            T_src2:     [],
+            H_mnrl:     [],
+            T_mnrl:     [],
+
+            W_ctrl:     [],
+            U_ctrl:     [],
+            W_cntn:     [],
+            T_cntn:     [],
+        }
     },
 }

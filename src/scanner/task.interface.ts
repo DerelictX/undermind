@@ -23,13 +23,14 @@ interface DynamicTaskPool {
     //mineral
     H_mnrl:     Posed<RestrictedPrimitiveDescript<'harvest',MineralConstant>>[]
     T_mnrl:     Posed<RestrictedPrimitiveDescript<'transfer',MineralConstant>>[]
-    deposit:    Posed<RestrictedPrimitiveDescript<'harvest',DepositConstant>>[]
     //controller
     W_ctrl:     Posed<RestrictedPrimitiveDescript<'withdraw','energy'>>[]
     U_ctrl:     Posed<PrimitiveDescript<'upgradeController'>>[]
+    downgraded: Posed<PrimitiveDescript<'upgradeController'>>[]
+    gen_safe:   Posed<PrimitiveDescript<'generateSafeMode'>>[]
     //get energy
-    H_srcs:     Posed<RestrictedPrimitiveDescript<'harvest','energy'>>[]
     recycle:    Posed<PrimitiveDescript<'dismantle'>>[]
+    H_srcs:     Posed<RestrictedPrimitiveDescript<'harvest','energy'>>[]
     W_energy:   Posed<RestrictedPrimitiveDescript<'withdraw','energy'>>[]
     //consume energy
     build:      Posed<PrimitiveDescript<'build'>>[]
@@ -37,10 +38,6 @@ interface DynamicTaskPool {
     decayed:    Posed<PrimitiveDescript<'repair'>>[]
     repair:     Posed<PrimitiveDescript<'repair'>>[]
     anti_nuke:  Posed<PrimitiveDescript<'repair'>>[]
-    downgraded: Posed<PrimitiveDescript<'upgradeController'>>[]
-    T_ext:      Posed<RestrictedPrimitiveDescript<'transfer','energy'>>[]
-    T_tower:    Posed<RestrictedPrimitiveDescript<'transfer','energy'>>[]
-    T_cntn:     Posed<RestrictedPrimitiveDescript<'transfer','energy'>>[]
     //collect
     W_cntn:     Posed<PrimitiveDescript<'withdraw'>>[]
     W_link:     Posed<RestrictedPrimitiveDescript<'withdraw','energy'>>[]
@@ -48,11 +45,13 @@ interface DynamicTaskPool {
     sweep:      Posed<PrimitiveDescript<'withdraw'|'pickup'>>[]
     compound:   Posed<PrimitiveDescript<'withdraw'>>[]
     //supply
+    T_ext:      Posed<RestrictedPrimitiveDescript<'transfer','energy'>>[]
+    T_tower:    Posed<RestrictedPrimitiveDescript<'transfer','energy'>>[]
+    T_cntn:     Posed<RestrictedPrimitiveDescript<'transfer','energy'>>[]
     T_boost:    Posed<PrimitiveDescript<'transfer'>>[]
     T_react:    Posed<PrimitiveDescript<'transfer'>>[]
     T_power:    Posed<PrimitiveDescript<'transfer'>>[]
     T_nuker:    Posed<PrimitiveDescript<'transfer'>>[]
-    gen_safe:   Posed<PrimitiveDescript<'generateSafeMode'>>[]
 }
 
 interface StaticTaskPool {
@@ -66,10 +65,9 @@ interface StaticTaskPool {
 
     W_ctrl:     Posed<RestrictedPrimitiveDescript<'withdraw','energy'>>[]
     U_ctrl:     Posed<PrimitiveDescript<'upgradeController'>>[]
-    
-    R_ctrl:     Posed<PrimitiveDescript<'reserveController'>>[]
-    A_ctrl:     Posed<PrimitiveDescript<'attackController'>>[]
-    A_core:     Posed<PrimitiveDescript<'attack'>>[]
+
+    W_cntn:     Posed<PrimitiveDescript<'withdraw'>>[]
+    T_cntn:     Posed<RestrictedPrimitiveDescript<'transfer','energy'>>[]
 }
 
 type EnSource = FilterPoolKey<(WorkAction|CarryAction)&CollectAction,'energy'>

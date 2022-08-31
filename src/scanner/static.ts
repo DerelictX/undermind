@@ -1,6 +1,40 @@
 import _ from "lodash"
 
 export const static_updater = {
+    
+    containers: function (room:Room,pool:Partial<StaticTaskPool>) {
+        pool.W_cntn = []
+        pool.T_cntn = []
+        const containers:StructureContainer[] = room.find(FIND_STRUCTURES,{
+            filter: {structureType: STRUCTURE_CONTAINER}
+        });
+
+        for(let container of containers){
+            if(container.pos.findInRange(FIND_SOURCES,2).length){
+                pool.W_cntn.push({
+                    action: 'withdraw',
+                    args: [container.id,'energy'],
+                    pos: container.pos
+                })
+            } else {
+                const mineral = container.pos.findInRange(FIND_MINERALS,2)
+                if(mineral[0]) {
+                    pool.W_cntn.push({
+                        action: 'withdraw',
+                        args: [container.id,mineral[0].mineralType],
+                        pos: container.pos
+                    })
+                } else {
+                    pool.T_cntn.push({
+                        action: 'transfer',
+                        args: [container.id,'energy'],
+                        pos: container.pos
+                    })
+                }
+            }
+        }
+    },
+
     sources: function (room:Room,pool:Partial<StaticTaskPool>) {
         pool.H_srcs = []
         var T_srcs: Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[][] = [[],[],[]]

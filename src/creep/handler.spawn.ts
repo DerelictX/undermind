@@ -76,8 +76,8 @@ const spawn_handler: {[r in AnyRole]:(room:Room) => RoleImpl|null} = {
     },
 
     Collector: function (room: Room) {
-        structure_updater.containers(room)
-        structure_updater.links(room)
+        static_updater.containers(room,room.memory._static)
+        structure_updater.links(room,room.memory._static)
         if(!room.storage?.my) return null
         return {
             _body:{generator:'C',workload:12},
@@ -85,8 +85,8 @@ const spawn_handler: {[r in AnyRole]:(room:Room) => RoleImpl|null} = {
         }
     },
     Supplier: function (room: Room) {
-        structure_updater.unique(room)
-        structure_updater.towers(room)
+        structure_updater.unique(room,room.memory._static)
+        structure_updater.towers(room,room.memory._static)
         if(!room.storage?.my) return null
         return {
             _body:{generator:'C',workload:12},
@@ -94,7 +94,7 @@ const spawn_handler: {[r in AnyRole]:(room:Room) => RoleImpl|null} = {
         }
     },
     Chemist: function (room: Room) {
-        structure_updater.labs(room)
+        structure_updater.labs(room,room.memory._static)
         return null
     },
 }
