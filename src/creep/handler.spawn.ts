@@ -7,7 +7,7 @@ type RoleImpl = Omit<SpawnTask,'_caller'>
 const spawn_handler: {[r in AnyRole]:(room:Room) => RoleImpl|null} = {
     HarvesterSource0: function (room: Room) {
         static_updater['sources'](room)
-        if (!room.memory._typed._static.H_srcs?.at(0)) return null
+        if (!room.memory._typed._static.H_srcs?.[0]) return null
         return {
             _body:{generator:'Wc',workload:10},
             _class:init_worker_behavior('HarvesterSource0',room.name,room.name)
@@ -15,7 +15,7 @@ const spawn_handler: {[r in AnyRole]:(room:Room) => RoleImpl|null} = {
     },
     HarvesterSource1: function (room: Room) {
         static_updater['sources'](room)
-        if (!room.memory._typed._static.H_srcs?.at(1)) return null
+        if (!room.memory._typed._static.H_srcs?.[1]) return null
         return {
             _body:{generator:'Wc',workload:10},
             _class:init_worker_behavior('HarvesterSource1',room.name,room.name)
@@ -23,7 +23,7 @@ const spawn_handler: {[r in AnyRole]:(room:Room) => RoleImpl|null} = {
     },
     HarvesterSource2: function (room: Room) {
         static_updater['sources'](room)
-        if (!room.memory._typed._static.H_srcs?.at(2)) return null
+        if (!room.memory._typed._static.H_srcs?.[2]) return null
         return {
             _body:{generator:'Wc',workload:10},
             _class:init_worker_behavior('HarvesterSource2',room.name,room.name)
@@ -39,6 +39,7 @@ const spawn_handler: {[r in AnyRole]:(room:Room) => RoleImpl|null} = {
         if(room.memory._typed._type != 'owned') return null
         static_updater['controller'](room)
         if (!room.memory._typed._static.W_ctrl[0]) return null
+        if (room.controller?.level == 8) return null
         return {
             _body:{generator:'Wc',workload:10},
             _class:init_worker_behavior('Upgrader',room.name,room.name)
@@ -71,7 +72,7 @@ const spawn_handler: {[r in AnyRole]:(room:Room) => RoleImpl|null} = {
         }
     },
     EnergySupplier: function (room: Room) {
-        if(!room.storage?.my) return null
+        if(room.storage?.my) return null
         return {
             _body:{generator:'C',workload:12},
             _class:init_worker_behavior('EnergySupplier',room.name,room.name)
@@ -112,6 +113,7 @@ export const spawn_loop = function(room: Room) {
         _spawn = Memory.rooms[_spawn]._typed._spawn
         if(_.isString(_spawn)) return
     }
+    if(!_spawn) return
     switch(room.memory._typed._type) {
         case 'owned':
         case 'reserved':

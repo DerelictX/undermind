@@ -1,7 +1,7 @@
 import { structure_updater } from "./room/structure.updater";
 import { operator_run } from "./power_creep/operator";
 import { body_generator } from "./creep/config.body";
-import { inspector_memory } from "./room/memory.inspector";
+import { inspector_memory, _format_room } from "./room/memory.inspector";
 import { spawn_loop } from "./creep/handler.spawn";
 import { spawn_run } from "./structure/spawn";
 import { tower_run } from "./structure/tower";
@@ -17,16 +17,17 @@ export const loop = function () {
         static_updater
         structure_updater
         body_generator
+        _format_room
     }
     
     //ROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOMS
     if(!Memory.owned_rooms)
         Memory.owned_rooms = []
-    for(let name of Memory.owned_rooms){
+    for(let name in Memory.rooms){
         try{
+            inspector_memory(name,false)
             const room = Game.rooms[name];
             if(!room)continue
-            inspector_memory(room)
             spawn_loop(room)
             spawn_run(room)
             tower_run(room)

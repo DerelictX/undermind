@@ -158,15 +158,15 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         return tasks
     },
     H_src0: function (room: Room) {
-        if (!room.memory._typed._static.H_srcs?.at(0)) return []
+        if (!room.memory._typed._static.H_srcs?.[0]) return []
         return [room.memory._typed._static.H_srcs[0]].slice()
     },
     H_src1: function (room: Room) {
-        if (!room.memory._typed._static.H_srcs?.at(1)) return []
+        if (!room.memory._typed._static.H_srcs?.[1]) return []
         return [room.memory._typed._static.H_srcs[1]].slice()
     },
     H_src2: function (room: Room) {
-        if (!room.memory._typed._static.H_srcs?.at(2)) return []
+        if (!room.memory._typed._static.H_srcs?.[2]) return []
         return [room.memory._typed._static.H_srcs[2]].slice()
     },
     H_mnrl: function (room: Room) {
@@ -294,12 +294,18 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
                 })
             }
         }
-        if (!tasks.length)
-            wallHits += 100000
+        if (!tasks.length){
+            wallHits = walls[0].hits + 10000
+            tasks.push({
+                action: 'repair',
+                args: [walls[0].id],
+                pos: walls[0].pos
+            })
+        }
 
         if (wallHits >= 100000 && wallHits <= 100000000) {
+            room.memory._typed._struct.wall_hits = wallHits
         }
-        room.memory._typed._struct.wall_hits = wallHits
         return tasks
     },
 

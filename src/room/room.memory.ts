@@ -3,9 +3,14 @@ type ShadowedPick<T, K extends keyof T> = {
 } & {
     [P in Exclude<keyof T, K>]?: undefined
 }
+type FilterOptional<T extends object> = Pick<T, Exclude<{
+    [K in keyof T]: T extends Record<K, T[K]>
+    ? K : never
+}[keyof T], undefined>>;
 
+type RoomTypes = RoomMemory['_typed']['_type']
 interface RoomMemory {
-    _typed:     OwnedRoomMemory | ReservedRoomMemory | HighwayRoomMemory
+    _typed:     OwnedRoomMemory | ReservedRoomMemory | HighwayRoomMemory | NeutralRoomMemory
     _dynamic:   {[k in keyof DynamicTaskPool]?: PosedCreepTask<TargetedAction>[]}
 }
 
@@ -29,7 +34,7 @@ interface ReservedRoomMemory {
     _type:      'reserved'
     _struct?:   undefined
     _static:    ShadowedPick<FullTaskPool,keyof (ReservedTaskPool & SourceTaskPool)>
-    _spawn:     string
+    _spawn?:    string
     _looper:    ShadowedPick<{[R in AnyRole]: Looper},reserved_room_role>
 }
 
@@ -39,6 +44,14 @@ interface HighwayRoomMemory {
     _type:      'highway'
     _struct?:   undefined
     _static:    ShadowedPick<FullTaskPool,keyof HighwayTaskPool>
-    _spawn:     string
+    _spawn?:    string
     _looper:    ShadowedPick<{[R in AnyRole]: Looper},highway_room_role>
+}
+
+interface NeutralRoomMemory{
+    _type:      'neutral'
+    _struct?:   undefined
+    _static:    ShadowedPick<FullTaskPool,never>
+    _spawn?:    string
+    _looper:    ShadowedPick<{[R in AnyRole]: Looper},never>
 }

@@ -192,6 +192,7 @@ const lazy_storage = function(fb:CarrierMemory) {
         if(last_collect && last_collect.action == 'withdraw'
                 && last_collect.args[0] == collect.args[0]
                 && last_collect.args[1] == collect.args[1]) {
+            console.log('withdraw:'+last_collect.args[2]+'+'+collect.args[2])
             last_collect.args[2] = (last_collect.args[2] && collect.args[2])
                 ? (last_collect.args[2] + collect.args[2]) : undefined
         } else fb.collect.push(parse_posed_task(collect))
