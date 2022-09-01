@@ -54,16 +54,19 @@ export const run_carrier = function(creep:Creep,fb:CarrierMemory){
 
 const change_flow = function(fb:CarrierMemory) {
     const pool = Memory.rooms[fb.fromRoom]._dynamic
+    const fromRoom = Game.rooms[fb.fromRoom]
+    const toRoom = Game.rooms[fb.toRoom]
     for(let flow of carry_priority[fb.priority]){
         if(flow[0] != 'storage' && !pool[flow[0]]?.length) {
-            pool[flow[0]] = posed_task_updater[flow[0]](Game.rooms[fb.fromRoom])
+            if(!fromRoom) return null
+            pool[flow[0]] = posed_task_updater[flow[0]](fromRoom)
         }
         if(flow[0] != 'storage' && !pool[flow[0]]?.length) {
             continue
         }
         if(flow[1] != 'storage' && !pool[flow[1]]?.length) {
-            const dsfa = posed_task_updater[flow[1]](Game.rooms[fb.toRoom])
-            pool[flow[1]] = posed_task_updater[flow[1]](Game.rooms[fb.toRoom])
+            if(!toRoom) return null
+            pool[flow[1]] = posed_task_updater[flow[1]](toRoom)
         }
         if(flow[1] != 'storage' && !pool[flow[1]]?.length) {
             continue
@@ -154,6 +157,12 @@ const find_collect = function(creep:Creep,fb:CarrierMemory){
     }
 }
 
+/**
+ * 生成将creep.store中所有的资源送回storage的任务
+ * @param creep 
+ * @param fb 
+ * @returns 
+ */
 const lazy_restock = function(creep:Creep,fb:CarrierMemory) {
     const toRoom = Game.rooms[fb.toRoom]
     if(!toRoom) return
@@ -165,7 +174,7 @@ const lazy_restock = function(creep:Creep,fb:CarrierMemory) {
 
     var store: StorePropertiesOnly = creep.store
     var resourceType: keyof typeof store
-    for (resourceType in store) {
+    for (resourceType in store) {   //遍历资源
         fb.consume.push(parse_posed_task({
             pos: storage.pos,
             action: 'transfer',
@@ -174,10 +183,15 @@ const lazy_restock = function(creep:Creep,fb:CarrierMemory) {
     }
 }
 
+/**
+ * 根据已获取的供应任务，生成从storage取对应资源的任务
+ * @param fb 
+ * @returns 
+ */
 const lazy_storage = function(fb:CarrierMemory) {
-    const storage = Game.rooms[fb.fromRoom].storage
+    const storage = Game.rooms[fb.fromRoom]?.storage
     if(!storage) return
-    for(let consume of fb.consume){
+    for(let consume of fb.consume){ //遍历供应任务
         let collect: PosedCreepTask<'withdraw'> = {
             pos:    storage.pos,
             action: 'withdraw',
@@ -188,17 +202,27 @@ const lazy_storage = function(fb:CarrierMemory) {
         else if(consume.action == 'transfer')
             collect.args = [storage.id,consume.args[1],consume.args[2]]
 
-        const last_collect = fb.collect[fb.collect.length - 1]
-        if(last_collect && last_collect.action == 'withdraw'
+        //合并目标相同，资源类型相同的withdraw任务
+        const last_collect = fb.collect[fb.collect.length - 1]?.[OK]
+        if(last_collect
+                && last_collect != TASK_DOING
+                && last_collect != TASK_COMPLETE
+                && last_collect != TASK_FAILED
+                //要合并的任务位于第二层，参见parse_posed_task
+                && last_collect.action == 'withdraw'
                 && last_collect.args[0] == collect.args[0]
                 && last_collect.args[1] == collect.args[1]) {
-            console.log('withdraw:'+last_collect.args[2]+'+'+collect.args[2])
             last_collect.args[2] = (last_collect.args[2] && collect.args[2])
                 ? (last_collect.args[2] + collect.args[2]) : undefined
-        } else fb.collect.push(parse_posed_task(collect))
+        } else fb.collect.push(parse_posed_task(collect))   //不合并
     }
 }
 
+/**
+ * 将缓存的任务，解析为能被perform_callback执行的格式
+ * @param posed 
+ * @returns 
+ */
 const parse_posed_task = function(posed:PosedCreepTask<TargetedAction>):CallbackBehavior<AnyAction>{
     const main: CallbackBehavior<TargetedAction> = {...{bhvr_name:'callbackful'},...posed}
     const move: CallbackBehavior<'approach'> = {...{bhvr_name:'callbackful'},

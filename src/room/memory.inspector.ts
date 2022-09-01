@@ -12,9 +12,9 @@ export const _format_room = function (room_name: string, type:RoomTypes) {
 _.assign(global, {_format_room:_format_room})
 
 /**
- * 房间内存完整性检查
+ * 房间内存完整性检查和补全
  * @param room_name 房间名
- * @param restart_room 重启房间
+ * @param restart_room 是否重置房间
  * @returns 
  */
 export const inspector_memory = function (room_name: string, restart_room: boolean = false) {

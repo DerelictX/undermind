@@ -8,6 +8,18 @@ const spawn_handler: {[r in AnyRole]:(room:Room) => RoleImpl|null} = {
     HarvesterSource0: function (room: Room) {
         static_updater['sources'](room)
         if (!room.memory._typed._static.H_srcs?.[0]) return null
+        if (!room.memory._typed._static.T_src0[0]) {
+            const posed = room.memory._typed._static.H_srcs[0]
+            const main: CallbackBehavior<TargetedAction> = {...{bhvr_name:'callbackful'},...posed}
+            const move: CallbackBehavior<'approach'> = {...{bhvr_name:'callbackful'},
+                    ...{action:"approach",args:[posed.pos,1]}}
+            main[ERR_NOT_FOUND] = move
+            main[ERR_NOT_IN_RANGE] = move
+            return {
+                _body:{generator:'W',workload:5},
+                _class:{...{bhvr_name:'callbackful'},...main}
+            }
+        }
         return {
             _body:{generator:'Wc',workload:10},
             _class:init_worker_behavior('HarvesterSource0',room.name,room.name)
@@ -16,6 +28,18 @@ const spawn_handler: {[r in AnyRole]:(room:Room) => RoleImpl|null} = {
     HarvesterSource1: function (room: Room) {
         static_updater['sources'](room)
         if (!room.memory._typed._static.H_srcs?.[1]) return null
+        if (!room.memory._typed._static.T_src1[0]) {
+            const posed = room.memory._typed._static.H_srcs[1]
+            const main: CallbackBehavior<TargetedAction> = {...{bhvr_name:'callbackful'},...posed}
+            const move: CallbackBehavior<'approach'> = {...{bhvr_name:'callbackful'},
+                    ...{action:"approach",args:[posed.pos,1]}}
+            main[ERR_NOT_FOUND] = move
+            main[ERR_NOT_IN_RANGE] = move
+            return {
+                _body:{generator:'W',workload:5},
+                _class:{...{bhvr_name:'callbackful'},...main}
+            }
+        }
         return {
             _body:{generator:'Wc',workload:10},
             _class:init_worker_behavior('HarvesterSource1',room.name,room.name)
@@ -23,7 +47,37 @@ const spawn_handler: {[r in AnyRole]:(room:Room) => RoleImpl|null} = {
     },
     HarvesterSource2: function (room: Room) {
         static_updater['sources'](room)
+        const controller = room.controller
+        if(controller){
+            const posed: Posed<PrimitiveDescript<'reserveController'>> = {
+                action: 'reserveController',
+                args: [controller.id],
+                pos: controller.pos
+            }
+            const main: CallbackBehavior<TargetedAction> = {...{bhvr_name:'callbackful'},...posed}
+            const move: CallbackBehavior<'approach'> = {...{bhvr_name:'callbackful'},
+                    ...{action:"approach",args:[posed.pos,1]}}
+            main[ERR_NOT_FOUND] = move
+            main[ERR_NOT_IN_RANGE] = move
+            return {
+                _body:{generator:'Cl',workload:4},
+                _class:{...{bhvr_name:'callbackful'},...main}
+            }
+        }
+
         if (!room.memory._typed._static.H_srcs?.[2]) return null
+        if (!room.memory._typed._static.T_src2?.[0]) {
+            const posed = room.memory._typed._static.H_srcs[2]
+            const main: CallbackBehavior<TargetedAction> = {...{bhvr_name:'callbackful'},...posed}
+            const move: CallbackBehavior<'approach'> = {...{bhvr_name:'callbackful'},
+                    ...{action:"approach",args:[posed.pos,1]}}
+            main[ERR_NOT_FOUND] = move
+            main[ERR_NOT_IN_RANGE] = move
+            return {
+                _body:{generator:'W',workload:5},
+                _class:{...{bhvr_name:'callbackful'},...main}
+            }
+        }
         return {
             _body:{generator:'Wc',workload:10},
             _class:init_worker_behavior('HarvesterSource2',room.name,room.name)
@@ -40,6 +94,7 @@ const spawn_handler: {[r in AnyRole]:(room:Room) => RoleImpl|null} = {
         static_updater['controller'](room)
         if (!room.memory._typed._static.W_ctrl[0]) return null
         if (room.controller?.level == 8) return null
+        if(room.storage && room.storage.store.energy <= 120000) return null
         return {
             _body:{generator:'Wc',workload:10},
             _class:init_worker_behavior('Upgrader',room.name,room.name)
@@ -72,15 +127,23 @@ const spawn_handler: {[r in AnyRole]:(room:Room) => RoleImpl|null} = {
         }
     },
     EnergySupplier: function (room: Room) {
-        if(room.storage?.my) return null
+        return null
         return {
-            _body:{generator:'C',workload:12},
+            _body:{generator:'C',workload:8},
             _class:init_worker_behavior('EnergySupplier',room.name,room.name)
         }
     },
 
     Collector: function (room: Room) {
         static_updater.containers(room)
+        let _spawn = room.memory._typed._spawn
+        if(_.isString(_spawn)) {
+            return {
+                _body:{generator:'C',workload:32},
+                _class:init_carrier_behavior('Collector',room.name,_spawn)
+            }
+        }
+
         if(!room.storage?.my) return null
         return {
             _body:{generator:'C',workload:12},
@@ -114,24 +177,22 @@ export const spawn_loop = function(room: Room) {
         if(_.isString(_spawn)) return
     }
     if(!_spawn) return
-    switch(room.memory._typed._type) {
-        case 'owned':
-        case 'reserved':
-            let role_name: keyof typeof room.memory._typed._looper
-            for(role_name in room.memory._typed._looper){
-                const spawn_loop = room.memory._typed._looper[role_name]
-                if(!spawn_loop || spawn_loop.reload_time > Game.time)
-                    continue
-                
-                const role_impl = spawn_handler[role_name](room)
-                if(!role_impl){
-                    spawn_loop.reload_time = Game.time + 400
-                    continue
-                }
 
-                spawn_loop.reload_time = Game.time + spawn_loop.interval
-                const caller = {_caller:{room_name:room.name,looper:role_name}}
-                _spawn.push({...caller,...role_impl})
-            }
+    let role_name: keyof typeof room.memory._typed._looper
+    for(role_name in room.memory._typed._looper){
+        const spawn_loop = room.memory._typed._looper[role_name]
+        if(!spawn_loop || spawn_loop.reload_time > Game.time)
+            continue
+        
+        const role_impl = spawn_handler[role_name](room)
+        if(!role_impl){
+            spawn_loop.reload_time = Game.time + 400
+            continue
+        }
+
+        spawn_loop.reload_time = Game.time + spawn_loop.interval
+        const caller = {_caller:{room_name:room.name,looper:role_name}}
+        _spawn.push({...caller,...role_impl})
+        return
     }
 }

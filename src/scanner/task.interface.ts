@@ -31,7 +31,7 @@ interface DynamicTaskPool {
     //get energy
     recycle:    Posed<PrimitiveDescript<'dismantle'>>[]
     H_srcs:     Posed<RestrictedPrimitiveDescript<'harvest','energy'>>[]
-    W_energy:   Posed<RestrictedPrimitiveDescript<'withdraw','energy'>>[]
+    W_energy:   Posed<RestrictedPrimitiveDescript<'withdraw'|'pickup','energy'>>[]
     //consume energy
     build:      Posed<PrimitiveDescript<'build'>>[]
     fortify:    Posed<PrimitiveDescript<'repair'>>[]

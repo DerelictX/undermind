@@ -69,7 +69,7 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
      * @returns
      */
     sweep: function (room: Room) {
-        var tasks: PosedCreepTask<"withdraw">[] = []
+        var tasks: PosedCreepTask<"withdraw"|"pickup">[] = []
         const tombstones: Tombstone[] = room.find(FIND_TOMBSTONES, {
             filter: (tombstone) => {
                 return tombstone.store.getUsedCapacity() >= 200
@@ -102,6 +102,19 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
                     pos: ruin.pos
                 })
             }
+        }
+
+        const dropped: Resource[] = room.find(FIND_DROPPED_RESOURCES, {
+            filter: (resource) => {
+                return resource.amount > 400
+            }
+        })
+        for (let resource of dropped) {
+            tasks.push({
+                action: 'pickup',
+                args: [resource.id],
+                pos: resource.pos
+            })
         }
         return tasks
     },
@@ -175,7 +188,7 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
     },
 
     W_energy: function (room: Room) {
-        var tasks: Posed<RestrictedPrimitiveDescript<'withdraw', 'energy'>>[] = []
+        var tasks: Posed<RestrictedPrimitiveDescript<'withdraw'|'pickup', 'energy'>>[] = []
         const storage = room.storage
         if (storage && storage.store['energy'] >= 10000) {
             tasks.push({
@@ -184,28 +197,46 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
                 pos: storage.pos
             })
         }
-        if (!room.memory._typed._static.W_cntn) return tasks
-        for (let task of room.memory._typed._static.W_cntn) {
-            const container = Game.getObjectById(task.args[0])
-            if (container && container.store['energy'] >= 800) {
-                tasks.push({
-                    action: 'withdraw',
-                    args: [container.id, 'energy'],
-                    pos: container.pos
-                })
+        if(tasks.length) return tasks
+
+        if (room.memory._typed._static.W_cntn){
+            for (let task of room.memory._typed._static.W_cntn) {
+                const container = Game.getObjectById(task.args[0])
+                if (container && container.store['energy'] >= 800) {
+                    tasks.push({
+                        action: 'withdraw',
+                        args: [container.id, 'energy'],
+                        pos: container.pos
+                    })
+                }
             }
         }
-        if (!room.memory._typed._struct) return tasks
-        const links = room.memory._typed._struct.links.outs
-            .map(id => Game.getObjectById(id))
-        for (let link of links) {
-            if (link && link.store['energy'] >= 600) {
-                tasks.push({
-                    action: 'withdraw',
-                    args: [link.id, 'energy'],
-                    pos: link.pos
-                })
+        if (room.memory._typed._struct){
+            const links = room.memory._typed._struct.links.outs
+                .map(id => Game.getObjectById(id))
+            for (let link of links) {
+                if (link && link.store['energy'] >= 600) {
+                    tasks.push({
+                        action: 'withdraw',
+                        args: [link.id, 'energy'],
+                        pos: link.pos
+                    })
+                }
             }
+        }
+        if(tasks.length) return tasks
+        
+        const dropped: Resource<'energy'>[] = room.find(FIND_DROPPED_RESOURCES, {
+            filter: (resource) => {
+                return resource.resourceType == 'energy' && resource.amount > 200
+            }
+        })
+        for (let resource of dropped) {
+            tasks.push({
+                action: 'pickup',
+                args: [resource.id],
+                pos: resource.pos
+            })
         }
         return tasks
     },

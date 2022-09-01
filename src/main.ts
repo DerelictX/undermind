@@ -10,6 +10,7 @@ import { static_updater } from "./scanner/static";
 import { run_carrier } from "./creep/role.carrier";
 import { run_worker } from "./creep/role.worker";
 import { link_run } from "./structure/link";
+import { perform_callback } from "./performer/behavior.callback";
 
 export const loop = function () {
 
@@ -54,6 +55,9 @@ export const loop = function () {
                     break
                 case 'worker':
                     run_worker(creep,_class)
+                    break
+                case 'callbackful':
+                    perform_callback(creep,_class)
                     break
                 default: throw new Error("Unexpected state.")
             }

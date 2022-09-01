@@ -22,7 +22,7 @@ interface OwnedRoomMemory {
     _type:      'owned'
     _struct:    RoomStructureList
     _static:    ShadowedPick<FullTaskPool,keyof (OwnedTaskPool & SourceTaskPool & MineralTaskPool)>
-    _spawn:     SpawnTask[]
+    _spawn:     SpawnTask[] //孵化队列
     _looper:    ShadowedPick<{[R in AnyRole]: Looper},owned_room_role>
 }
 
@@ -34,7 +34,7 @@ interface ReservedRoomMemory {
     _type:      'reserved'
     _struct?:   undefined
     _static:    ShadowedPick<FullTaskPool,keyof (ReservedTaskPool & SourceTaskPool)>
-    _spawn?:    string
+    _spawn?:    string  //生爬的房间名
     _looper:    ShadowedPick<{[R in AnyRole]: Looper},reserved_room_role>
 }
 
@@ -44,14 +44,15 @@ interface HighwayRoomMemory {
     _type:      'highway'
     _struct?:   undefined
     _static:    ShadowedPick<FullTaskPool,keyof HighwayTaskPool>
-    _spawn?:    string
+    _spawn?:    string  //生爬的房间名
     _looper:    ShadowedPick<{[R in AnyRole]: Looper},highway_room_role>
 }
 
+/**白板房，啥也不干 */
 interface NeutralRoomMemory{
     _type:      'neutral'
     _struct?:   undefined
     _static:    ShadowedPick<FullTaskPool,never>
-    _spawn?:    string
+    _spawn?:    string  ////生爬的房间名
     _looper:    ShadowedPick<{[R in AnyRole]: Looper},never>
 }

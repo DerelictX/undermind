@@ -85,6 +85,11 @@ const change_flow = function(creep:Creep,fb:WorkerMemory) {
     }
 }
 
+/**
+ * 将缓存的任务，解析为能被perform_callback执行的格式，加上一些条件判断
+ * @param posed 
+ * @returns 
+ */
 const parse_posed_task = function(posed:PosedCreepTask<TargetedAction>):CallbackBehavior<AnyAction>{
     const main: CallbackBehavior<TargetedAction> = {...{bhvr_name:'callbackful'},...posed}
     const move: CallbackBehavior<'approach'> = {...{bhvr_name:'callbackful'},
