@@ -523,8 +523,10 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
     },
     T_power: function (room: Room): PosedCreepTask<"transfer">[] {
         if (!room.memory._typed._struct?.power_spawn) return []
+        const storage = room.storage
         const power_spawn = Game.getObjectById(room.memory._typed._struct.power_spawn)
-        if (!power_spawn) return []
+        if (!storage || !power_spawn) return []
+
         var tasks: PosedCreepTask<'transfer'>[] = []
         if (power_spawn.store['energy'] <= 3000) {
             tasks.push({
@@ -533,7 +535,7 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
                 pos: power_spawn.pos
             })
         }
-        if (power_spawn.store['power'] <= 50) {
+        if (storage.store['power'] && power_spawn.store['power'] <= 50) {
             tasks.push({
                 action: 'transfer',
                 args: [power_spawn.id, 'power', power_spawn.store.getFreeCapacity('power')],
@@ -544,8 +546,10 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
     },
     T_nuker: function (room: Room): PosedCreepTask<"transfer">[] {
         if (!room.memory._typed._struct?.nuker) return []
+        const storage = room.storage
         const nuker = Game.getObjectById(room.memory._typed._struct.nuker)
-        if (!nuker) return []
+        if (!storage || !nuker) return []
+
         var tasks: PosedCreepTask<'transfer'>[] = []
         if (nuker.store.getFreeCapacity('energy')) {
             tasks.push({
@@ -554,7 +558,7 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
                 pos: nuker.pos
             })
         }
-        if (nuker.store.getFreeCapacity('G')) {
+        if (storage.store['G'] && nuker.store.getFreeCapacity('G')) {
             tasks.push({
                 action: 'transfer',
                 args: [nuker.id, 'G', nuker.store.getFreeCapacity('G')],

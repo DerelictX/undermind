@@ -40,6 +40,11 @@ const performer:{[action in PrimitiveAction]:PrimitivePerformer<action>} = {
         const target = Game.getObjectById(args[0])
         if(!target) return ERR_NOT_FOUND
 
+        if(!creep.store.getFreeCapacity(args[1]))
+            return ERR_FULL
+        if(!target.store.getUsedCapacity(args[1]))
+            return ERR_NOT_ENOUGH_RESOURCES
+
         let ret = creep.withdraw(target,args[1],args[2]);
         if(ret == ERR_FULL || ret == ERR_NOT_ENOUGH_RESOURCES)
             ret = creep.withdraw(target,args[1]);
@@ -51,6 +56,11 @@ const performer:{[action in PrimitiveAction]:PrimitivePerformer<action>} = {
         const target = Game.getObjectById(args[0])
         if(!target) return ERR_NOT_FOUND
         
+        if(!creep.store.getUsedCapacity(args[1]))
+            return ERR_NOT_ENOUGH_RESOURCES
+        if(!target.store.getFreeCapacity(args[1]))
+            return ERR_FULL
+
         let ret = creep.transfer(target,args[1],args[2]);
         if(ret == ERR_FULL || ret == ERR_NOT_ENOUGH_RESOURCES)
             ret = creep.transfer(target,args[1]);

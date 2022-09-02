@@ -46,20 +46,15 @@ export const static_updater = {
                 args: [source.id],
                 pos: source.pos
             })
-            const container:StructureContainer|null = source.pos.findClosestByRange(FIND_STRUCTURES,{
-                filter: {structureType: STRUCTURE_CONTAINER}
-            })
-            if(!container || !container.pos.isNearTo(source)) continue
-            T_srcs[i].push({
-                action: 'repair',
-                args: [container.id],
-                pos: container.pos
-            })
             
-            const near_structs:AnyStoreStructure[] = container.pos.findInRange(FIND_STRUCTURES,1,{
+            const near_structs:AnyStoreStructure[] = source.pos.findInRange(FIND_STRUCTURES,2,{
                 filter: (structure) => {
-                    if(structure.structureType == STRUCTURE_CONTAINER
-                        || structure.structureType == STRUCTURE_STORAGE
+                    if(structure.structureType == STRUCTURE_CONTAINER){
+                        if(structure.pos.inRangeTo(source,2))
+                            T_srcs[i].push({action: 'repair',args: [structure.id],pos: structure.pos})
+                        return true
+                    }
+                    if(structure.structureType == STRUCTURE_STORAGE
                         || structure.structureType == STRUCTURE_TERMINAL
                         || structure.structureType == STRUCTURE_LINK)
                         return true

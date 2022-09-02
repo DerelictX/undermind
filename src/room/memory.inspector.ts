@@ -5,9 +5,11 @@ import _ from "lodash"
  * @param room_name 房间名
  * @param type 房间类型
  */
-export const _format_room = function (room_name: string, type:RoomTypes) {
+export const _format_room = function (room_name: string, type:RoomTypes, spawn_room: string) {
     Memory.rooms[room_name]._typed._type = type
     inspector_memory(room_name,true)
+    if(!Memory.rooms[room_name]._typed._spawn)
+        Memory.rooms[room_name]._typed._spawn = spawn_room
 }
 _.assign(global, {_format_room:_format_room})
 

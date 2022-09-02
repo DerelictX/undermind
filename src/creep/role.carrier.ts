@@ -4,52 +4,96 @@ import { TASK_COMPLETE, TASK_DOING, TASK_FAILED } from "../performer/behavior.an
 import { perform_callback } from "../performer/behavior.callback"
 
 export const run_carrier = function(creep:Creep,fb:CarrierMemory){
-    //console.log(creep.name)
     if(fb.state == 'idle'){
         if(creep.store.getUsedCapacity()){
             lazy_restock(creep,fb)
             fb.state = 'consume'
-            return TASK_DOING
+        } else {
+            const flow = change_flow(fb)
+            if(!flow) return
+            fb.current = flow
+            fb.state = 'collect'
         }
-        const flow = change_flow(fb)
-        if(!flow) return TASK_DOING
-        fb.current = flow
-        fb.state = 'collect'
-        return TASK_COMPLETE
     }
     if(fb.state == 'collect'){
-        if(!fb.collect.length){
-            find_collect(creep,fb)
-            if(!fb.collect.length) {
-                fb.state = 'idle'
-                return TASK_COMPLETE
+        fb.state = run_carrier_collect(creep,fb)
+        if(fb.state == 'idle'){
+            if(creep.store.getUsedCapacity()){
+                lazy_restock(creep,fb)
+                fb.state = 'consume'
+            } else {
+                const flow = change_flow(fb)
+                if(!flow) return
+                fb.current = flow
+                fb.state = 'collect'
             }
         }
-        const ret = perform_callback(creep,fb.collect[0])
-        if(ret != TASK_DOING) fb.collect.shift()
-        if(ret == TASK_FAILED){
-            fb.state = 'consume'
-            return TASK_DOING
+        if(fb.state == 'consume'){
+            fb.state = run_carrier_consume(creep,fb)
         }
-        return TASK_DOING
+    } else if(fb.state == 'consume'){
+        fb.state = run_carrier_consume(creep,fb)
+        if(fb.state == 'idle'){
+            if(creep.store.getUsedCapacity()){
+                lazy_restock(creep,fb)
+                fb.state = 'consume'
+            } else {
+                const flow = change_flow(fb)
+                if(!flow) return
+                fb.current = flow
+                fb.state = 'collect'
+            }
+        }
+        if(fb.state == 'collect'){
+            fb.state = run_carrier_collect(creep,fb)
+        }
     }
-    if(fb.state == 'consume'){
+}
+
+const run_carrier_collect = function(creep:Creep,fb:CarrierMemory){
+    if(!fb.collect.length){
+        if(creep.store.getFreeCapacity('energy') == 0){
+            return 'consume'
+        }
+        if(fb.current[0] == 'storage'){
+            if(!fb.consume.length)
+                find_consume(creep,fb)
+            lazy_storage(fb)
+        } else find_collect(creep,fb)
+        if(!fb.collect.length) {
+            return 'idle'
+        }
+    }
+    const ret = perform_callback(creep,fb.collect[0])
+    if(ret != TASK_DOING) {
+        fb.collect.shift()
+        if(!fb.collect.length && creep.store.getFreeCapacity('energy') == 0){
+            return 'consume'
+        }
+    }
+    return 'collect'
+}
+
+const run_carrier_consume = function(creep:Creep,fb:CarrierMemory){
+    if(!fb.consume.length) {
+        if(creep.store.getUsedCapacity('energy') == 0){
+            return 'idle'
+        }
+        if(fb.current[1] == 'storage')
+            lazy_restock(creep,fb)
+        else find_consume(creep,fb)
         if(!fb.consume.length) {
-            find_consume(creep,fb)
-            if(!fb.consume.length) {
-                fb.state = 'idle'
-                return TASK_COMPLETE
-            }
+            return 'idle'
         }
-        const ret = perform_callback(creep,fb.consume[0])
-        if(ret != TASK_DOING) fb.consume.shift()
-        if(ret == TASK_FAILED){
-            fb.state = 'collect'
-            return TASK_DOING
-        }
-        return TASK_DOING
     }
-    return TASK_FAILED
+    const ret = perform_callback(creep,fb.consume[0])
+    if(ret != TASK_DOING) {
+        fb.consume.shift()
+        if(!fb.consume.length && creep.store.getUsedCapacity('energy') == 0){
+            return 'idle'
+        }
+    }
+    return 'consume'
 }
 
 const change_flow = function(fb:CarrierMemory) {
@@ -79,15 +123,11 @@ const change_flow = function(fb:CarrierMemory) {
 
 const find_consume = function(creep:Creep,fb:CarrierMemory){
     const consume = Memory.rooms[fb.toRoom]._dynamic
-    if(fb.current[1] == 'storage'){
-        lazy_restock(creep,fb)
-        return
-    }
+    if(fb.current[1] == 'storage') return
     let free = creep.store.getCapacity()
     const pool = consume[fb.current[1]]
     while(pool && pool.length && free > 0) {
         const task = pool[0]
-        //console.log('\t' + JSON.stringify(task))
         if(task.action == 'transfer' && task.args[2]){
             if(free < task.args[2]){
                 task.args[2] -= free
@@ -122,12 +162,7 @@ const find_consume = function(creep:Creep,fb:CarrierMemory){
 
 const find_collect = function(creep:Creep,fb:CarrierMemory){
     const collect = Memory.rooms[fb.fromRoom]._dynamic
-    if(fb.current[0] == 'storage'){
-        if(!fb.consume.length)
-            find_consume(creep,fb)
-        lazy_storage(fb)
-        return
-    }
+    if(fb.current[0] == 'storage') return
     let free = creep.store.getCapacity()
     const pool = collect[fb.current[0]]
     while(pool && pool.length && free > 0) {
@@ -203,13 +238,8 @@ const lazy_storage = function(fb:CarrierMemory) {
             collect.args = [storage.id,consume.args[1],consume.args[2]]
 
         //合并目标相同，资源类型相同的withdraw任务
-        const last_collect = fb.collect[fb.collect.length - 1]?.[OK]
-        if(last_collect
-                && last_collect != TASK_DOING
-                && last_collect != TASK_COMPLETE
-                && last_collect != TASK_FAILED
-                //要合并的任务位于第二层，参见parse_posed_task
-                && last_collect.action == 'withdraw'
+        const last_collect = fb.collect[fb.collect.length - 1]
+        if(last_collect && last_collect.action == 'withdraw'
                 && last_collect.args[0] == collect.args[0]
                 && last_collect.args[1] == collect.args[1]) {
             last_collect.args[2] = (last_collect.args[2] && collect.args[2])
@@ -232,11 +262,9 @@ const parse_posed_task = function(posed:PosedCreepTask<TargetedAction>):Callback
     switch(main.action){
         case 'withdraw':
         case 'pickup':
-            const prejudge: CallbackBehavior<'prejudge_full'> = {...{bhvr_name:'callbackful'},
-                    ...{action:"prejudge_full",args:[0]}}
-            prejudge[OK] = main
-            return prejudge
+            return main
         case 'transfer':
+            return main
         case 'generateSafeMode':
             return main
         default: throw new Error("Unexpected state.")

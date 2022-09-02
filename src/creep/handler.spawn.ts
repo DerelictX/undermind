@@ -49,6 +49,10 @@ const spawn_handler: {[r in AnyRole]:(room:Room) => RoleImpl|null} = {
         static_updater['sources'](room)
         const controller = room.controller
         if(controller){
+            const reservation = controller.reservation
+            if(reservation && reservation.username == 'absGeist' && reservation.ticksToEnd > 3000){
+                return null
+            }
             const posed: Posed<PrimitiveDescript<'reserveController'>> = {
                 action: 'reserveController',
                 args: [controller.id],
@@ -121,6 +125,15 @@ const spawn_handler: {[r in AnyRole]:(room:Room) => RoleImpl|null} = {
         }
     },
     Maintainer: function (room: Room) {
+        const decayed = room.find(FIND_STRUCTURES, {
+            filter: (structure) => {
+                if (structure.structureType == STRUCTURE_ROAD
+                    ||structure.structureType == STRUCTURE_CONTAINER)
+                    return structure.hits < structure.hitsMax * 0.5
+                return false
+            }
+        })
+        if(!decayed.length) return null
         return {
             _body:{generator:'WC',workload:8},
             _class:init_worker_behavior('Maintainer',room.name,room.name)
