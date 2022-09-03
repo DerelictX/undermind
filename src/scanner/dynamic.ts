@@ -171,12 +171,38 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         return tasks
     },
     H_src0: function (room: Room) {
-        if (!room.memory._typed._static.H_srcs?.[0]) return []
-        return [room.memory._typed._static.H_srcs[0]].slice()
+        const task = room.memory._typed._static.H_srcs?.[0]
+        if (!task) return []
+        if (Game.getObjectById(task.args[0])?.energy) return [task]
+        
+        if(room.memory._typed._type != 'owned') return []
+        const t_task = room.memory._typed._static.T_src0[2]
+        const container = Game.getObjectById(t_task.args[0])
+        if(container instanceof StructureContainer && container.store['energy'] >= 100){
+            return [{
+                action: 'withdraw',
+                args: [container.id, 'energy'],
+                pos: container.pos
+            }]
+        }
+        return []
     },
     H_src1: function (room: Room) {
-        if (!room.memory._typed._static.H_srcs?.[1]) return []
-        return [room.memory._typed._static.H_srcs[1]].slice()
+        const task = room.memory._typed._static.H_srcs?.[1]
+        if (!task) return []
+        if (Game.getObjectById(task.args[0])?.energy) return [task]
+        
+        if(room.memory._typed._type != 'owned') return []
+        const t_task = room.memory._typed._static.T_src1[2]
+        const container = Game.getObjectById(t_task.args[0])
+        if(container instanceof StructureContainer && container.store['energy'] >= 100){
+            return [{
+                action: 'withdraw',
+                args: [container.id, 'energy'],
+                pos: container.pos
+            }]
+        }
+        return []
     },
     H_src2: function (room: Room) {
         if (!room.memory._typed._static.H_srcs?.[2]) return []

@@ -1,44 +1,50 @@
 import { structure_updater } from "./room/structure.updater";
 import { operator_run } from "./power_creep/operator";
-import { body_generator } from "./creep/config.body";
 import { inspector_memory, _format_room } from "./room/memory.inspector";
 import { spawn_loop } from "./creep/handler.spawn";
 import { spawn_run } from "./structure/spawn";
 import { tower_run } from "./structure/tower";
-import { perform_any } from "./performer/behavior.any";
 import { static_updater } from "./scanner/static";
 import { run_carrier } from "./creep/role.carrier";
 import { run_worker } from "./creep/role.worker";
 import { link_run } from "./structure/link";
 import { perform_callback } from "./performer/behavior.callback";
+import { lab_run } from "./structure/lab";
 
 export const loop = function () {
 
     if(false){
         static_updater
         structure_updater
-        body_generator
         _format_room
     }
-    
-    //ROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOMS
-    if(!Memory.owned_rooms)
-        Memory.owned_rooms = []
+
+    run_rooms()
+    run_creeps()
+    run_power_creeps()
+}
+
+const run_rooms = function(){
     for(let name in Memory.rooms){
         try{
             inspector_memory(name,false)
             const room = Game.rooms[name];
-            if(!room)continue
+            if(!room){
+                continue
+            }
             spawn_loop(room)
             spawn_run(room)
             tower_run(room)
             link_run(room)
+
+            lab_run(room)
         }catch(error){
-            console.log(name +':' + error);
+            console.log(name +':\t' + error);
         }
     }
+}
 
-    //CREEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEPS
+const run_creeps = function(){
     for(let name in Memory.creeps) {
         try{
             const creep = Game.creeps[name]
@@ -62,11 +68,12 @@ export const loop = function () {
                 default: throw new Error("Unexpected state.")
             }
         }catch(error){
-            console.log(name + ':' + error + '');
+            console.log(name + ':\t' + error);
         }
     }
+}
 
-    //POOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOWWWWWWWEEEEEEEERRRRRRRRR
+const run_power_creeps = function(){
     for(let name in Game.powerCreeps){
         try{
             const powerCreep = Game.powerCreeps[name]
@@ -78,7 +85,7 @@ export const loop = function () {
                     break;
             }
         }catch(error){
-            console.log(name + ':' + error);
+            console.log(name + ':\t' + error);
         }
     }
 }

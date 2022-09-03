@@ -45,7 +45,7 @@ export const change_reaction = function(room:Room){
             const reactants = reactions[reacts[i]] 
             if(terminal.store[reactants[0]] >= 1000 && terminal.store[reactants[1]] >= 1000){
                 room.memory._typed._struct.labs.reaction = reacts[i]
-                return
+                return reacts[i]
             }
         }
     }

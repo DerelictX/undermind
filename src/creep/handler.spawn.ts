@@ -1,10 +1,11 @@
 import { structure_updater } from "@/room/structure.updater"
 import { static_updater } from "@/scanner/static"
+import { change_reaction } from "@/structure/lab"
 import _ from "lodash"
 import { init_carrier_behavior, init_worker_behavior } from "./config.behavior"
 
 type RoleImpl = Omit<SpawnTask,'_caller'>
-const spawn_handler: {[r in AnyRole]:(room:Room) => RoleImpl|null} = {
+const spawn_handler: {[r in AnyRole]:(room:Room,looper:Looper) => RoleImpl|null} = {
     HarvesterSource0: function (room: Room) {
         static_updater['sources'](room)
         if (!room.memory._typed._static.H_srcs?.[0]) return null
@@ -147,10 +148,11 @@ const spawn_handler: {[r in AnyRole]:(room:Room) => RoleImpl|null} = {
         }
     },
 
-    Collector: function (room: Room) {
+    Collector: function (room: Room, looper: Looper) {
         static_updater.containers(room)
-        let _spawn = room.memory._typed._spawn
-        if(_.isString(_spawn)) {
+        let _spawn = room.memory._spawn
+        if(room.memory._typed._type == 'reserved') {
+            looper.interval = 750
             return {
                 _body:{generator:'C',workload:32},
                 _class:init_carrier_behavior('Collector',room.name,_spawn)
@@ -159,7 +161,7 @@ const spawn_handler: {[r in AnyRole]:(room:Room) => RoleImpl|null} = {
 
         if(!room.storage?.my) return null
         return {
-            _body:{generator:'C',workload:12},
+            _body:{generator:'C',workload:16},
             _class:init_carrier_behavior('Collector',room.name,room.name)
         }
     },
@@ -170,42 +172,52 @@ const spawn_handler: {[r in AnyRole]:(room:Room) => RoleImpl|null} = {
         structure_updater.unique(room,room.memory._typed._struct)
         if(!room.storage?.my) return null
         return {
-            _body:{generator:'C',workload:12},
+            _body:{generator:'C',workload:16},
             _class:init_carrier_behavior('Supplier',room.name,room.name)
         }
     },
     Chemist: function (room: Room) {
         if(room.memory._typed._type != 'owned') return null
         structure_updater.labs(room,room.memory._typed._struct)
+        change_reaction(room)
         return null
     },
 }
 
-
+/**
+ * 定时任务调度程序，用于扫描房间和孵化
+ * @param room 
+ * @returns 
+ */
 export const spawn_loop = function(room: Room) {
-    let _spawn = room.memory._typed._spawn
-    if(_.isString(_spawn)) {
-        if(!Memory.rooms[_spawn]) return
-        _spawn = Memory.rooms[_spawn]._typed._spawn
-        if(_.isString(_spawn)) return
-    }
-    if(!_spawn) return
-
     let role_name: keyof typeof room.memory._typed._looper
     for(role_name in room.memory._typed._looper){
         const spawn_loop = room.memory._typed._looper[role_name]
         if(!spawn_loop || spawn_loop.reload_time > Game.time)
             continue
         
-        const role_impl = spawn_handler[role_name](room)
-        if(!role_impl){
-            spawn_loop.reload_time = Game.time + 400
-            continue
-        }
-
+        /**调用扫描程序 */
+        const role_impl = spawn_handler[role_name](room,spawn_loop)
+        /**限定时间间隔，防止无限生爬 */
+        if(spawn_loop.interval < 200) spawn_loop.interval = 200
+        if(spawn_loop.interval > 10000) spawn_loop.interval = 10000
+        /**重置定时器 */
         spawn_loop.reload_time = Game.time + spawn_loop.interval
-        const caller = {_caller:{room_name:room.name,looper:role_name}}
-        _spawn.push({...caller,...role_impl})
+
+        if(role_impl){
+            let _spawn
+            if(room.memory._typed._type == 'owned'){
+                _spawn = room.memory._typed._struct.spawns.t1
+            } else {
+                /**援助爬孵化优先级更低 */
+                _spawn = Memory.rooms[room.memory._spawn]._typed._struct?.spawns.t2
+                if(!_spawn) return
+            }
+            /**按获取到的role_impl生爬 */
+            const caller = {_caller:{room_name:room.name,looper:role_name}}
+            _spawn.push({...caller,...role_impl})
+        }
+        /**每tick只扫描一次，减少cpu负载波动 */
         return
     }
 }

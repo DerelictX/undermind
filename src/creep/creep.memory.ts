@@ -1,6 +1,7 @@
 
 interface CreepMemory {
-    _class: CarrierMemory|WorkerMemory|CallbackBehavior<AnyAction>
+    _class:     CarrierMemory|WorkerMemory|CallbackBehavior<AnyAction>
+    _caller:    SpawnTask['_caller']
     _move?:{
         dest: {x:number,y:number,room:string},
         time: number,

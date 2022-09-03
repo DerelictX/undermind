@@ -55,12 +55,18 @@ const run_worker_consume = function(creep:Creep,fb:WorkerMemory){
 }
 
 const change_flow = function(creep:Creep,fb:WorkerMemory) {
-    const pool = Memory.rooms[fb.fromRoom]._dynamic
     const flow = work_priority[fb.priority]
     if(fb.state == 'collect'){
+        const pool = Memory.rooms[fb.fromRoom]._dynamic
+        const room = Game.rooms[fb.fromRoom]
+        if(!room){
+            creep.moveTo(new RoomPosition(25,25,fb.fromRoom))
+            return
+        }
         for(let source of flow[0]){
-            if(!pool[source]?.length)
-                pool[source] = posed_task_updater[source](Game.rooms[fb.fromRoom])
+            if(!pool[source]?.length){
+                pool[source] = posed_task_updater[source](room)
+            }
             const tasks = pool[source]
             if(tasks && tasks.length) {
                 fb.collect.push(parse_posed_task(tasks[0]))
@@ -71,9 +77,16 @@ const change_flow = function(creep:Creep,fb:WorkerMemory) {
         }
     }
     if(fb.state == 'consume'){
+        const pool = Memory.rooms[fb.toRoom]._dynamic
+        const room = Game.rooms[fb.toRoom]
+        if(!room){
+            creep.moveTo(new RoomPosition(25,25,fb.toRoom))
+            return
+        }
         for(let sink of flow[1]){
-            if(!pool[sink]?.length)
-                pool[sink] = posed_task_updater[sink](Game.rooms[fb.toRoom])
+            if(!pool[sink]?.length){
+                pool[sink] = posed_task_updater[sink](room)
+            }
             const tasks = pool[sink]
             if(tasks && tasks.length) {
                 fb.consume.push(parse_posed_task(tasks[0]))

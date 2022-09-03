@@ -6,10 +6,20 @@ import _ from "lodash"
  * @param type 房间类型
  */
 export const _format_room = function (room_name: string, type:RoomTypes, spawn_room: string) {
+    if(!Memory.rooms[room_name]) {
+        Memory.rooms[room_name] = {
+            _typed:{
+                _type:      'neutral',
+                _static:    {},
+                _looper:    {}
+            },
+            _dynamic: {},
+            _spawn: room_name
+        }
+    }
+    Memory.rooms[room_name]._spawn = spawn_room
     Memory.rooms[room_name]._typed._type = type
     inspector_memory(room_name,true)
-    if(!Memory.rooms[room_name]._typed._spawn)
-        Memory.rooms[room_name]._typed._spawn = spawn_room
 }
 _.assign(global, {_format_room:_format_room})
 
@@ -27,7 +37,8 @@ export const inspector_memory = function (room_name: string, restart_room: boole
                 _static:    {},
                 _looper:    {}
             },
-            _dynamic: {}
+            _dynamic: {},
+            _spawn: room_name
         }
     }
     const mem = Memory.rooms[room_name]
@@ -85,9 +96,6 @@ const owned_memory_initializer: {[k in keyof FilterOptional<OwnedRoomMemory>]:
             Chemist: spawn_loop
         }
     },
-    _spawn: function (mem: OwnedRoomMemory) {
-        mem._spawn = []
-    },
     _static: function (mem: OwnedRoomMemory): void {
         mem._static = {
             H_srcs: [],
@@ -104,6 +112,12 @@ const owned_memory_initializer: {[k in keyof FilterOptional<OwnedRoomMemory>]:
     },
     _struct: function (mem: OwnedRoomMemory): void {
         mem._struct = {
+            spawns: {
+                t0: [],
+                t1: [],
+                t2: [],
+                t3: [],
+            },
             towers: [],
             links: {
                 nexus: [],

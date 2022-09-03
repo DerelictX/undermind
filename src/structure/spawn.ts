@@ -4,12 +4,20 @@ import { ceil, floor } from "lodash";
 export const spawn_run = function(room: Room) {
     if(room.memory._typed._type != 'owned') return
     if(room.energyAvailable < 300) return
-    const spawn = room.find(FIND_MY_SPAWNS).find(spawn => !spawn.spawning)
-    if(!spawn) return
-    const spawn_task = room.memory._typed._spawn[0]
-    if(!spawn_task) return
-    room.memory._typed._spawn.shift()
+    const spawns = room.find(FIND_MY_SPAWNS,{
+        filter: (spawn) => !spawn.spawning
+    })
+    const spawn = spawns[0]
+    if(!spawns) return
 
+    let spawn_task = room.memory._typed._struct.spawns.t1.shift()
+    if(!spawn_task && spawns[1])
+        spawn_task = room.memory._typed._struct.spawns.t2.shift()
+    if(!spawn_task && spawns[2])
+        spawn_task = room.memory._typed._struct.spawns.t3.shift()
+    if(!spawn_task) return
+
+    /**生爬 */
     Memory.creep_SN = (Memory.creep_SN + 1) % 1000
     const creep_name = 'c'+ Memory.creep_SN
     const generator = body_generator[spawn_task._body.generator]
@@ -25,7 +33,11 @@ export const spawn_run = function(room: Room) {
     if(!spawn_loop) return
     if(ret == OK){
         spawn_loop.reload_time = Game.time + spawn_loop.interval + 1
-        Memory.creeps[creep_name] = { _class: spawn_task._class }
+        /**creep内存赋值 */
+        Memory.creeps[creep_name] = {
+            _class:     spawn_task._class,
+            _caller:    spawn_task._caller
+        }
     } else {
         spawn_loop.reload_time = Game.time + 200
         console.log(spawn.name + ":" + creep_name + ":" + ret)

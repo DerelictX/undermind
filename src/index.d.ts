@@ -8,7 +8,6 @@ type Looper = {
 }
 
 interface Memory {
-    owned_rooms: string[]
     creep_SN:   number
 }
 

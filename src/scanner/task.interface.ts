@@ -14,8 +14,8 @@ type FilterPoolKey<T extends WorkAction|CarryAction, R extends ResourceConstant>
 
 interface DynamicTaskPool {
     //sources
-    H_src0:     Posed<RestrictedPrimitiveDescript<'harvest','energy'>>[]
-    H_src1:     Posed<RestrictedPrimitiveDescript<'harvest','energy'>>[]
+    H_src0:     Posed<RestrictedPrimitiveDescript<'harvest'|'withdraw','energy'>>[]
+    H_src1:     Posed<RestrictedPrimitiveDescript<'harvest'|'withdraw','energy'>>[]
     H_src2:     Posed<RestrictedPrimitiveDescript<'harvest','energy'>>[]
     T_src0:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]
     T_src1:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]

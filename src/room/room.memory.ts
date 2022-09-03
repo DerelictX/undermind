@@ -12,6 +12,7 @@ type RoomTypes = RoomMemory['_typed']['_type']
 interface RoomMemory {
     _typed:     OwnedRoomMemory | ReservedRoomMemory | HighwayRoomMemory | NeutralRoomMemory
     _dynamic:   {[k in keyof DynamicTaskPool]?: PosedCreepTask<TargetedAction>[]}
+    _spawn:     string  //生爬的房间名
 }
 
 type owned_room_role =
@@ -22,7 +23,6 @@ interface OwnedRoomMemory {
     _type:      'owned'
     _struct:    RoomStructureList
     _static:    ShadowedPick<FullTaskPool,keyof (OwnedTaskPool & SourceTaskPool & MineralTaskPool)>
-    _spawn:     SpawnTask[] //孵化队列
     _looper:    ShadowedPick<{[R in AnyRole]: Looper},owned_room_role>
 }
 
@@ -34,7 +34,6 @@ interface ReservedRoomMemory {
     _type:      'reserved'
     _struct?:   undefined
     _static:    ShadowedPick<FullTaskPool,keyof (ReservedTaskPool & SourceTaskPool)>
-    _spawn?:    string  //生爬的房间名
     _looper:    ShadowedPick<{[R in AnyRole]: Looper},reserved_room_role>
 }
 
@@ -44,7 +43,6 @@ interface HighwayRoomMemory {
     _type:      'highway'
     _struct?:   undefined
     _static:    ShadowedPick<FullTaskPool,keyof HighwayTaskPool>
-    _spawn?:    string  //生爬的房间名
     _looper:    ShadowedPick<{[R in AnyRole]: Looper},highway_room_role>
 }
 
@@ -53,6 +51,5 @@ interface NeutralRoomMemory{
     _type:      'neutral'
     _struct?:   undefined
     _static:    ShadowedPick<FullTaskPool,never>
-    _spawn?:    string  ////生爬的房间名
     _looper:    ShadowedPick<{[R in AnyRole]: Looper},never>
 }
