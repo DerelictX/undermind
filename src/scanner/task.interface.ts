@@ -52,6 +52,9 @@ interface DynamicTaskPool {
     T_react:    Posed<PrimitiveDescript<'transfer'>>[]
     T_power:    Posed<PrimitiveDescript<'transfer'>>[]
     T_nuker:    Posed<PrimitiveDescript<'transfer'>>[]
+    //central
+    T_term:     Posed<PrimitiveDescript<'transfer'>>[]
+    W_term:     Posed<PrimitiveDescript<'withdraw'>>[]
 }
 
 type EnSource = FilterPoolKey<(WorkAction|CarryAction)&CollectAction,'energy'>

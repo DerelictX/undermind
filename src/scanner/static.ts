@@ -61,7 +61,10 @@ export const static_updater = {
                     return false
                 }
             })
-            near_structs.sort((a, b) => a.store.getCapacity('energy') - b.store.getCapacity('energy'))
+            near_structs.sort((a, b) => {
+                return a.store.getCapacity('energy') - b.store.getCapacity('energy')
+                    - a.pos.getRangeTo(source) + b.pos.getRangeTo(source)
+            })
             for(let struct of near_structs){
                 T_srcs[i].push({action:'transfer',args:[struct.id,'energy'],pos:struct.pos})
             }

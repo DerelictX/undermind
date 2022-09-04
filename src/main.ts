@@ -18,7 +18,14 @@ export const loop = function () {
         structure_updater
         _format_room
     }
-
+    if(Game.time % 100 == 3){    
+        console.log('cpu_task_updater_100:\t' + Memory.cpu_task_updater)
+        Memory.cpu_task_updater = 0
+    }
+    if(Game.time % 100 == 4){    
+        console.log('cpu_moveTo_100:\t' + Memory.cpu_moveTo)
+        Memory.cpu_moveTo = 0
+    }
     run_rooms()
     run_creeps()
     run_power_creeps()

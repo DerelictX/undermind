@@ -103,14 +103,18 @@ const change_flow = function(fb:CarrierMemory) {
     for(let flow of carry_priority[fb.priority]){
         if(flow[0] != 'storage' && !pool[flow[0]]?.length) {
             if(!fromRoom) return null
+            const cpu = Game.cpu.getUsed()
             pool[flow[0]] = posed_task_updater[flow[0]](fromRoom)
+            Memory.cpu_task_updater += Game.cpu.getUsed() - cpu
         }
         if(flow[0] != 'storage' && !pool[flow[0]]?.length) {
             continue
         }
         if(flow[1] != 'storage' && !pool[flow[1]]?.length) {
             if(!toRoom) return null
+            const cpu = Game.cpu.getUsed()
             pool[flow[1]] = posed_task_updater[flow[1]](toRoom)
+            Memory.cpu_task_updater += Game.cpu.getUsed() - cpu
         }
         if(flow[1] != 'storage' && !pool[flow[1]]?.length) {
             continue
@@ -164,6 +168,15 @@ const find_collect = function(creep:Creep,fb:CarrierMemory){
     const collect = Memory.rooms[fb.fromRoom]._dynamic
     if(fb.current[0] == 'storage') return
     let free = creep.store.getCapacity()
+    if(!collect[fb.current[0]]?.length){
+        const fromRoom = Game.rooms[fb.fromRoom]
+        if(fromRoom){
+            const cpu = Game.cpu.getUsed()
+            collect[fb.current[0]] = posed_task_updater[fb.current[0]](fromRoom)
+            Memory.cpu_task_updater += Game.cpu.getUsed() - cpu
+        }
+    }
+    
     const pool = collect[fb.current[0]]
     while(pool && pool.length && free > 0) {
         const task = pool[0]
@@ -225,6 +238,7 @@ const lazy_restock = function(creep:Creep,fb:CarrierMemory) {
  */
 const lazy_storage = function(fb:CarrierMemory) {
     const storage = Game.rooms[fb.fromRoom]?.storage
+    const terminal = Game.rooms[fb.fromRoom]?.terminal
     if(!storage) return
     for(let consume of fb.consume){ //遍历供应任务
         let collect: PosedCreepTask<'withdraw'> = {
@@ -236,6 +250,15 @@ const lazy_storage = function(fb:CarrierMemory) {
             collect.args = [storage.id,'G',1000]
         else if(consume.action == 'transfer')
             collect.args = [storage.id,consume.args[1],consume.args[2]]
+
+        if(!storage.store[collect.args[1]]) {
+            if(terminal?.store[collect.args[1]]){
+                collect.args[0] = terminal?.id
+                collect.pos = terminal.pos
+            } else {
+                continue
+            }
+        }
 
         //合并目标相同，资源类型相同的withdraw任务
         const last_collect = fb.collect[fb.collect.length - 1]

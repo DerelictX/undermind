@@ -8,7 +8,9 @@ type Looper = {
 }
 
 interface Memory {
-    creep_SN:   number
+    creep_SN:           number
+    cpu_task_updater:   number  
+    cpu_moveTo:         number
 }
 
 type ValueTypes<T> = T[keyof T]

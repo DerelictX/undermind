@@ -65,7 +65,9 @@ const change_flow = function(creep:Creep,fb:WorkerMemory) {
         }
         for(let source of flow[0]){
             if(!pool[source]?.length){
+                const cpu = Game.cpu.getUsed()
                 pool[source] = posed_task_updater[source](room)
+                Memory.cpu_task_updater += Game.cpu.getUsed() - cpu
             }
             const tasks = pool[source]
             if(tasks && tasks.length) {
@@ -85,7 +87,9 @@ const change_flow = function(creep:Creep,fb:WorkerMemory) {
         }
         for(let sink of flow[1]){
             if(!pool[sink]?.length){
+                const cpu = Game.cpu.getUsed()
                 pool[sink] = posed_task_updater[sink](room)
+                Memory.cpu_task_updater += Game.cpu.getUsed() - cpu
             }
             const tasks = pool[sink]
             if(tasks && tasks.length) {

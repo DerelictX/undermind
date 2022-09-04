@@ -94,14 +94,16 @@ const spawn_handler: {[r in AnyRole]:(room:Room,looper:Looper) => RoleImpl|null}
         if (!room.memory._typed._static.H_mnrl[0]) return null
         return null
     },
-    Upgrader: function (room: Room) {
+    Upgrader: function (room: Room, looper: Looper) {
         if(room.memory._typed._type != 'owned') return null
         static_updater['controller'](room)
         if (!room.memory._typed._static.W_ctrl[0]) return null
         if (room.controller?.level == 8) return null
-        if(room.storage && room.storage.store.energy <= 120000) return null
+        if(room.storage && room.storage.store.energy <= 150000) return null
+
+        looper.interval = 800
         return {
-            _body:{generator:'Wc',workload:10},
+            _body:{generator:'Wc',workload:30},
             _class:init_worker_behavior('Upgrader',room.name,room.name)
         }
     },
@@ -109,18 +111,20 @@ const spawn_handler: {[r in AnyRole]:(room:Room,looper:Looper) => RoleImpl|null}
     HarvesterDeposit: function (room: Room) {
         return null
     },
-    Builder: function (room: Room) {
+    Builder: function (room: Room, looper: Looper) {
         const storage = room.storage
         if(!storage){
             if(!room.find(FIND_MY_CONSTRUCTION_SITES).length) return null
+            looper.interval = 1500
             return {
                 _body:{generator:'WC',workload:12},
                 _class:init_worker_behavior('Builder',room.name,room.name)
             }
         } else {
+            looper.interval = 600
             if(storage.store.energy <= 180000) return null
             return {
-                _body:{generator:'WC',workload:24},
+                _body:{generator:'WC',workload:32},
                 _class:init_worker_behavior('Builder',room.name,room.name)
             }
         }

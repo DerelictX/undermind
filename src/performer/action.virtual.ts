@@ -5,7 +5,10 @@ const performer:{[action in keyof VirtualAction]: VirtualPerformer<action>} = {
     approach: function (creep: Creep | PowerCreep, args: VirtualAction['approach']) {
         const pos = new RoomPosition(args[0].x, args[0].y, args[0].roomName)
         if(creep.pos.inRangeTo(pos, args[1])) return OK
+        const cpu = Game.cpu.getUsed()
         const ret = creep.moveTo(pos) //custom_move.moveTo(creep,pos)
+        Memory.cpu_moveTo += Game.cpu.getUsed() - cpu
+        if(ret == OK) Memory.cpu_moveTo -= 0.2
         if(ret == ERR_TIRED) return OK
         return ret
     },

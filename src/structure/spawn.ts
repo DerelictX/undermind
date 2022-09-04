@@ -8,7 +8,7 @@ export const spawn_run = function(room: Room) {
         filter: (spawn) => !spawn.spawning
     })
     const spawn = spawns[0]
-    if(!spawns) return
+    if(!spawn) return
 
     let spawn_task = room.memory._typed._struct.spawns.t1.shift()
     if(!spawn_task && spawns[1])

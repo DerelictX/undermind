@@ -4,25 +4,23 @@ export const lab_run = function(room: Room){
     if(room.memory._typed._type != 'owned') return
     const labs = room.memory._typed._struct.labs
     const reaction = labs.reaction
-    if(reaction){
-        const labs_in0 = Game.getObjectById(labs.ins[0]);
-        const labs_in1 = Game.getObjectById(labs.ins[1]);
-        if(!labs_in0 || !labs_in1)return
-        if(labs_in0.mineralType != reactions[reaction][0]
-            || labs_in1.mineralType != reactions[reaction][1])
-            return
-        const labs_out = labs.outs;
-        for(var id in labs_out){
-            let lab = Game.getObjectById(labs_out[id]);
-            if(!lab || labs.boosts[id])
-                continue;
-            let ret = lab.runReaction(labs_in0, labs_in1);
-            if(ret != OK)
-                break;
-        }
-            
+    if(!reaction) return
+
+    const labs_in0 = Game.getObjectById(labs.ins[0]);
+    const labs_in1 = Game.getObjectById(labs.ins[1]);
+    if(!labs_in0 || !labs_in1)return
+    if(labs_in0.mineralType != reactions[reaction][0]
+        || labs_in1.mineralType != reactions[reaction][1])
+        return
+    const labs_out = labs.outs;
+    for(var id in labs_out){
+        let lab = Game.getObjectById(labs_out[id]);
+        if(!lab || labs.boosts[id])
+            continue;
+        let ret = lab.runReaction(labs_in0, labs_in1);
+        if(ret != OK)
+            break;
     }
-    
 }
 
 export const change_reaction = function(room:Room){
