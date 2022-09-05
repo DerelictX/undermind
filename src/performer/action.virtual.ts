@@ -1,4 +1,4 @@
-import { holdPlace } from "@/move/hold"
+import { crawlTo } from "@/move/path"
 
 type VirtualPerformer<T extends keyof VirtualAction>
     = (creep: Creep|PowerCreep, args:VirtualAction[T]) => ScreepsReturnCode
@@ -8,7 +8,7 @@ const performer:{[action in keyof VirtualAction]: VirtualPerformer<action>} = {
         const pos = new RoomPosition(args[0].x, args[0].y, args[0].roomName)
         if (creep.pos.inRangeTo(pos, args[1]))
             return OK
-        const ret = creep.moveTo(pos) //custom_move.moveTo(creep,pos)
+        let ret = crawlTo(creep,pos)
         if (ret == ERR_TIRED)
             return OK
         return ret

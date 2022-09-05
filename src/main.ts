@@ -12,6 +12,7 @@ import { perform_callback } from "./performer/behavior.callback";
 import { lab_run } from "./structure/lab";
 import { terminal_run } from "./structure/terminal";
 import { oberver_run } from "./structure/observer";
+import { holdPlace } from "./move/hold";
 
 export const loop = function () {
 
@@ -37,6 +38,7 @@ const run_rooms = function(){
             if(!room){
                 continue
             }
+            room.memory._pos_hold = {}
             spawn_loop(room)
             spawn_run(room)
             tower_run(room)
@@ -50,6 +52,9 @@ const run_rooms = function(){
 }
 
 const run_creeps = function(){
+    for(let creep in Game.creeps)
+        holdPlace(Game.creeps[creep])
+
     for(let name in Memory.creeps) {
         try{
             const creep = Game.creeps[name]
