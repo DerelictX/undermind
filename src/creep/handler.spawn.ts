@@ -91,8 +91,17 @@ const spawn_handler: {[r in AnyRole]:(room:Room,looper:Looper) => RoleImpl|null}
     HarvesterMineral: function (room: Room) {
         if(room.memory._typed._type != 'owned') return null
         static_updater['mineral'](room)
-        if (!room.memory._typed._static.H_mnrl[0]) return null
-        return null
+        const posed = room.memory._typed._static.H_mnrl[0]
+        const stand = room.memory._typed._static.T_mnrl[0]
+        if(!posed || !stand) return null
+        const main: CallbackBehavior<TargetedAction> = {...{bhvr_name:'callbackful'},...posed}
+        const move: CallbackBehavior<'approach'> = {...{bhvr_name:'callbackful'},
+                ...{action:"approach",args:[stand.pos,0]}}
+        main[ERR_NOT_IN_RANGE] = move
+        return {
+            _body:{generator:'W',workload:24},
+            _class:{...{bhvr_name:'callbackful'},...main}
+        }
     },
     Upgrader: function (room: Room, looper: Looper) {
         if(room.memory._typed._type != 'owned') return null
@@ -101,7 +110,7 @@ const spawn_handler: {[r in AnyRole]:(room:Room,looper:Looper) => RoleImpl|null}
         if (room.controller?.level == 8) return null
         if(room.storage && room.storage.store.energy <= 150000) return null
 
-        looper.interval = 800
+        looper.interval = 900
         return {
             _body:{generator:'Wc',workload:30},
             _class:init_worker_behavior('Upgrader',room.name,room.name)
@@ -121,7 +130,7 @@ const spawn_handler: {[r in AnyRole]:(room:Room,looper:Looper) => RoleImpl|null}
                 _class:init_worker_behavior('Builder',room.name,room.name)
             }
         } else {
-            looper.interval = 600
+            looper.interval = 900
             if(storage.store.energy <= 180000) return null
             return {
                 _body:{generator:'WC',workload:32},

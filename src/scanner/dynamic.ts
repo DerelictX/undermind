@@ -593,8 +593,8 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
             return []
         const storage = room.storage
         const power_spawn = Game.getObjectById(room.memory._typed._struct.power_spawn)
-        if (!storage || !power_spawn)
-            return []
+        if (!storage || !power_spawn) return []
+        if(storage.store['energy'] < 200000) return []
 
         var tasks: PosedCreepTask<'transfer'>[] = []
         if (power_spawn.store['energy'] <= 3000) {
@@ -618,8 +618,8 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
             return []
         const storage = room.storage
         const nuker = Game.getObjectById(room.memory._typed._struct.nuker)
-        if (!storage || !nuker)
-            return []
+        if (!storage || !nuker) return []
+        if(storage.store['energy'] < 200000) return []
 
         var tasks: PosedCreepTask<'transfer'>[] = []
         if (nuker.store.getFreeCapacity('energy')) {

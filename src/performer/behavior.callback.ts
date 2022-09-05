@@ -10,6 +10,7 @@ export const perform_callback = function(creep:Creep, behavior:CallbackBehavior<
         switch(callback.action){
             case 'approach':
             case 'escape':
+            case 'hold_place':
             case 'prejudge_empty':
             case 'prejudge_full':
             case 'full_hits':

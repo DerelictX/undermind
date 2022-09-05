@@ -32,6 +32,7 @@ type TargetedAction = Exclude<PrimitiveAction,"drop"|"rangedMassAttack">
 type VirtualAction = {
     approach:   [pos:RoomPosition, range:number],
     escape:     [pos:RoomPosition, range:number],
+    hold_place: [priority:number],
     prejudge_full:  [amount:number],
     prejudge_empty: [amount:number],
     full_hits:      [target:Id<Structure>,amount:number],

@@ -7,7 +7,10 @@ export const crawlTo = function(creep:Creep, targetPos:RoomPosition){
         return ERR_INVALID_ARGS
     }
     const _move = creep.memory._move;
-    if(!_move || _move.room != roomName || _move.dest != {x,y,room:roomName}){
+    if(_move?.room != roomName
+            || _move.dest.room != roomName
+            || _move.dest.x != x
+            || _move.dest.y != y){
         if(seekTo(creep, targetPos) == ERR_NO_PATH)
             return ERR_NO_PATH
         if(!_move) return ERR_NO_PATH
@@ -30,6 +33,7 @@ const seekTo = function(creep:Creep, targetPos:RoomPosition){
     var x=targetPos.x, y=targetPos.y, roomName=targetPos.roomName
     delete creep.memory._move;
     const path = creep.room.findPath(creep.pos, targetPos, {
+        ignoreCreeps:   true,
         costCallback:function(roomName: string, costMatrix: CostMatrix): void | CostMatrix {
             return
         }

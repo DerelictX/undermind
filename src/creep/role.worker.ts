@@ -59,15 +59,13 @@ const change_flow = function(creep:Creep,fb:WorkerMemory) {
     if(fb.state == 'collect'){
         const pool = Memory.rooms[fb.fromRoom]._dynamic
         const room = Game.rooms[fb.fromRoom]
-        if(!room){
+        if(creep.room.name != fb.fromRoom){
             creep.moveTo(new RoomPosition(25,25,fb.fromRoom))
             return
         }
         for(let source of flow[0]){
             if(!pool[source]?.length){
-                const cpu = Game.cpu.getUsed()
                 pool[source] = posed_task_updater[source](room)
-                Memory.cpu_task_updater += Game.cpu.getUsed() - cpu
             }
             const tasks = pool[source]
             if(tasks && tasks.length) {
@@ -81,15 +79,13 @@ const change_flow = function(creep:Creep,fb:WorkerMemory) {
     if(fb.state == 'consume'){
         const pool = Memory.rooms[fb.toRoom]._dynamic
         const room = Game.rooms[fb.toRoom]
-        if(!room){
+        if(creep.room.name != fb.toRoom){
             creep.moveTo(new RoomPosition(25,25,fb.toRoom))
             return
         }
         for(let sink of flow[1]){
             if(!pool[sink]?.length){
-                const cpu = Game.cpu.getUsed()
                 pool[sink] = posed_task_updater[sink](room)
-                Memory.cpu_task_updater += Game.cpu.getUsed() - cpu
             }
             const tasks = pool[sink]
             if(tasks && tasks.length) {
@@ -111,6 +107,8 @@ const parse_posed_task = function(posed:PosedCreepTask<TargetedAction>):Callback
     const main: CallbackBehavior<TargetedAction> = {...{bhvr_name:'callbackful'},...posed}
     const move: CallbackBehavior<'approach'> = {...{bhvr_name:'callbackful'},
             ...{action:"approach",args:[posed.pos,1]}}
+    const hold: CallbackBehavior<'hold_place'> = {...{bhvr_name:'callbackful'},
+            ...{action:'hold_place',args:[1]}}
     main[ERR_NOT_IN_RANGE] = move
     switch(main.action){
         case 'withdraw':
@@ -120,15 +118,15 @@ const parse_posed_task = function(posed:PosedCreepTask<TargetedAction>):Callback
             return main
         case 'harvest':
         case 'dismantle':
-            const prejudge: CallbackBehavior<'prejudge_full'> = {...{bhvr_name:'callbackful'},
+            const full_store: CallbackBehavior<'prejudge_full'> = {...{bhvr_name:'callbackful'},
                     ...{action:"prejudge_full",args:[0]}}
-            prejudge[OK] = main
-            return prejudge
+            full_store[OK] = main
+            return full_store
         case 'repair':
             const full_hits: CallbackBehavior<'full_hits'> = {...{bhvr_name:'callbackful'},
                     ...{action:"full_hits",args:[main.args[0],0]}}
-            main[OK] = full_hits
-            return main
+            full_hits[OK] = main
+            return full_hits
         case 'build':
         case 'upgradeController':
             return main

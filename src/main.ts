@@ -10,6 +10,8 @@ import { run_worker } from "./creep/role.worker";
 import { link_run } from "./structure/link";
 import { perform_callback } from "./performer/behavior.callback";
 import { lab_run } from "./structure/lab";
+import { terminal_run } from "./structure/terminal";
+import { oberver_run } from "./structure/observer";
 
 export const loop = function () {
 
@@ -18,17 +20,13 @@ export const loop = function () {
         structure_updater
         _format_room
     }
-    if(Game.time % 100 == 3){    
-        console.log('cpu_task_updater_100:\t' + Memory.cpu_task_updater)
-        Memory.cpu_task_updater = 0
-    }
-    if(Game.time % 100 == 4){    
-        console.log('cpu_moveTo_100:\t' + Memory.cpu_moveTo)
-        Memory.cpu_moveTo = 0
-    }
+    
     run_rooms()
     run_creeps()
     run_power_creeps()
+    
+    if(Game.shard.name == 'shard2')
+        Game.cpu.generatePixel()
 }
 
 const run_rooms = function(){

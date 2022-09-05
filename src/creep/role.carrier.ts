@@ -103,18 +103,14 @@ const change_flow = function(fb:CarrierMemory) {
     for(let flow of carry_priority[fb.priority]){
         if(flow[0] != 'storage' && !pool[flow[0]]?.length) {
             if(!fromRoom) return null
-            const cpu = Game.cpu.getUsed()
             pool[flow[0]] = posed_task_updater[flow[0]](fromRoom)
-            Memory.cpu_task_updater += Game.cpu.getUsed() - cpu
         }
         if(flow[0] != 'storage' && !pool[flow[0]]?.length) {
             continue
         }
         if(flow[1] != 'storage' && !pool[flow[1]]?.length) {
             if(!toRoom) return null
-            const cpu = Game.cpu.getUsed()
             pool[flow[1]] = posed_task_updater[flow[1]](toRoom)
-            Memory.cpu_task_updater += Game.cpu.getUsed() - cpu
         }
         if(flow[1] != 'storage' && !pool[flow[1]]?.length) {
             continue
@@ -171,9 +167,7 @@ const find_collect = function(creep:Creep,fb:CarrierMemory){
     if(!collect[fb.current[0]]?.length){
         const fromRoom = Game.rooms[fb.fromRoom]
         if(fromRoom){
-            const cpu = Game.cpu.getUsed()
             collect[fb.current[0]] = posed_task_updater[fb.current[0]](fromRoom)
-            Memory.cpu_task_updater += Game.cpu.getUsed() - cpu
         }
     }
     

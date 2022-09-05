@@ -1,7 +1,8 @@
-const terminal_run = function(){
+export const terminal_run = function(){
     var terminals: StructureTerminal[] = []
-    for(let room_name of Memory.owned_rooms){
+    for(let room_name in Memory.rooms){
         const room = Game.rooms[room_name]
+        if(!room) continue
         if(room.terminal && room.terminal.my){
             terminals.push(room.terminal)
         }
