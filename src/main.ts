@@ -13,6 +13,7 @@ import { lab_run } from "./structure/lab";
 import { terminal_run } from "./structure/terminal";
 import { oberver_run } from "./structure/observer";
 import { holdPlace } from "./move/hold";
+import { factory_run } from "./structure/factory";
 
 export const loop = function () {
 
@@ -45,6 +46,7 @@ const run_rooms = function(){
             link_run(room)
 
             lab_run(room)
+            factory_run(room)
         }catch(error){
             console.log(name +':\t' + error);
         }
@@ -54,6 +56,8 @@ const run_rooms = function(){
 const run_creeps = function(){
     for(let creep in Game.creeps)
         holdPlace(Game.creeps[creep])
+    for(let creep in Game.powerCreeps)
+        holdPlace(Game.powerCreeps[creep])
 
     for(let name in Memory.creeps) {
         try{
@@ -63,7 +67,9 @@ const run_creeps = function(){
                 continue
             }
             if(creep.spawning) continue
-            
+            if(Game.cpu.bucket < 8000 && Game.cpu.getUsed() > 18) return
+
+            const creep_cpu = Game.cpu.getUsed()
             const _class = creep.memory._class
             switch(_class.bhvr_name){
                 case 'carrier':
@@ -77,6 +83,7 @@ const run_creeps = function(){
                     break
                 default: throw new Error("Unexpected state.")
             }
+            const creep_cpv = Game.cpu.getUsed() - creep_cpu
         }catch(error){
             console.log(name + ':\t' + error);
         }

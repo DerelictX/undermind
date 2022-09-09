@@ -55,6 +55,8 @@ interface DynamicTaskPool {
     //central
     T_term:     Posed<PrimitiveDescript<'transfer'>>[]
     W_term:     Posed<PrimitiveDescript<'withdraw'>>[]
+    T_fact:     Posed<PrimitiveDescript<'transfer'>>[]
+    W_fact:     Posed<PrimitiveDescript<'withdraw'>>[]
 }
 
 type EnSource = FilterPoolKey<(WorkAction|CarryAction)&CollectAction,'energy'>

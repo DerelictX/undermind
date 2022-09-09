@@ -1,4 +1,6 @@
-import { reactions } from "@/structure/lab"
+import { compressed } from "@/structure/factory"
+import { change_reaction, reactions } from "@/structure/lab"
+import { T_term_thre } from "@/structure/terminal"
 
 export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
     /**
@@ -131,13 +133,12 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         var tasks: PosedCreepTask<"withdraw">[] = []
         const labs = room.memory._typed._struct?.labs
         const compoundType = labs.reaction
-        if (!compoundType)
-            return []
 
         for (let i in labs.ins) {
-            const reactantType = reactions[compoundType][i]
+            const reactantType = compoundType ? reactions[compoundType][i] : null
             const lab_in = Game.getObjectById(labs.ins[i])
-            if (!lab_in) continue
+            if (!lab_in)
+                continue
             /**反应底物不对，取出来 */
             if (lab_in.mineralType && reactantType != lab_in.mineralType) {
                 tasks.push({
@@ -151,7 +152,8 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         for (let i in labs.outs) {
             const boostType: MineralBoostConstant | undefined = labs.boosts[i]
             const lab_out = Game.getObjectById(labs.outs[i])
-            if (!lab_out) continue
+            if (!lab_out)
+                continue
 
             if (boostType) {
                 if (lab_out.mineralType && boostType != lab_out.mineralType) {
@@ -163,7 +165,7 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
                 }
             } else {
                 if (lab_out.mineralType && (compoundType != lab_out.mineralType
-                    || lab_out.store[compoundType] >= 600)) {
+                        || lab_out.store[compoundType] >= (tasks.length ? 400 : 600))) {
                     tasks.push({
                         action: 'withdraw',
                         args: [lab_out.id, lab_out.mineralType, lab_out.store[lab_out.mineralType]],
@@ -564,21 +566,24 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         return tasks
     },
     T_react: function (room: Room): PosedCreepTask<"transfer">[] {
-        if (!room.memory._typed._struct)
-            return []
+        if (!room.memory._typed._struct) return []
+        const terminal = room.terminal
         const labs = room.memory._typed._struct.labs
         const compoundType = labs.reaction
-        if (!compoundType)
-            return []
+        if (!terminal || !compoundType) return []
+
         var tasks: PosedCreepTask<'transfer'>[] = []
         for (let i in labs.ins) {
             const reactantType = reactions[compoundType][i]
             const lab_in = Game.getObjectById(labs.ins[i])
-            if (!lab_in)
-                continue
+            if (!lab_in) continue
 
             //reactant
             if (lab_in.store.getFreeCapacity(reactantType) > 2400) {
+                if(!terminal.store[reactantType]){
+                    change_reaction(room)
+                    return []
+                }
                 tasks.push({
                     action: 'transfer',
                     args: [lab_in.id, reactantType, 400],
@@ -593,8 +598,10 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
             return []
         const storage = room.storage
         const power_spawn = Game.getObjectById(room.memory._typed._struct.power_spawn)
-        if (!storage || !power_spawn) return []
-        if(storage.store['energy'] < 200000) return []
+        if (!storage || !power_spawn)
+            return []
+        if (storage.store['energy'] < 200000)
+            return []
 
         var tasks: PosedCreepTask<'transfer'>[] = []
         if (power_spawn.store['energy'] <= 3000) {
@@ -618,8 +625,10 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
             return []
         const storage = room.storage
         const nuker = Game.getObjectById(room.memory._typed._struct.nuker)
-        if (!storage || !nuker) return []
-        if(storage.store['energy'] < 200000) return []
+        if (!storage || !nuker)
+            return []
+        if (storage.store['energy'] < 150000)
+            return []
 
         var tasks: PosedCreepTask<'transfer'>[] = []
         if (nuker.store.getFreeCapacity('energy')) {
@@ -648,29 +657,28 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
             }]
         }
 
+
         else
             return []
     },
     T_term: function (room: Room) {
         const storage = room.storage
         const terminal = room.terminal
-        if(!storage || !terminal) return []
-        if(terminal.store.getFreeCapacity() < 50000) return []
+        if (!storage || !terminal)
+            return []
+        if (terminal.store.getFreeCapacity() < 50000)
+            return []
 
         var tasks: Posed<PrimitiveDescript<'transfer'>>[] = []
         var storage_store: StorePropertiesOnly = storage.store
         var resourceType: keyof typeof storage_store
-        for(resourceType in storage_store){
-            let target_amount = 3000
-            if(resourceType == 'energy')
-                target_amount = 30000
-            if(storage.store[resourceType] > target_amount * 3)
-                target_amount += target_amount
-            if(terminal.store[resourceType] < target_amount){
+        for (resourceType in storage_store) {
+            let target_amount = T_term_thre[resourceType]
+            if (terminal.store[resourceType] < target_amount) {
                 tasks.push({
-                    action:'transfer',
-                    args:[terminal.id,resourceType],
-                    pos:terminal.pos
+                    action: 'transfer',
+                    args: [terminal.id, resourceType],
+                    pos: terminal.pos
                 })
             }
         }
@@ -679,26 +687,51 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
     W_term: function (room: Room) {
         const storage = room.storage
         const terminal = room.terminal
-        if(!storage || !terminal) return []
-        if(storage.store.getFreeCapacity() < 100000) return []
+        if (!storage || !terminal)
+            return []
+        if (storage.store.getFreeCapacity() < 100000)
+            return []
 
         var tasks: Posed<PrimitiveDescript<'withdraw'>>[] = []
         let terminal_store: StorePropertiesOnly = terminal.store
         let resourceType: keyof typeof terminal_store
-        for(resourceType in terminal_store){
-            let target_amount = 3000
-            if(resourceType == 'energy')
-                target_amount = 30000
-            if(storage.store[resourceType] > target_amount * 2)
-                target_amount += target_amount
-            if(terminal_store[resourceType] > target_amount){
+        for (resourceType in terminal_store) {
+            let target_amount = T_term_thre[resourceType] * 2
+            if (terminal_store[resourceType] > target_amount) {
                 tasks.push({
-                    action:'withdraw',
-                    args:[terminal.id,resourceType],
-                    pos:terminal.pos
+                    action: 'withdraw',
+                    args: [terminal.id, resourceType],
+                    pos: terminal.pos
                 })
             }
         }
         return tasks
+    },
+    T_fact: function (room: Room) {
+        if (!room.memory._typed._struct?.factory) return []
+        const storage = room.storage
+        const factory = Game.getObjectById(room.memory._typed._struct.factory)
+        if (!storage || !factory) return []
+
+        var tasks: Posed<PrimitiveDescript<'transfer'>>[] = []
+        for(let res of compressed){
+            const components = COMMODITIES[res].components
+            let component: keyof typeof components
+            for(component in components){
+                //console.log(factory.store[component])
+                if(storage.store[component] > 30000
+                        && factory.store[component] < components[component] * 5){
+                    tasks.push({
+                        action: 'transfer',
+                        args: [factory.id, component],
+                        pos: factory.pos
+                    })
+                }
+            }
+        }
+        return tasks
+    },
+    W_fact: function (room: Room) {
+        throw new Error("Function not implemented.")
     }
 }

@@ -22,7 +22,7 @@ const spawn_handler: {[r in AnyRole]:(room:Room,looper:Looper) => RoleImpl|null}
             }
         }
         return {
-            _body:{generator:'Wc',workload:10},
+            _body:{generator:'Wc',workload:15},
             _class:init_worker_behavior('HarvesterSource0',room.name,room.name)
         }
     },
@@ -42,7 +42,7 @@ const spawn_handler: {[r in AnyRole]:(room:Room,looper:Looper) => RoleImpl|null}
             }
         }
         return {
-            _body:{generator:'Wc',workload:10},
+            _body:{generator:'Wc',workload:15},
             _class:init_worker_behavior('HarvesterSource1',room.name,room.name)
         }
     },
@@ -97,10 +97,10 @@ const spawn_handler: {[r in AnyRole]:(room:Room,looper:Looper) => RoleImpl|null}
         const main: CallbackBehavior<TargetedAction> = {...{bhvr_name:'callbackful'},...posed}
         const move: CallbackBehavior<'approach'> = {...{bhvr_name:'callbackful'},
                 ...{action:"approach",args:[stand.pos,0]}}
-        main[ERR_NOT_IN_RANGE] = move
+        move[OK] = main
         return {
             _body:{generator:'W',workload:24},
-            _class:{...{bhvr_name:'callbackful'},...main}
+            _class:{...{bhvr_name:'callbackful'},...move}
         }
     },
     Upgrader: function (room: Room, looper: Looper) {

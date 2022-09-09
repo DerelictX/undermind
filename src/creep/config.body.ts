@@ -11,7 +11,7 @@ export const body_generator:{[c in body_generator_name]:
     },
     Wc: function (workload: number, mobility: number): BodyPartConstant[] {
         var ret: BodyPartConstant[] = []
-        ret = ret.concat(new Array(ceil(workload * 0.8)).fill(WORK))
+        ret = ret.concat(new Array(ceil(workload)).fill(WORK))
         ret = ret.concat(new Array(ceil(workload * 0.2)).fill(CARRY))
         return ret.concat(new Array(ceil(ret.length / mobility)).fill(MOVE))
     },

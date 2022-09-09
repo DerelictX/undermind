@@ -33,18 +33,15 @@ export const change_reaction = function(room:Room){
         return
     room.memory._typed._struct.labs.reaction = null
     
-    for(let tier = 3; tier >= 0; tier--){
-        const reacts = compound_tier[tier]
-        for(let i in reacts){
-            if(tier < 3 && storage.store[reacts[i]] > 12000)
-                continue
-            if(storage.store[reacts[i]] > 24000)
-                continue
-            const reactants = reactions[reacts[i]] 
-            if(terminal.store[reactants[0]] >= 1000 && terminal.store[reactants[1]] >= 1000){
-                room.memory._typed._struct.labs.reaction = reacts[i]
-                return reacts[i]
-            }
+    const reacts = compound_tier[2]
+    for(let i in reacts){
+        if(storage.store[reacts[i]] > 24000)
+            continue
+            
+        const reactants = reactions[reacts[i]] 
+        if(terminal.store[reactants[0]] >= 1000 && terminal.store[reactants[1]] >= 1000){
+            room.memory._typed._struct.labs.reaction = reacts[i]
+            return reacts[i]
         }
     }
 }

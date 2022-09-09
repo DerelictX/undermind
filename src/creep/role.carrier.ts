@@ -5,6 +5,7 @@ import { perform_callback } from "../performer/behavior.callback"
 
 export const run_carrier = function(creep:Creep,fb:CarrierMemory){
     if(fb.state == 'idle'){
+        delete creep.memory._move
         if(creep.store.getUsedCapacity()){
             lazy_restock(creep,fb)
             fb.state = 'consume'

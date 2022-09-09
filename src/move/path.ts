@@ -58,7 +58,7 @@ const seekTo = function(creep:Creep|PowerCreep, targetPos:RoomPosition){
 const moveByPath = function(creep:Creep|PowerCreep, path: PathStep[]) {
     if(!creep.room) return ERR_NOT_FOUND
     const pos = creep.pos
-    var cur = _.find(path, (i) => i.x - i.dx == pos.x && i.y - i.dy == pos.y);
+    let cur = _.find(path, (i) => i.x - i.dx == pos.x && i.y - i.dy == pos.y);
     if(!cur) {
         delete creep.memory._move
         return ERR_TIRED;
