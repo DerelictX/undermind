@@ -72,6 +72,10 @@ function find_power_task(operator: PowerCreep) {
             }
         }
     }
+
+    if(operator.powers[PWR_REGEN_MINERAL] && !operator.powers[PWR_REGEN_MINERAL].cooldown){
+        
+    }
 }
 
 const perform_normal = function(operator:PowerCreep, task:PowerActionDescript<PowerAction>){

@@ -68,7 +68,7 @@ const run_carrier_collect = function(creep:Creep,fb:CarrierMemory){
     const ret = perform_callback(creep,fb.collect[0])
     if(ret != TASK_DOING) {
         fb.collect.shift()
-        if(!fb.collect.length && creep.store.getFreeCapacity('energy') == 0){
+        if(!fb.collect.length){
             return 'consume'
         }
     }

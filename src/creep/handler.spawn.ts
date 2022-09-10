@@ -94,6 +94,11 @@ const spawn_handler: {[r in AnyRole]:(room:Room,looper:Looper) => RoleImpl|null}
         const posed = room.memory._typed._static.H_mnrl[0]
         const stand = room.memory._typed._static.T_mnrl[0]
         if(!posed || !stand) return null
+        const mineral = Game.getObjectById(posed.args[0])
+        const storage = room.storage
+        if (!mineral || !storage) return null
+        if (storage.store[mineral.mineralType] > 60000) return null
+
         const main: CallbackBehavior<TargetedAction> = {...{bhvr_name:'callbackful'},...posed}
         const move: CallbackBehavior<'approach'> = {...{bhvr_name:'callbackful'},
                 ...{action:"approach",args:[stand.pos,0]}}
@@ -189,10 +194,11 @@ const spawn_handler: {[r in AnyRole]:(room:Room,looper:Looper) => RoleImpl|null}
             _class:init_carrier_behavior('Supplier',room.name,room.name)
         }
     },
-    Chemist: function (room: Room) {
+    Chemist: function (room: Room, looper: Looper) {
         if(room.memory._typed._type != 'owned') return null
         structure_updater.labs(room,room.memory._typed._struct)
         change_reaction(room)
+        looper.interval = 300
         return null
     },
 }

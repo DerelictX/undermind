@@ -10,10 +10,11 @@ import { run_worker } from "./creep/role.worker";
 import { link_run } from "./structure/link";
 import { perform_callback } from "./performer/behavior.callback";
 import { lab_run } from "./structure/lab";
-import { terminal_run } from "./structure/terminal";
+import { terminal_run, update_export, update_import } from "./structure/terminal";
 import { oberver_run } from "./structure/observer";
 import { holdPlace } from "./move/hold";
 import { factory_run } from "./structure/factory";
+import { power_spawn_run } from "./structure/power_spawn";
 
 export const loop = function () {
 
@@ -27,6 +28,9 @@ export const loop = function () {
     run_creeps()
     run_power_creeps()
     
+    if(Game.time % 20 == 3){
+        terminal_run()
+    }
     if(Game.shard.name == 'shard2')
         Game.cpu.generatePixel()
 }
@@ -40,6 +44,10 @@ const run_rooms = function(){
                 continue
             }
             room.memory._pos_hold = {}
+            if(Game.time % 100 == 1){
+                update_import(room)
+                update_export(room)
+            }
             spawn_loop(room)
             spawn_run(room)
             tower_run(room)
@@ -47,6 +55,7 @@ const run_rooms = function(){
 
             lab_run(room)
             factory_run(room)
+            power_spawn_run(room)
         }catch(error){
             console.log(name +':\t' + error);
         }

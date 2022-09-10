@@ -76,10 +76,8 @@ export const static_updater = {
 
     mineral: function (room:Room) {
         room.memory._typed._static.H_mnrl = []
-        const mineral = room.find(FIND_MINERALS,{
-            filter: (mineral) => mineral.mineralAmount > 0
-                && room.storage && room.storage.store[mineral.mineralType] < 60000
-        })[0]
+        const mineral = room.find(FIND_MINERALS,
+            {filter: (mineral) => mineral.mineralAmount > 0})[0]
         if(!mineral) return
         const extractor:StructureExtractor|null = mineral.pos.findClosestByRange(FIND_MY_STRUCTURES,
                 {filter: {structureType: STRUCTURE_EXTRACTOR}})

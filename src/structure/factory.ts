@@ -5,7 +5,7 @@ export const factory_run = function(room: Room){
     if(!factory || factory.cooldown) return
 
     for(let res of compressed){
-        if(factory.store[res] >= 1000) continue
+        if(factory.store[res] > 2000) continue
         if(factory.produce(res) == OK) return
     }
     for(let res of product_tier[0]){

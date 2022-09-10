@@ -20,9 +20,6 @@ interface DynamicTaskPool {
     T_src0:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]
     T_src1:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]
     T_src2:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]
-    //mineral
-    H_mnrl:     Posed<RestrictedPrimitiveDescript<'harvest',MineralConstant>>[]
-    T_mnrl:     Posed<RestrictedPrimitiveDescript<'transfer',MineralConstant>>[]
     //controller
     W_ctrl:     Posed<RestrictedPrimitiveDescript<'withdraw','energy'>>[]
     U_ctrl:     Posed<PrimitiveDescript<'upgradeController'>>[]

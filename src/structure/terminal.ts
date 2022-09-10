@@ -1,43 +1,68 @@
+import _ from "lodash"
+
 export const terminal_run = function(){
-    var terminals: StructureTerminal[] = []
-    for(let room_name in Memory.rooms){
-        const room = Game.rooms[room_name]
-        if(!room) continue
-        if(room.terminal && room.terminal.my){
-            terminals.push(room.terminal)
-        }
-    }
+    let resourceType: ResourceConstant
+    for(resourceType in Memory.terminal.demand) {
+        const demand = Memory.terminal.demand[resourceType]
+        const supply = Memory.terminal.supply[resourceType]
+        if(!demand || !supply) continue
 
-    for(let i in terminals){
-        const terminal_from = terminals[i]
-        var terminal_store: StorePropertiesOnly = terminal_from.store
-        var resourceType: keyof typeof terminal_store
+        let toRoom: string|undefined = undefined
+        for(toRoom in demand)
+            if(demand[toRoom]) break
+        if(!toRoom) continue
 
-        if(terminal_from.cooldown != 0 || terminal_from.store['energy'] < 20000)
-            continue
+        let terminal: StructureTerminal|undefined
+        for(let fromRoom in supply){
+            terminal = Game.rooms[fromRoom]?.terminal
+            if(!supply[fromRoom] || !terminal || terminal.cooldown) continue
 
-        for(resourceType in terminal_store){
-            let target_amount = 1000
-            if(resourceType == 'energy')
-                target_amount = 15000
-
-            if(terminal_store[resourceType] >= target_amount * 6){
-                for(let j in terminals){
-                    if(i == j) continue
-                    const terminal_to = terminals[j]
-                    if(terminal_to.store[resourceType] < target_amount * 2){
-                        terminal_from.send(
-                            resourceType,
-                            target_amount * 3 - terminal_to.store[resourceType],
-                            terminal_to.room.name)
-                        return
-                    }
-                }
-            }
-            
+            delete supply[fromRoom]
+            delete demand[toRoom]
+            const ret = terminal.send(resourceType,T_term_thre[resourceType],toRoom)
+            console.log(fromRoom + ' -> ' + toRoom + ' ' + ret + ' ' + resourceType)
+            return
         }
     }
 }
+
+export const update_export = function(room:Room){
+    const storage = room.storage
+    const terminal = room.terminal
+    if(!storage?.my || !terminal?.my) return
+
+    var storage_store: StorePropertiesOnly = storage.store
+    var resourceType: keyof typeof storage_store
+    for (resourceType in storage_store) {
+        let target_amount = T_term_thre[resourceType]
+        if (storage.store[resourceType] > target_amount * 5) {
+            if(!Memory.terminal.supply[resourceType])
+                Memory.terminal.supply[resourceType] = {}
+            const supply = Memory.terminal.supply[resourceType]
+            if(supply) supply[room.name] = true
+        }
+    }
+}
+_.assign(global, {update_export:update_export})
+
+export const update_import = function(room:Room){
+    const storage = room.storage
+    const terminal = room.terminal
+    if(!storage?.my || !terminal?.my) return
+
+    var terminal_store: StorePropertiesOnly = terminal.store
+    var resourceType: keyof typeof terminal_store
+    for (resourceType in terminal_store) {
+        let target_amount = T_term_thre[resourceType]
+        if (terminal.store[resourceType] < target_amount) {
+            if(!Memory.terminal.demand[resourceType])
+                Memory.terminal.demand[resourceType] = {}
+            const demand = Memory.terminal.demand[resourceType]
+            if(demand) demand[room.name] = true
+        }
+    }
+}
+_.assign(global, {update_import:update_import})
 
 export const T_term_thre: {[R in ResourceConstant]: number} = {
     energy: 30000,

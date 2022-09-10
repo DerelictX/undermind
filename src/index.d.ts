@@ -9,6 +9,10 @@ type Looper = {
 
 interface Memory {
     creep_SN:           number
+    terminal:   {
+        supply: {[res in ResourceConstant] ?: {[room: string]: boolean}}
+        demand: {[res in ResourceConstant] ?: {[room: string]: boolean}}
+    }
 }
 
 type ValueTypes<T> = T[keyof T]
