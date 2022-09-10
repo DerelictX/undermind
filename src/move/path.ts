@@ -83,7 +83,7 @@ const moveByPath = function(creep:Creep|PowerCreep, path: PathStep[]) {
     return creep.move(cur.direction);
 }
 
-const real_roomPos = function(fake:{x:number,y:number,room:string}){
+export const real_roomPos = function(fake:{x:number,y:number,room:string}){
     return new RoomPosition(fake.x,fake.y,fake.room)
 }
 

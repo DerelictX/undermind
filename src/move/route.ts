@@ -1,6 +1,7 @@
-import { crawlTo } from "./path"
+import { crawlTo, real_roomPos } from "./path"
 
-const hikeTo = function(creep:Creep, targetPos:RoomPosition){
+export const hikeTo = function(creep:Creep|PowerCreep, targetPos:RoomPosition){
+    if(!creep.room) return ERR_NOT_FOUND
     if(creep.room.name == targetPos.roomName)
         return crawlTo(creep,targetPos)
     const _hike = creep.memory._hike
@@ -10,8 +11,22 @@ const hikeTo = function(creep:Creep, targetPos:RoomPosition){
         if(!_hike || !_hike.route[0]) return ERR_NO_PATH
     }
 
-    if(creep.fatigue) return ERR_TIRED
     if(creep.room.name == _hike.from){
+        if(creep.memory._move){
+            const exit = real_roomPos(creep.memory._move.dest)
+            const a = (_hike.route[0].exit == TOP || _hike.route[0].exit == BOTTOM) ? exit.y : exit.x
+            const b = (_hike.route[0].exit == TOP || _hike.route[0].exit == LEFT) ? 0 : 50
+            if(a != b) {
+                delete creep.memory._move
+                return ERR_TIRED
+            }
+            const ret = crawlTo(creep,exit)
+            if(ret == ERR_INVALID_ARGS) {
+                delete creep.memory._move
+                return ERR_TIRED
+            }
+            return ret
+        }
         const exit = creep.pos.findClosestByRange(_hike.route[0].exit);
         return exit ? crawlTo(creep,exit) : ERR_NO_PATH
     }
@@ -25,7 +40,8 @@ const hikeTo = function(creep:Creep, targetPos:RoomPosition){
     return ERR_TIRED
 }
 
-const seekTo = function(creep:Creep, toRoom:string){
+const seekTo = function(creep:Creep|PowerCreep, toRoom:string){
+    if(!creep.room) return ERR_NOT_FOUND
     delete creep.memory._hike;
     const route = Game.map.findRoute(creep.room, toRoom, {routeCallback:routeCallback});
     if(route != ERR_NO_PATH && route.length > 0) {

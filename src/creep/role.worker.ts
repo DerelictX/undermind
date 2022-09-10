@@ -1,4 +1,4 @@
-import { crawlTo } from "@/move/path"
+import { hikeTo } from "@/move/route"
 import { TASK_COMPLETE, TASK_DOING, TASK_FAILED } from "@/performer/behavior.any"
 import { perform_callback } from "@/performer/behavior.callback"
 import { posed_task_updater } from "@/scanner/dynamic"
@@ -61,7 +61,7 @@ const change_flow = function(creep:Creep,fb:WorkerMemory) {
         const pool = Memory.rooms[fb.fromRoom]._dynamic
         const room = Game.rooms[fb.fromRoom]
         if(creep.room.name != fb.fromRoom){
-            crawlTo(creep,new RoomPosition(25,25,fb.fromRoom))
+            hikeTo(creep,new RoomPosition(25,25,fb.fromRoom))
             return
         }
         for(let source of flow[0]){
@@ -81,7 +81,7 @@ const change_flow = function(creep:Creep,fb:WorkerMemory) {
         const pool = Memory.rooms[fb.toRoom]._dynamic
         const room = Game.rooms[fb.toRoom]
         if(creep.room.name != fb.toRoom){
-            crawlTo(creep,new RoomPosition(25,25,fb.toRoom))
+            hikeTo(creep,new RoomPosition(25,25,fb.toRoom))
             return
         }
         for(let sink of flow[1]){

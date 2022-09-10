@@ -1,4 +1,4 @@
-import { crawlTo } from "@/move/path"
+import { hikeTo } from "@/move/route"
 
 export const operator_run = function(operator:PowerCreep){
     if(!operator.room) return
@@ -27,7 +27,7 @@ export const operator_run = function(operator:PowerCreep){
     if(target) {
         ret = operator.usePower(pwr_task.power,target)
         if(ret == ERR_NOT_IN_RANGE){
-            crawlTo(operator,target.pos)
+            hikeTo(operator,target.pos)
             operator.usePower(PWR_GENERATE_OPS)
             return
         }
@@ -36,27 +36,36 @@ export const operator_run = function(operator:PowerCreep){
 }
 
 function find_power_task(operator: PowerCreep) {
+    if(!operator.room) return
     if(operator.ticksToLive && operator.ticksToLive < 2000){
         const power_spawn_id = operator.room?.memory._typed._struct?.power_spawn
         if(power_spawn_id)
             operator.memory._tasks.push({action:'renew',args:[power_spawn_id]})
     }
-    if(operator.store.getFreeCapacity('ops') < 20){
-        const storage = operator.room?.storage
-        if(storage)
-            operator.memory._tasks.push({
-                action:'transfer',
-                args:[storage.id,'ops',operator.store['ops'] * 0.4]
-            })
-    }/*
-    if(operator.store.getUsedCapacity('ops') < operator.store.getCapacity() * 0.2){
-        const storage = operator.room?.storage
-        if(storage)
-            operator.memory._tasks.push({
-                action:'withdraw',
-                args:[storage.id,'ops',operator.store.getFreeCapacity() * 0.4]
-            })
-    }*/
+    const controller = operator.room.controller
+    if(controller && !controller.isPowerEnabled){
+        if(operator.room.name == '???')
+            operator.memory._tasks.push({action:'enableRoom',args:[controller.id]})
+    }
+    const storage = operator.room.storage
+    if(storage && operator.store.getFreeCapacity('ops') < 20){
+        operator.memory._tasks.push({
+            action:'transfer',
+            args:[storage.id,'ops',operator.store['ops'] * 0.4]
+        })
+    }
+    if(storage && operator.store.getUsedCapacity('ops') < operator.store.getCapacity() * 0.2){
+        operator.memory._tasks.push({
+            action:'withdraw',
+            args:[storage.id,'ops',operator.store.getFreeCapacity() * 0.4]
+        })
+    }
+
+    if(operator.powers[PWR_OPERATE_EXTENSION] && !operator.powers[PWR_OPERATE_EXTENSION].cooldown){
+        if(storage && operator.room.energyAvailable < operator.room.energyCapacityAvailable * 0.5){
+            operator.memory._power.push({power: PWR_OPERATE_EXTENSION, target: storage.id})
+        }
+    }
 
     if(operator.powers[PWR_OPERATE_LAB] && !operator.powers[PWR_OPERATE_LAB].cooldown){
         const labs = operator.room?.memory._typed._struct?.labs
@@ -64,17 +73,10 @@ function find_power_task(operator: PowerCreep) {
         for (let id of labs.outs) {
             const lab_in = Game.getObjectById(id)
             if(lab_in && (!lab_in.effects || !lab_in.effects[0]) && lab_in.cooldown > 0){
-                operator.memory._power.push({
-                    power:  PWR_OPERATE_LAB,
-                    target: id
-                })
+                operator.memory._power.push({power: PWR_OPERATE_LAB, target: id})
                 break
             }
         }
-    }
-
-    if(operator.powers[PWR_REGEN_MINERAL] && !operator.powers[PWR_REGEN_MINERAL].cooldown){
-        
     }
 }
 
@@ -86,7 +88,7 @@ const perform_normal = function(operator:PowerCreep, task:PowerActionDescript<Po
             if(!target) return ERR_NOT_FOUND
             ret = operator.renew(target)
             if(ret == ERR_NOT_IN_RANGE)
-                crawlTo(operator,target.pos)
+                hikeTo(operator,target.pos)
             return ret
         }
         case 'enableRoom': {
@@ -94,7 +96,7 @@ const perform_normal = function(operator:PowerCreep, task:PowerActionDescript<Po
             if(!target) return ERR_NOT_FOUND
             ret = operator.enableRoom(target)
             if(ret == ERR_NOT_IN_RANGE)
-                crawlTo(operator,target.pos)
+                hikeTo(operator,target.pos)
             return ret
         }
         case 'transfer': {
@@ -111,7 +113,7 @@ const perform_normal = function(operator:PowerCreep, task:PowerActionDescript<Po
                 ret = operator.transfer(target,task.args[1])
 
             if(ret == ERR_NOT_IN_RANGE)
-                crawlTo(operator,target.pos)
+                hikeTo(operator,target.pos)
             return ret
         }
         case 'withdraw': {
@@ -128,7 +130,7 @@ const perform_normal = function(operator:PowerCreep, task:PowerActionDescript<Po
                 ret = operator.withdraw(target,task.args[1])
 
             if(ret == ERR_NOT_IN_RANGE)
-                crawlTo(operator,target.pos)
+                hikeTo(operator,target.pos)
             return ret
         }
     }

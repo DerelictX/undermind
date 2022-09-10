@@ -35,7 +35,7 @@ export const update_export = function(room:Room){
     var resourceType: keyof typeof storage_store
     for (resourceType in storage_store) {
         let target_amount = T_term_thre[resourceType]
-        if (storage.store[resourceType] > target_amount * 5) {
+        if (storage.store[resourceType] > target_amount * 3) {
             if(!Memory.terminal.supply[resourceType])
                 Memory.terminal.supply[resourceType] = {}
             const supply = Memory.terminal.supply[resourceType]

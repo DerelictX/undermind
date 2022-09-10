@@ -1,4 +1,5 @@
 import { crawlTo } from "@/move/path"
+import { hikeTo } from "@/move/route"
 
 type VirtualPerformer<T extends keyof VirtualAction>
     = (creep: Creep|PowerCreep, args:VirtualAction[T]) => ScreepsReturnCode
@@ -8,7 +9,7 @@ const performer:{[action in keyof VirtualAction]: VirtualPerformer<action>} = {
         const pos = new RoomPosition(args[0].x, args[0].y, args[0].roomName)
         if (creep.pos.inRangeTo(pos, args[1]))
             return OK
-        let ret = crawlTo(creep,pos)
+        let ret = hikeTo(creep,pos)
         if (ret == ERR_TIRED)
             return OK
         return ret

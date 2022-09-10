@@ -38,6 +38,12 @@ export const body_generator:{[c in body_generator_name]:
     R: function (workload: number, mobility: number): BodyPartConstant[] {
         var ret: BodyPartConstant[] = new Array(workload).fill(RANGED_ATTACK)
         return ret.concat(new Array(ceil(ret.length / mobility)).fill(MOVE))
+    },
+    DH: function (workload: number, mobility: number): BodyPartConstant[] {
+        var ret: BodyPartConstant[] = []
+        ret = ret.concat(new Array(ceil(workload * 0.6)).fill(WORK))
+        ret = ret.concat(new Array(ceil(workload * 0.4)).fill(CARRY))
+        return ret.concat(new Array(ceil(ret.length / mobility)).fill(MOVE))
     }
 }
 _.assign(global, {body_generator:body_generator})

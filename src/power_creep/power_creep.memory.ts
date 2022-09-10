@@ -5,6 +5,14 @@ interface PowerCreepMemory {
         path: string,
         room: string
     }
+    _hike?:{
+        from:   string
+        to:     string
+        route:{
+            exit: ExitConstant
+            room: string
+        }[]
+    }
     _tasks: PowerActionDescript<PowerAction>[]
     _power: {power:PowerConstant, target:Id<Structure|Source|Mineral>}[]
 }

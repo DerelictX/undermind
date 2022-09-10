@@ -22,10 +22,13 @@ export const spawn_run = function(room: Room) {
     const creep_name = 'c'+ Memory.creep_SN
     const generator = body_generator[spawn_task._body.generator]
     let workload = spawn_task._body.workload
-    let ret = spawn.spawnCreep(generator(workload, 2), creep_name)
+    let mobility = spawn_task._body.mobility
+    if(!mobility) mobility = 2
+    
+    let ret = spawn.spawnCreep(generator(workload, mobility), creep_name)
     while(ret == ERR_NOT_ENOUGH_ENERGY){
         workload = floor(workload/2)
-        ret = spawn.spawnCreep(generator(workload, 2), creep_name)
+        ret = spawn.spawnCreep(generator(workload, mobility), creep_name)
     }
 
     const spawn_loop = Memory.rooms[spawn_task._caller.room_name]._typed
