@@ -1,4 +1,3 @@
-import { crawlTo } from "@/move/path"
 import { hikeTo } from "@/move/route"
 
 type VirtualPerformer<T extends keyof VirtualAction>

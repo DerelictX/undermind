@@ -14,6 +14,9 @@ interface RoomMemory {
     _dynamic:   {[k in keyof DynamicTaskPool]?: PosedCreepTask<TargetedAction>[]}
     _spawn:     string  //生爬的房间名
     _pos_hold?: {[p:string]:Id<Creep|PowerCreep>}
+    _route?:    {
+        [Exits: string]:RoomPosition[]
+    }
 }
 
 type owned_room_role =
