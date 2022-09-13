@@ -18,19 +18,8 @@ interface CreepMemory {
     }
 }
 
-type AnyRole = |EnergyRole|CarrierRole|MineralWorker
-
-type EnergyRole =
-    |"HarvesterSource0"|"HarvesterSource1"|"HarvesterSource2"
-    |"Upgrader"|"Builder"|"Maintainer"|'EnergySupplier'
-
 type CarrierRole =
     |"Collector"|"Supplier"|"Chemist"
-
-type MineralWorker = |'HarvesterMineral'|'HarvesterDeposit'
-
-type StoreLessRole = |'Reserver'
-
 interface CarrierMemory {
     bhvr_name:  "carrier"
     
@@ -44,6 +33,9 @@ interface CarrierMemory {
     priority:   CarrierRole
 }
 
+type EnergyRole =
+    |"HarvesterSource0"|"HarvesterSource1"|"HarvesterSource2"
+    |"Upgrader"|"Builder"|"Maintainer"|'EnergySupplier'
 interface WorkerMemory {
     bhvr_name:  "worker"
     

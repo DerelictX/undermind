@@ -1,12 +1,10 @@
-import { structure_updater } from "./room/structure.updater";
+import { structure_updater } from "./scanner/structure.updater";
 import { operator_run } from "./power_creep/operator";
 import { inspector_memory, _format_room } from "./room/memory.inspector";
 import { spawn_loop } from "./creep/handler.spawn";
 import { spawn_run } from "./structure/spawn";
 import { tower_run } from "./structure/tower";
 import { static_updater } from "./scanner/static";
-import { run_carrier } from "./creep/role.carrier";
-import { run_worker } from "./creep/role.worker";
 import { link_run } from "./structure/link";
 import { perform_callback } from "./performer/behavior.callback";
 import { lab_run } from "./structure/lab";
@@ -15,6 +13,8 @@ import { oberver_run } from "./structure/observer";
 import { holdPlace } from "./move/hold";
 import { factory_run } from "./structure/factory";
 import { power_spawn_run } from "./structure/power_spawn";
+import { run_carrier } from "./role/role.carrier";
+import { run_worker } from "./role/role.worker";
 
 export const loop = function () {
 
@@ -36,15 +36,14 @@ export const loop = function () {
 }
 
 const run_rooms = function(){
+    Memory._pos_hold = {}
     for(let name in Memory.rooms){
         try{
-            inspector_memory(name,false)
             const room = Game.rooms[name];
             if(!room){
                 continue
             }
-            room.memory._pos_hold = {}
-            if(Game.time % 100 == 1){
+            if(Game.time % 60 == 1){
                 update_import(room)
                 update_export(room)
             }
@@ -58,6 +57,7 @@ const run_rooms = function(){
             power_spawn_run(room)
         }catch(error){
             console.log(name +':\t' + error);
+            inspector_memory(name,false)
         }
     }
 }
@@ -95,6 +95,7 @@ const run_creeps = function(){
             const creep_cpv = Game.cpu.getUsed() - creep_cpu
         }catch(error){
             console.log(name + ':\t' + error);
+            throw(error)
         }
     }
 }

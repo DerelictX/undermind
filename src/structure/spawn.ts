@@ -31,18 +31,32 @@ export const spawn_run = function(room: Room) {
         ret = spawn.spawnCreep(generator(workload, mobility), creep_name)
     }
 
-    const spawn_loop = Memory.rooms[spawn_task._caller.room_name]._typed
-            ._looper[spawn_task._caller.looper]
-    if(!spawn_loop) return
+    const _typed = Memory.rooms[spawn_task._caller.room_name]._typed
+    let looper: Looper|undefined
+    switch(_typed._type){
+        case 'owned':
+            if(_typed._type == spawn_task._caller.room_type)
+                looper = _typed._looper[spawn_task._caller.loop_key]
+            break
+        case 'reserved':
+            if(_typed._type == spawn_task._caller.room_type)
+                looper = _typed._looper[spawn_task._caller.loop_key]
+            break
+        case 'highway':
+            if(_typed._type == spawn_task._caller.room_type)
+                looper = _typed._looper[spawn_task._caller.loop_key]
+            break
+    }
+    if(!looper) return
     if(ret == OK){
-        spawn_loop.reload_time = Game.time + spawn_loop.interval + 1
+        looper.reload_time = Game.time + looper.interval + 1
         /**creep内存赋值 */
         Memory.creeps[creep_name] = {
             _class:     spawn_task._class,
             _caller:    spawn_task._caller
         }
     } else {
-        spawn_loop.reload_time = Game.time + 200
+        looper.reload_time = Game.time + 200
         console.log(spawn.name + ":" + creep_name + ":" + ret)
     }
 }

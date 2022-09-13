@@ -38,9 +38,11 @@ export const operator_run = function(operator:PowerCreep){
 function find_power_task(operator: PowerCreep) {
     if(!operator.room) return
     if(operator.ticksToLive && operator.ticksToLive < 2000){
-        const power_spawn_id = operator.room?.memory._typed._struct?.power_spawn
-        if(power_spawn_id)
-            operator.memory._tasks.push({action:'renew',args:[power_spawn_id]})
+        if(operator.room?.memory._typed._type == 'owned'){
+            const power_spawn_id = operator.room?.memory._typed._struct.power_spawn
+            if(power_spawn_id)
+                operator.memory._tasks.push({action:'renew',args:[power_spawn_id]})
+        }
     }
     const controller = operator.room.controller
     if(controller && !controller.isPowerEnabled){
@@ -68,13 +70,15 @@ function find_power_task(operator: PowerCreep) {
     }
 
     if(operator.powers[PWR_OPERATE_LAB] && !operator.powers[PWR_OPERATE_LAB].cooldown){
-        const labs = operator.room?.memory._typed._struct?.labs
-        if(!labs?.reaction) return
-        for (let id of labs.outs) {
-            const lab_in = Game.getObjectById(id)
-            if(lab_in && (!lab_in.effects || !lab_in.effects[0]) && lab_in.cooldown > 0){
-                operator.memory._power.push({power: PWR_OPERATE_LAB, target: id})
-                break
+        if(operator.room?.memory._typed._type == 'owned'){
+            const labs = operator.room?.memory._typed._struct?.labs
+            if(!labs?.reaction) return
+            for (let id of labs.outs) {
+                const lab_in = Game.getObjectById(id)
+                if(lab_in && (!lab_in.effects || !lab_in.effects[0]) && lab_in.cooldown > 0){
+                    operator.memory._power.push({power: PWR_OPERATE_LAB, target: id})
+                    break
+                }
             }
         }
     }

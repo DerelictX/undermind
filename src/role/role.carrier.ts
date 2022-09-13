@@ -1,4 +1,4 @@
-import { carry_priority } from "@/creep/config.behavior"
+import { carry_priority } from "@/role/config.behavior"
 import { posed_task_updater } from "@/scanner/dynamic"
 import { TASK_COMPLETE, TASK_DOING, TASK_FAILED } from "../performer/behavior.any"
 import { perform_callback } from "../performer/behavior.callback"

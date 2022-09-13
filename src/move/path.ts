@@ -5,7 +5,7 @@ export const crawlTo = function(creep:Creep|PowerCreep, targetPos:RoomPosition){
     let pos_str = ''
     pos_str += creep.pos.x > 9 ? creep.pos.x : '0' + creep.pos.x
     pos_str += creep.pos.y > 9 ? creep.pos.y : '0' + creep.pos.y
-    delete creep.room.memory._pos_hold?.[pos_str]
+    delete Memory._pos_hold[creep.room.name]?.[pos_str]
 
     var x=targetPos.x, y=targetPos.y, roomName=targetPos.roomName
     if(creep.room.name != roomName){
@@ -67,7 +67,7 @@ const moveByPath = function(creep:Creep|PowerCreep, path: PathStep[]) {
     pos_str += cur.x > 9 ? cur.x : '0' + cur.x
     pos_str += cur.y > 9 ? cur.y : '0' + cur.y
 
-    const block_id = creep.room.memory._pos_hold?.[pos_str]
+    const block_id = Memory._pos_hold[creep.room.name]?.[pos_str]
     if(block_id){
         const block_creep = Game.getObjectById(block_id)
         if(block_creep?.pos.roomName == pos.roomName){
@@ -78,7 +78,7 @@ const moveByPath = function(creep:Creep|PowerCreep, path: PathStep[]) {
                 } else block_creep.move(reverse_dir[cur.direction])
             }
         }
-        delete creep.room.memory._pos_hold?.[pos_str]
+        delete Memory._pos_hold[creep.room.name]?.[pos_str]
     }
     return creep.move(cur.direction);
 }

@@ -1,8 +1,8 @@
+import { work_priority } from "@/role/config.behavior"
 import { hikeTo } from "@/move/route"
 import { TASK_COMPLETE, TASK_DOING, TASK_FAILED } from "@/performer/behavior.any"
 import { perform_callback } from "@/performer/behavior.callback"
 import { posed_task_updater } from "@/scanner/dynamic"
-import { work_priority } from "./config.behavior"
 
 export const run_worker = function(creep:Creep,fb:WorkerMemory){
     if(fb.state == 'collect'){

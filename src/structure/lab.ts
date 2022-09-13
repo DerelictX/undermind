@@ -23,15 +23,11 @@ export const lab_run = function(room: Room){
     }
 }
 
-export const change_reaction = function(room:Room){
-    if(room.memory._typed._type != 'owned') return
+export const change_reaction = function(room:Room): MineralCompoundConstant|null {
+    if(room.memory._typed._type != 'owned') return null
     const storage = room.storage
-    if(!storage || !storage.my)
-        return
     const terminal = room.terminal
-    if(!terminal || !terminal.my)
-        return
-    room.memory._typed._struct.labs.reaction = null
+    if(!storage?.my || !terminal?.my) return null
     let reacts: MineralCompoundConstant[]
 
     reacts = compound_tier[0]
@@ -41,7 +37,6 @@ export const change_reaction = function(room:Room){
             
         const reactants = reactions[reacts[i]] 
         if(terminal.store[reactants[0]] >= 1000 && terminal.store[reactants[1]] >= 1000){
-            room.memory._typed._struct.labs.reaction = reacts[i]
             return reacts[i]
         }
     }
@@ -50,7 +45,6 @@ export const change_reaction = function(room:Room){
     for(let i in reacts){
         const reactants = reactions[reacts[i]] 
         if(terminal.store[reactants[0]] >= 1000 && terminal.store[reactants[1]] >= 1000){
-            room.memory._typed._struct.labs.reaction = reacts[i]
             return reacts[i]
         }
     }
@@ -59,16 +53,16 @@ export const change_reaction = function(room:Room){
     for(let i in reacts){
         const reactants = reactions[reacts[i]] 
         if(terminal.store[reactants[0]] >= 1000 && terminal.store[reactants[1]] >= 1000){
-            room.memory._typed._struct.labs.reaction = reacts[i]
             return reacts[i]
         }
     }
+    return null
 }
 _.assign(global, {change_reaction:change_reaction})
 
 const compound_tier:MineralCompoundConstant[][]  = [
     [
-        'OH','G','ZK','UL'
+        'G','ZK','UL','OH'
     ],[
         'ZO','GO','LO',
         'KO','UH',

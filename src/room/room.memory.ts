@@ -13,47 +13,42 @@ interface RoomMemory {
     _typed:     OwnedRoomMemory | ReservedRoomMemory | HighwayRoomMemory | NeutralRoomMemory
     _dynamic:   {[k in keyof DynamicTaskPool]?: PosedCreepTask<TargetedAction>[]}
     _spawn:     string  //生爬的房间名
-    _pos_hold?: {[p:string]:Id<Creep|PowerCreep>}
-    _route?:    {
-        [Exits: string]:RoomPosition[]
-    }
 }
 
 type owned_room_role =
-    |"HarvesterSource0"|"HarvesterSource1"|'HarvesterMineral'
-    |"Upgrader"|"Builder"|"Maintainer"|'EnergySupplier'
-    |"Collector"|"Supplier"|"Chemist"
+    |"Source0"|"Source1"|'Mineral'
+    |"Upgrade"|"Build"|"Maintain"
+    |"Collector"|"Supplier"
 interface OwnedRoomMemory {
     _type:      'owned'
     _struct:    RoomStructureList
     _static:    ShadowedPick<FullTaskPool,keyof (OwnedTaskPool & SourceTaskPool & MineralTaskPool)>
-    _looper:    ShadowedPick<{[R in AnyRole]: Looper},owned_room_role>
+    //_looper:    ShadowedPick<{[R in RoomLoopKey]: Looper},owned_room_role>
+    _looper:    ObserveThis & {[R in owned_room_role]: Looper}
 }
 
 type reserved_room_role =
-    |"HarvesterSource0"|"HarvesterSource1"|"HarvesterSource2"
-    |"Builder"|"Maintainer"|'EnergySupplier'
+    |"Source0"|"Source1"|"Reserve"
+    |"Build"|"Maintain"
     |"Collector"
 interface ReservedRoomMemory {
     _type:      'reserved'
-    _struct?:   undefined
     _static:    ShadowedPick<FullTaskPool,keyof (ReservedTaskPool & SourceTaskPool)>
-    _looper:    ShadowedPick<{[R in AnyRole]: Looper},reserved_room_role>
+    _looper:    ObserveThis & {[R in reserved_room_role]: Looper}
 }
 
 type highway_room_role =
-    |"HarvesterDeposit"|"Collector"
+    |"Deposit"|"Collector"
 interface HighwayRoomMemory {
     _type:      'highway'
-    _struct?:   undefined
     _static:    ShadowedPick<FullTaskPool,keyof HighwayTaskPool>
-    _looper:    ShadowedPick<{[R in AnyRole]: Looper},highway_room_role>
+    _looper:    ObserveThis & {[R in highway_room_role]: Looper}
 }
 
 /**白板房，啥也不干 */
+type ObserveThis = {observe:Looper}
 interface NeutralRoomMemory{
     _type:      'neutral'
-    _struct?:   undefined
     _static:    ShadowedPick<FullTaskPool,never>
-    _looper:    ShadowedPick<{[R in AnyRole]: Looper},never>
+    _looper:    ObserveThis
 }

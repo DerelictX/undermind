@@ -24,18 +24,15 @@ export const hikeTo = function(creep:Creep|PowerCreep, targetPos:RoomPosition){
         const exit = real_roomPos(creep.memory._move.dest)
         const a = (_hike.route[0].exit == TOP || _hike.route[0].exit == BOTTOM) ? exit.y : exit.x
         const b = (_hike.route[0].exit == TOP || _hike.route[0].exit == LEFT) ? 0 : 49
-        if(a != b || exit.roomName != creep.room.name) {
-            delete creep.memory._move
-            creep.say('....')
-            return ERR_TIRED
-        }
-        return crawlTo(creep,exit)
+        if(a == b && exit.roomName == creep.room.name)
+            return crawlTo(creep,exit)
+        delete creep.memory._move
     }
 
     //分段寻路优化，在当前房间和下一个房间寻路，用来优化通往下个房间的exit
     if(_hike.route[1]){
         //从内存获取下个房间通往下下个房间的exits
-        const exit_cache = Memory.rooms[_hike.route[0].room]._route?.[_hike.route[1].room]
+        const exit_cache = Memory._route[_hike.route[0].room]?.[_hike.route[1].room]
         if(exit_cache){
             const exits: RoomPosition[] = []
             for(const pos of exit_cache)
@@ -90,10 +87,9 @@ const routeCallback = function(roomName:string):number {
 }
 
 export const update_exit = function(roomName:string){
-    if(!Memory.rooms[roomName]._route){
-        Memory.rooms[roomName]._route = {}
-    }
-    const _route = Memory.rooms[roomName]._route
+    if(!Memory._route[roomName])
+        Memory._route[roomName] = {}
+    const _route = Memory._route[roomName]
     if(!_route) return
     console.log('update_exit('+ roomName +')')
     

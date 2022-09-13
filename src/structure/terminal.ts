@@ -35,7 +35,7 @@ export const update_export = function(room:Room){
     var resourceType: keyof typeof storage_store
     for (resourceType in storage_store) {
         let target_amount = T_term_thre[resourceType]
-        if (storage.store[resourceType] > target_amount * 3) {
+        if (storage.store[resourceType] > target_amount * 2) {
             if(!Memory.terminal.supply[resourceType])
                 Memory.terminal.supply[resourceType] = {}
             const supply = Memory.terminal.supply[resourceType]
@@ -52,7 +52,7 @@ export const update_import = function(room:Room){
 
     var terminal_store: StorePropertiesOnly = terminal.store
     var resourceType: keyof typeof terminal_store
-    for (resourceType in terminal_store) {
+    for (resourceType in base) {
         let target_amount = T_term_thre[resourceType]
         if (terminal.store[resourceType] < target_amount) {
             if(!Memory.terminal.demand[resourceType])
@@ -63,6 +63,20 @@ export const update_import = function(room:Room){
     }
 }
 _.assign(global, {update_import:update_import})
+
+const base: {[R in MineralConstant|MineralBaseCompoundsConstant]: number} = {
+    OH: 0,
+    X: 0,
+    O: 0,
+    H: 0,
+    G: 0,
+    ZK: 0,
+    UL: 0,
+    U: 0,
+    L: 0,
+    K: 0,
+    Z: 0,
+}
 
 export const T_term_thre: {[R in ResourceConstant]: number} = {
     energy: 30000,
@@ -80,40 +94,40 @@ export const T_term_thre: {[R in ResourceConstant]: number} = {
     OH: 3000,
     ZK: 3000,
     UL: 3000,
-    G: 6000,
+    G: 3000,
 
-    UH: 1000,
-    UO: 1000,
-    KH: 1000,
-    KO: 1000,
-    LH: 1000,
-    LO: 1000,
-    ZH: 1000,
-    ZO: 1000,
-    GH: 1000,
-    GO: 1000,
+    UH: 2000,
+    UO: 2000,
+    KH: 2000,
+    KO: 2000,
+    LH: 2000,
+    LO: 2000,
+    ZH: 2000,
+    ZO: 2000,
+    GH: 2000,
+    GO: 2000,
 
-    UH2O: 1000,
-    UHO2: 1000,
-    KH2O: 1000,
-    KHO2: 1000,
-    LH2O: 1000,
-    LHO2: 1000,
-    ZH2O: 1000,
-    ZHO2: 1000,
-    GH2O: 1000,
-    GHO2: 1000,
+    UH2O: 2000,
+    UHO2: 2000,
+    KH2O: 2000,
+    KHO2: 2000,
+    LH2O: 2000,
+    LHO2: 2000,
+    ZH2O: 2000,
+    ZHO2: 2000,
+    GH2O: 2000,
+    GHO2: 2000,
 
-    XUH2O: 10000,
-    XUHO2: 10000,
-    XKH2O: 10000,
-    XKHO2: 10000,
-    XLH2O: 10000,
-    XLHO2: 10000,
-    XZH2O: 10000,
-    XZHO2: 10000,
-    XGH2O: 10000,
-    XGHO2: 10000,
+    XUH2O: 6000,
+    XUHO2: 6000,
+    XKH2O: 6000,
+    XKHO2: 6000,
+    XLH2O: 6000,
+    XLHO2: 6000,
+    XZH2O: 6000,
+    XZHO2: 6000,
+    XGH2O: 6000,
+    XGHO2: 6000,
 
     mist: 3000,
     biomass: 3000,

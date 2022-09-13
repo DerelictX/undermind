@@ -11,7 +11,10 @@ export const _format_room = function (room_name: string, type:RoomTypes, spawn_r
             _typed:{
                 _type:      'neutral',
                 _static:    {},
-                _looper:    {}
+                _looper:    {observe: {
+                    reload_time: Game.time + 10,
+                    interval: 1500,
+                }}
             },
             _dynamic: {},
             _spawn: room_name
@@ -30,12 +33,15 @@ _.assign(global, {_format_room:_format_room})
  * @returns 
  */
 export const inspector_memory = function (room_name: string, restart_room: boolean = false) {
-    if(!Memory.rooms[room_name]._typed?._type) {
+    if(!Memory.rooms[room_name]?._typed?._type) {
         Memory.rooms[room_name] = {
             _typed:{
                 _type:      'neutral',
                 _static:    {},
-                _looper:    {}
+                _looper:    {observe: {
+                    reload_time: Game.time + 10,
+                    interval: 1500,
+                }}
             },
             _dynamic: {},
             _spawn: room_name
@@ -84,16 +90,15 @@ const owned_memory_initializer: {[k in keyof FilterOptional<OwnedRoomMemory>]:
             interval: 1500,
         }
         mem._looper = {
-            HarvesterSource0: spawn_loop,
-            HarvesterSource1: spawn_loop,
-            HarvesterMineral: spawn_loop,
-            Upgrader: spawn_loop,
-            Builder: spawn_loop,
-            Maintainer: spawn_loop,
-            EnergySupplier: spawn_loop,
+            Source0: spawn_loop,
+            Source1: spawn_loop,
+            Mineral: spawn_loop,
+            Upgrade: spawn_loop,
+            Build: spawn_loop,
+            Maintain: spawn_loop,
             Collector: spawn_loop,
             Supplier: spawn_loop,
-            Chemist: spawn_loop
+            observe: spawn_loop
         }
     },
     _static: function (mem: OwnedRoomMemory): void {
@@ -166,13 +171,13 @@ const reserved_memory_initializer: {[k in keyof FilterOptional<ReservedRoomMemor
             interval: 1500,
         }
         mem._looper = {
-            HarvesterSource0: spawn_loop,
-            HarvesterSource1: spawn_loop,
-            HarvesterSource2: spawn_loop,
-            Builder: spawn_loop,
-            Maintainer: spawn_loop,
-            EnergySupplier: spawn_loop,
+            Reserve: spawn_loop,
+            Source0: spawn_loop,
+            Source1: spawn_loop,
+            Build: spawn_loop,
+            Maintain: spawn_loop,
             Collector: spawn_loop,
+            observe: spawn_loop
         }
     }
 }
@@ -194,8 +199,9 @@ const highway_memory_initializer: {[k in keyof FilterOptional<HighwayRoomMemory>
             interval: 1500,
         }
         mem._looper = {
-            HarvesterDeposit: spawn_loop,
+            Deposit: spawn_loop,
             Collector: spawn_loop,
+            observe: spawn_loop
         }
     }
 }

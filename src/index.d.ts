@@ -13,6 +13,8 @@ interface Memory {
         supply: {[res in ResourceConstant] ?: {[room: string]: boolean}}
         demand: {[res in ResourceConstant] ?: {[room: string]: boolean}}
     }
+    _pos_hold:  {[room:string] : undefined | {[pos:string]:Id<Creep|PowerCreep>}}
+    _route:     {[room:string] : undefined | {[toRoom: string]:RoomPosition[]}}
 }
 
 type ValueTypes<T> = T[keyof T]
