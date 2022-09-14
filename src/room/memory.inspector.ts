@@ -11,7 +11,7 @@ export const _format_room = function (room_name: string, type:RoomTypes, spawn_r
             _type:      'neutral',
             _static:    {},
             _looper:    {Observe: {
-                reload_time: Game.time + 10,
+                reload_time: Game.time,
                 interval: 1500,
             }}
         },
@@ -37,7 +37,7 @@ export const inspector_memory = function (room_name: string, restart_room: boole
                 _type:      'neutral',
                 _static:    {},
                 _looper:    {Observe: {
-                    reload_time: Game.time + 10,
+                    reload_time: Game.time,
                     interval: 1500,
                 }}
             },
@@ -84,7 +84,7 @@ const owned_memory_initializer: {[k in keyof FilterOptional<OwnedRoomMemory>]:
     },
     _looper: function (mem: OwnedRoomMemory) {
         const spawn_loop: Looper = {
-            reload_time: Game.time + 10,
+            reload_time: Game.time,
             interval: 1500,
         }
         mem._looper = {
@@ -169,7 +169,7 @@ const reserved_memory_initializer: {[k in keyof FilterOptional<ReservedRoomMemor
     },
     _looper: function (mem: ReservedRoomMemory): void {
         const spawn_loop: Looper = {
-            reload_time: Game.time + 10,
+            reload_time: Game.time,
             interval: 1500,
         }
         mem._looper = {
@@ -197,7 +197,7 @@ const highway_memory_initializer: {[k in keyof FilterOptional<HighwayRoomMemory>
     },
     _looper: function (mem: HighwayRoomMemory): void {
         const spawn_loop: Looper = {
-            reload_time: Game.time + 10,
+            reload_time: Game.time,
             interval: 1500,
         }
         mem._looper = {

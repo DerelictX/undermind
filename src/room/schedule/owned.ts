@@ -161,15 +161,6 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
     },
     Collector: function (room: Room, pool: SourceTaskPool, looper: Looper) {
         static_updater.containers(room,pool)
-        let _spawn = room.memory._spawn
-        if (room.memory._typed._type == 'reserved') {
-            looper.interval = 750
-            return {
-                _body: { generator: 'C', workload: 32 },
-                _class: init_carrier_behavior('Collector', room.name, _spawn)
-            }
-        }
-
         if (!room.storage?.my)
             return null
         return {
