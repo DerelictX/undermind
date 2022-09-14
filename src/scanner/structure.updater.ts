@@ -29,13 +29,16 @@ export const structure_updater = {
         else pool.power_spawn = null
 
         //observer
-        pool.observer = null
+        pool.observer = {
+            ob_id:      null,
+            observing:  null,
+            BFS_open:   []
+        }
         const observer = room.find(FIND_MY_STRUCTURES,{
             filter: {structureType: STRUCTURE_OBSERVER}
         })[0];
         if(observer instanceof StructureObserver)
-            pool.observer = observer.id
-        else pool.observer = null
+            pool.observer.ob_id = observer.id
     },
 
     links: function(room:Room,pool:RoomStructureList){

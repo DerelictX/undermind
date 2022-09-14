@@ -1,20 +1,20 @@
 import { structure_updater } from "./scanner/structure.updater";
 import { operator_run } from "./power_creep/operator";
 import { inspector_memory, _format_room } from "./room/memory.inspector";
-import { spawn_loop } from "./creep/handler.spawn";
+import { spawn_loop } from "./room/handler.spawn";
 import { spawn_run } from "./structure/spawn";
 import { tower_run } from "./structure/tower";
 import { static_updater } from "./scanner/static";
 import { link_run } from "./structure/link";
 import { perform_callback } from "./performer/behavior.callback";
 import { lab_run } from "./structure/lab";
-import { terminal_run, update_export, update_import } from "./structure/terminal";
-import { oberver_run } from "./structure/observer";
+import { terminal_run } from "./structure/terminal";
 import { holdPlace } from "./move/hold";
 import { factory_run } from "./structure/factory";
 import { power_spawn_run } from "./structure/power_spawn";
 import { run_carrier } from "./role/role.carrier";
 import { run_worker } from "./role/role.worker";
+import { observer_run } from "./structure/observer";
 
 export const loop = function () {
 
@@ -27,7 +27,16 @@ export const loop = function () {
     run_rooms()
     run_creeps()
     run_power_creeps()
-    
+
+    for(let name in Memory._closest_owned){
+        const qwer = Memory._closest_owned[name]
+        if(!qwer) continue
+        Game.map.visual.line(
+            new RoomPosition(25,25,qwer.prev),
+            new RoomPosition(25,25,name), {color: '#FFFF00', width:1, opacity:0.3});
+        Game.map.visual.text('' + qwer.dist,
+            new RoomPosition(25,25,name), {color: '#FF0000', fontSize:15}); 
+    }
     if(Game.time % 20 == 3){
         terminal_run()
     }
@@ -43,10 +52,6 @@ const run_rooms = function(){
             if(!room){
                 continue
             }
-            if(Game.time % 60 == 1){
-                update_import(room)
-                update_export(room)
-            }
             spawn_loop(room)
             spawn_run(room)
             tower_run(room)
@@ -55,6 +60,7 @@ const run_rooms = function(){
             lab_run(room)
             factory_run(room)
             power_spawn_run(room)
+            observer_run(room)
         }catch(error){
             console.log(name +':\t' + error);
             inspector_memory(name,false)
@@ -95,7 +101,6 @@ const run_creeps = function(){
             const creep_cpv = Game.cpu.getUsed() - creep_cpu
         }catch(error){
             console.log(name + ':\t' + error);
-            throw(error)
         }
     }
 }

@@ -1,12 +1,12 @@
 export const reserved_room_loop_handler: RoomLoopHandler<'reserved'> = {
-    observe: function (room: Room, pool: {}, looper: Looper) {
-        throw new Error("Function not implemented.");
+    Observe: function (room: Room, pool: {}, looper: Looper) {
+        return null
     },
     Source0: function (room: Room, pool: {}, looper: Looper) {
-        throw new Error("Function not implemented.");
+        return null
     },
     Source1: function (room: Room, pool: {}, looper: Looper) {
-        throw new Error("Function not implemented.");
+        return null
     },
     Reserve: function (room: Room) {
         const controller = room.controller;
@@ -29,17 +29,17 @@ export const reserved_room_loop_handler: RoomLoopHandler<'reserved'> = {
         main[ERR_NOT_FOUND] = move;
         main[ERR_NOT_IN_RANGE] = move;
         return {
-            _body: { generator: 'Cl', workload: 4 },
+            _body: { generator: 'Cl', workload: 4, mobility: 1 },
             _class: { ...{ bhvr_name: 'callbackful' }, ...main }
         };
     },
     Build: function (room: Room, pool: {}, looper: Looper) {
-        throw new Error("Function not implemented.");
+        return null
     },
     Maintain: function (room: Room, pool: {}, looper: Looper) {
-        throw new Error("Function not implemented.");
+        return null
     },
     Collector: function (room: Room, pool: {}, looper: Looper) {
-        throw new Error("Function not implemented.");
+        return null
     }
 }

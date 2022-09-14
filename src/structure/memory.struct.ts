@@ -7,7 +7,7 @@ interface RoomStructureList {
     factory:        Id<StructureFactory>|null
     power_spawn:    Id<StructurePowerSpawn>|null
     nuker:          Id<StructureNuker>|null
-    observer:       Id<StructureObserver>|null
+    observer:       ObserverConfig
     
     wall_hits:      number
 }
@@ -30,4 +30,10 @@ interface LabConfig {
     outs:       Id<StructureLab>[]
     reaction:   MineralCompoundConstant|null
     boosts:     MineralBoostConstant[]
+}
+
+interface ObserverConfig {
+    ob_id:      Id<StructureObserver>|null
+    observing:  string|null|undefined
+    BFS_open:   string[]
 }

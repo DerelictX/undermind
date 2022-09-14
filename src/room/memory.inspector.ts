@@ -6,19 +6,17 @@ import _ from "lodash"
  * @param type 房间类型
  */
 export const _format_room = function (room_name: string, type:RoomTypes, spawn_room: string) {
-    if(!Memory.rooms[room_name]) {
-        Memory.rooms[room_name] = {
-            _typed:{
-                _type:      'neutral',
-                _static:    {},
-                _looper:    {observe: {
-                    reload_time: Game.time + 10,
-                    interval: 1500,
-                }}
-            },
-            _dynamic: {},
-            _spawn: room_name
-        }
+    Memory.rooms[room_name] = {
+        _typed:{
+            _type:      'neutral',
+            _static:    {},
+            _looper:    {Observe: {
+                reload_time: Game.time + 10,
+                interval: 1500,
+            }}
+        },
+        _dynamic: {},
+        _spawn: room_name
     }
     Memory.rooms[room_name]._spawn = spawn_room
     Memory.rooms[room_name]._typed._type = type
@@ -38,7 +36,7 @@ export const inspector_memory = function (room_name: string, restart_room: boole
             _typed:{
                 _type:      'neutral',
                 _static:    {},
-                _looper:    {observe: {
+                _looper:    {Observe: {
                     reload_time: Game.time + 10,
                     interval: 1500,
                 }}
@@ -90,15 +88,15 @@ const owned_memory_initializer: {[k in keyof FilterOptional<OwnedRoomMemory>]:
             interval: 1500,
         }
         mem._looper = {
+            Supplier: spawn_loop,
             Source0: spawn_loop,
             Source1: spawn_loop,
+            Collector: spawn_loop,
+            Maintain: spawn_loop,
             Mineral: spawn_loop,
             Upgrade: spawn_loop,
             Build: spawn_loop,
-            Maintain: spawn_loop,
-            Collector: spawn_loop,
-            Supplier: spawn_loop,
-            observe: spawn_loop
+            Observe: spawn_loop
         }
     },
     _static: function (mem: OwnedRoomMemory): void {
@@ -140,7 +138,11 @@ const owned_memory_initializer: {[k in keyof FilterOptional<OwnedRoomMemory>]:
             factory: null,
             power_spawn: null,
             nuker: null,
-            observer: null,
+            observer: {
+                ob_id:      null,
+                observing:  null,
+                BFS_open:   []
+            },
         }
     }
 }
@@ -177,7 +179,7 @@ const reserved_memory_initializer: {[k in keyof FilterOptional<ReservedRoomMemor
             Build: spawn_loop,
             Maintain: spawn_loop,
             Collector: spawn_loop,
-            observe: spawn_loop
+            Observe: spawn_loop
         }
     }
 }
@@ -201,7 +203,7 @@ const highway_memory_initializer: {[k in keyof FilterOptional<HighwayRoomMemory>
         mem._looper = {
             Deposit: spawn_loop,
             Collector: spawn_loop,
-            observe: spawn_loop
+            Observe: spawn_loop
         }
     }
 }

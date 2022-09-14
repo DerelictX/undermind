@@ -46,7 +46,7 @@ interface HighwayRoomMemory {
 }
 
 /**白板房，啥也不干 */
-type ObserveThis = {observe:Looper}
+type ObserveThis = {Observe:Looper}
 interface NeutralRoomMemory{
     _type:      'neutral'
     _static:    ShadowedPick<FullTaskPool,never>

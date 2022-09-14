@@ -15,6 +15,12 @@ interface Memory {
     }
     _pos_hold:  {[room:string] : undefined | {[pos:string]:Id<Creep|PowerCreep>}}
     _route:     {[room:string] : undefined | {[toRoom: string]:RoomPosition[]}}
+    _closest_owned: {[room:string] : undefined | {
+        root:   string
+        prev:   string
+        dist:   number
+        time:   number
+    }}
 }
 
 type ValueTypes<T> = T[keyof T]

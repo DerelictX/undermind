@@ -1,6 +1,38 @@
 import { init_carrier_behavior, init_worker_behavior } from "@/role/config.behavior"
 import { static_updater } from "@/scanner/static"
+import { update_export, update_import } from "@/structure/terminal"
 import { structure_updater } from "../../scanner/structure.updater"
+
+const spawnHarvest = function(H:Posed<PrimitiveDescript<'harvest'>>,
+        T?:Posed<PrimitiveDescript<'transfer'>>|undefined): RoleImpl|null{
+    const main: CallbackBehavior<'harvest'> = {
+        bhvr_name: 'callbackful', action: 'harvest', args: H.args
+    }
+    main[ERR_NOT_IN_RANGE] = main[ERR_NOT_FOUND] = {
+        bhvr_name: 'callbackful', action: 'approach', args: [H.pos, 1]
+    }
+    if(!T) return {
+        _body: { generator: 'W', workload: 5 },
+        _class: { ...{ bhvr_name: 'callbackful' }, ...main }
+    }
+
+    const back: CallbackBehavior<'transfer'> = {
+        bhvr_name: 'callbackful', action: 'transfer', args: T.args
+    }
+    back[ERR_NOT_IN_RANGE] = {
+        bhvr_name: 'callbackful', action: 'approach', args: [T.pos, 1]
+    }
+
+    const full_store: CallbackBehavior<'prejudge_full'> = {
+        bhvr_name: 'callbackful', action: "prejudge_full", args: [0]
+    }
+    full_store[OK] = main
+    full_store[ERR_FULL] = back
+    return {
+        _body: { generator: 'Wc', workload: 15 },
+        _class: full_store
+    }
+}
 
 export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
     Source0: function (room: Room, pool: SourceTaskPool, looper: Looper) {
@@ -22,7 +54,7 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
             }
         }
         return {
-            _body: { generator: 'Wc', workload: 15 },
+            _body: { generator: 'Wc', workload: 10 },
             _class: init_worker_behavior('HarvesterSource0', room.name, room.name)
         }
     },
@@ -45,7 +77,7 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
             }
         }
         return {
-            _body: { generator: 'Wc', workload: 15 },
+            _body: { generator: 'Wc', workload: 10 },
             _class: init_worker_behavior('HarvesterSource1', room.name, room.name)
         }
     },
@@ -158,7 +190,19 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
             _class: init_carrier_behavior('Supplier', room.name, room.name)
         }
     },
-    observe: function (room: Room, pool: {}, looper: Looper) {
-        throw new Error("Function not implemented.")
+    Observe: function (room: Room, pool: {}, looper: Looper) {
+        if (room.memory._typed._type != 'owned')
+            return null
+        update_import(room)
+        update_export(room)
+        Memory._closest_owned[room.name] = {
+            root:   room.name,
+            prev:   room.name,
+            dist:   0,
+            time:   Game.time
+        }
+        room.memory._typed._struct.observer.BFS_open.push(room.name)
+        looper.interval = 400
+        return null
     }
 }

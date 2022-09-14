@@ -32,10 +32,10 @@ export const highway_room_loop_handler: RoomLoopHandler<'highway'> = {
             _class: full_store
         }
     },
-    observe: function (room: Room, pool: HighwayTaskPool, looper: Looper): RoleImpl | null {
-        throw new Error("Function not implemented.")
+    Observe: function (room: Room, pool: HighwayTaskPool, looper: Looper): RoleImpl | null {
+        return null
     },
     Collector: function (room: Room, pool: HighwayTaskPool, looper: Looper): RoleImpl | null {
-        throw new Error("Function not implemented.")
+        return null
     }
 }
