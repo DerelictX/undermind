@@ -37,7 +37,7 @@ export const static_updater = {
 
     sources: function (room:Room, pool:SourceTaskPool) {
         pool.H_srcs = []
-        var T_srcs: Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[][] = [[],[],[]]
+        var T_srcs: Posed<RestrictedPrimitiveDescript<'transfer'|'repair'|'build','energy'>>[][] = [[],[],[]]
         const sources = room.find(FIND_SOURCES)
         for(let i in sources) {
             const source = sources[i]
@@ -46,19 +46,14 @@ export const static_updater = {
                 args: [source.id],
                 pos: source.pos
             })
-            
+            const sites = source.pos.findInRange(FIND_MY_CONSTRUCTION_SITES,2)
+            sites.forEach(s => T_srcs[i].push({action: 'build',args: [s.id],pos: s.pos}))
             const near_structs:AnyStoreStructure[] = source.pos.findInRange(FIND_STRUCTURES,2,{
                 filter: (structure) => {
-                    if(structure.structureType == STRUCTURE_CONTAINER){
-                        if(structure.pos.inRangeTo(source,2))
-                            T_srcs[i].push({action: 'repair',args: [structure.id],pos: structure.pos})
-                        return true
-                    }
-                    if(structure.structureType == STRUCTURE_STORAGE
+                    return structure.structureType == STRUCTURE_CONTAINER
+                        || structure.structureType == STRUCTURE_STORAGE
                         || structure.structureType == STRUCTURE_TERMINAL
-                        || structure.structureType == STRUCTURE_LINK)
-                        return true
-                    return false
+                        || structure.structureType == STRUCTURE_LINK
                 }
             })
             near_structs.sort((a, b) => {
@@ -66,6 +61,7 @@ export const static_updater = {
                     - a.pos.getRangeTo(source) + b.pos.getRangeTo(source)
             })
             for(let struct of near_structs){
+                T_srcs[i].push({action:'repair',args: [struct.id],pos: struct.pos})
                 T_srcs[i].push({action:'transfer',args:[struct.id,'energy'],pos:struct.pos})
             }
         }

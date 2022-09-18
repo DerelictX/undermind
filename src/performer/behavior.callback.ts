@@ -24,3 +24,38 @@ export const perform_callback = function(creep:Creep, behavior:CallbackBehavior<
     }while(callback)
     return ret ? TASK_FAILED : TASK_DOING
 }
+
+/**
+ * 将缓存的任务，解析为能被perform_callback执行的格式，加上一些条件判断
+ * @param posed 
+ * @returns 
+ */
+ export const parse_posed_task = function(posed:PosedCreepTask<TargetedAction>):CallbackBehavior<AnyAction>{
+    const main: CallbackBehavior<TargetedAction> = {...{bhvr_name:'callbackful'},...posed}
+    const move: CallbackBehavior<'approach'> = {...{bhvr_name:'callbackful'},
+            ...{action:"approach",args:[posed.pos,1]}}
+    main[ERR_NOT_IN_RANGE] = move
+    switch(main.action){
+        case 'withdraw':
+        case 'transfer':
+        case 'pickup':
+        case 'generateSafeMode':
+            main[OK] = TASK_COMPLETE
+            return main
+        case 'harvest':
+        case 'dismantle':
+            const full_store: CallbackBehavior<'prejudge_full'> = {...{bhvr_name:'callbackful'},
+                    ...{action:"prejudge_full",args:[0]}}
+            full_store[OK] = main
+            return full_store
+        case 'repair':
+            const full_hits: CallbackBehavior<'full_hits'> = {...{bhvr_name:'callbackful'},
+                    ...{action:"full_hits",args:[main.args[0],0]}}
+            full_hits[OK] = main
+            return full_hits
+        case 'build':
+        case 'upgradeController':
+            return main
+        default: throw new Error("Unexpected state: " + main.action)
+    }
+}

@@ -3,20 +3,24 @@ import { crawlTo, real_roomPos } from "./path"
 
 export const hikeTo = function(creep:Creep|PowerCreep, targetPos:RoomPosition){
     if(!creep.room) return ERR_NOT_FOUND
-    if(creep.room.name == targetPos.roomName)
-        return crawlTo(creep,targetPos)
-    const _hike = creep.memory._hike
-    if(!_hike || _hike.to != targetPos.roomName) {
+    if(creep.room.name == targetPos.roomName){
+        const ret = crawlTo(creep,targetPos)
+        return ret
+    }
+    let _hike = creep.memory._hike
+    if(_hike?.to != targetPos.roomName) {
         if(seekTo(creep, targetPos.roomName) == ERR_NO_PATH)
             return ERR_NO_PATH
-        if(!_hike || !_hike.route[0]) return ERR_NO_PATH
+        _hike = creep.memory._hike
     }
+    if(!_hike?.route[0]) return ERR_NO_PATH
+
     if(creep.room.name == _hike.route[0].room){
         _hike.from = _hike.route[0].room
         _hike.route.shift()
     }
     if(creep.room.name != _hike.from){
-        creep.say('...')
+        console.log(creep.pos + '\t' + targetPos + '\t' + JSON.stringify(_hike) + '...')
         return ERR_TIRED
     }
 
@@ -37,22 +41,37 @@ export const hikeTo = function(creep:Creep|PowerCreep, targetPos:RoomPosition){
             const exits: RoomPosition[] = []
             for(const pos of exit_cache)
                 exits.push(new RoomPosition(pos.x,pos.y,pos.roomName))
-            const path = PathFinder.search(creep.pos,exits)
+            const path = PathFinder.search(creep.pos,exits,{
+                roomCallback:function(roomName:string){
+                    if(roomName != _hike?.from && roomName != _hike?.route[0].room) return false
+                    return true
+                }
+            })
+            console.log('ops:\t' + path.ops)
             //在房间交界处截断，获取exit
-            const exit = _.findLast(path.path, (pos) => pos.roomName == _hike.from)
-            console.log(_hike.from + ' ->\t' + exit + ' ->\t' + _hike.route[1].room)
-            return exit ? crawlTo(creep,exit) : ERR_NO_PATH
+            const exit = _.findLast(path.path, (pos) => pos.roomName == _hike?.from)
+            if(!exit)
+                console.log(_hike.from + ' ->\t' + exit + ' ->\t' + _hike.route[1].room)
+            return exit ? crawlTo(creep,exit) : ERR_TIRED
         } else {
-            //update_exit(_hike.from)
-            creep.say('.....')
+            console.log(creep.pos + '\t' + targetPos + '\t' + JSON.stringify(_hike) + '.....')
             return ERR_TIRED
         }
     } else {
         //终点在下个房间
-        const path = PathFinder.search(creep.pos,targetPos)
-        const exit = _.findLast(path.path, (pos) => pos.roomName == _hike.from)
-        console.log(_hike.from + ' ->\t' + exit + ' ->\t' + targetPos)
-        return exit ? crawlTo(creep,exit) : ERR_NO_PATH
+        const path = PathFinder.search(creep.pos,targetPos,{
+            roomCallback:function(roomName:string){
+                if(roomName != _hike?.from && roomName != _hike?.route[0].room) return false
+                return true
+            }
+        })
+        const exit = _.findLast(path.path, (pos) => pos.roomName == _hike?.from)
+        if(!exit) {
+            console.log(_hike.from + ' ->\t' + exit + ' ->\t' + targetPos)
+            console.log('\t'+JSON.stringify(_hike))
+            console.log('\t'+path.path.slice(0,2))
+        }
+        return exit ? crawlTo(creep,exit) : ERR_TIRED
     }
 }
 
@@ -91,7 +110,6 @@ export const update_exit = function(roomName:string){
         Memory._route[roomName] = {}
     const _route = Memory._route[roomName]
     if(!_route) return
-    console.log('update_exit('+ roomName +')')
     
     const terrain = Game.map.getRoomTerrain(roomName)
     const exitRoom = Game.map.describeExits(roomName)

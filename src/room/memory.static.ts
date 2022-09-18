@@ -4,8 +4,8 @@ type FullTaskPool =
 
 interface SourceTaskPool {
     H_srcs:     Posed<RestrictedPrimitiveDescript<'harvest','energy'>>[]
-    T_src0:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]
-    T_src1:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]
+    T_src0:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair'|'build','energy'>>[]
+    T_src1:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair'|'build','energy'>>[]
     W_cntn:     Posed<PrimitiveDescript<'withdraw'>>[]
     T_cntn:     Posed<RestrictedPrimitiveDescript<'transfer','energy'>>[]
 }

@@ -17,8 +17,9 @@ export const crawlTo = function(creep:Creep|PowerCreep, targetPos:RoomPosition){
             || _move.dest.room != roomName
             || _move.dest.x != x
             || _move.dest.y != y){
-        if(seekTo(creep, targetPos) == ERR_NO_PATH)
+        if(seekTo(creep, targetPos) == ERR_NO_PATH){
             return ERR_NO_PATH
+        }
     }
     _move = creep.memory._move;
     if(!_move) return ERR_NO_PATH
@@ -41,7 +42,8 @@ const seekTo = function(creep:Creep|PowerCreep, targetPos:RoomPosition){
     var x=targetPos.x, y=targetPos.y, roomName=targetPos.roomName
     delete creep.memory._move;
     const path = creep.room.findPath(creep.pos, targetPos, {
-        ignoreCreeps:   true
+        ignoreCreeps:   true,
+        maxRooms:   1
     });
     if(path.length > 0) {
         creep.memory._move = {
@@ -52,6 +54,7 @@ const seekTo = function(creep:Creep|PowerCreep, targetPos:RoomPosition){
         };
         return OK
     }
+    console.log(creep.pos + ' -> ' + targetPos + ' : ' + path.length)
     return ERR_NO_PATH
 }
 

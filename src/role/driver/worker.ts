@@ -1,7 +1,7 @@
-import { work_priority } from "@/role/config.behavior"
+import { work_priority } from "@/role/initializer/config.behavior"
 import { hikeTo } from "@/move/route"
 import { TASK_COMPLETE, TASK_DOING, TASK_FAILED } from "@/performer/behavior.any"
-import { perform_callback } from "@/performer/behavior.callback"
+import { parse_posed_task, perform_callback } from "@/performer/behavior.callback"
 import { posed_task_updater } from "@/scanner/dynamic"
 
 export const run_worker = function(creep:Creep,fb:WorkerMemory){
@@ -76,6 +76,7 @@ const change_flow = function(creep:Creep,fb:WorkerMemory) {
                 return
             }
         }
+        delete creep.memory._move
     }
     if(fb.state == 'consume'){
         const pool = Memory.rooms[fb.toRoom]._dynamic
@@ -96,41 +97,6 @@ const change_flow = function(creep:Creep,fb:WorkerMemory) {
                 return
             }
         }
-    }
-}
-
-/**
- * 将缓存的任务，解析为能被perform_callback执行的格式，加上一些条件判断
- * @param posed 
- * @returns 
- */
-const parse_posed_task = function(posed:PosedCreepTask<TargetedAction>):CallbackBehavior<AnyAction>{
-    const main: CallbackBehavior<TargetedAction> = {...{bhvr_name:'callbackful'},...posed}
-    const move: CallbackBehavior<'approach'> = {...{bhvr_name:'callbackful'},
-            ...{action:"approach",args:[posed.pos,1]}}
-    const hold: CallbackBehavior<'hold_place'> = {...{bhvr_name:'callbackful'},
-            ...{action:'hold_place',args:[1]}}
-    main[ERR_NOT_IN_RANGE] = move
-    switch(main.action){
-        case 'withdraw':
-        case 'transfer':
-        case 'pickup':
-            main[OK] = TASK_COMPLETE
-            return main
-        case 'harvest':
-        case 'dismantle':
-            const full_store: CallbackBehavior<'prejudge_full'> = {...{bhvr_name:'callbackful'},
-                    ...{action:"prejudge_full",args:[0]}}
-            full_store[OK] = main
-            return full_store
-        case 'repair':
-            const full_hits: CallbackBehavior<'full_hits'> = {...{bhvr_name:'callbackful'},
-                    ...{action:"full_hits",args:[main.args[0],0]}}
-            full_hits[OK] = main
-            return full_hits
-        case 'build':
-        case 'upgradeController':
-            return main
-        default: throw new Error("Unexpected state: " + main.action)
+        delete creep.memory._move
     }
 }

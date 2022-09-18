@@ -7,13 +7,20 @@ export const work_priority: {[role in EnergyRole]:EnWorkerPriority} = {
     Upgrader: [['W_ctrl'], ['U_ctrl']],
     Builder: [
         ['W_energy', 'H_srcs'],
-        ['repair', 'anti_nuke', 'build', 'fortify', 'U_ctrl']],
+        ['repair', 'anti_nuke', 'build', 'fortify', 'U_ctrl']
+    ],
     Maintainer: [
         ['W_energy', 'H_srcs'],
-        ['repair', 'downgraded', 'decayed', 'fortify', 'U_ctrl']],
+        ['repair', 'downgraded', 'decayed', 'fortify', 'U_ctrl', 'build']
+    ],
     EnergySupplier: [
         ['W_energy'],
-        ['T_ext', 'T_tower', 'T_cntn']]
+        ['T_ext', 'T_tower', 'T_cntn']
+    ],
+    RMaintainer: [
+        ['W_energy', 'H_srcs'],
+        ['decayed', 'build']
+    ]
 }
 
 export const carry_priority: {[role in CarrierRole]:ResFlow[]} = {

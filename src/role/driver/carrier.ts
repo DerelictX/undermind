@@ -1,7 +1,7 @@
-import { carry_priority } from "@/role/config.behavior"
+import { carry_priority } from "@/role/initializer/config.behavior"
 import { posed_task_updater } from "@/scanner/dynamic"
-import { TASK_COMPLETE, TASK_DOING, TASK_FAILED } from "../performer/behavior.any"
-import { perform_callback } from "../performer/behavior.callback"
+import { TASK_COMPLETE, TASK_DOING, TASK_FAILED } from "../../performer/behavior.any"
+import { parse_posed_task, perform_callback } from "../../performer/behavior.callback"
 
 export const run_carrier = function(creep:Creep,fb:CarrierMemory){
     if(fb.state == 'idle'){
@@ -263,28 +263,5 @@ const lazy_storage = function(fb:CarrierMemory) {
             last_collect.args[2] = (last_collect.args[2] && collect.args[2])
                 ? (last_collect.args[2] + collect.args[2]) : undefined
         } else fb.collect.push(parse_posed_task(collect))   //不合并
-    }
-}
-
-/**
- * 将缓存的任务，解析为能被perform_callback执行的格式
- * @param posed 
- * @returns 
- */
-const parse_posed_task = function(posed:PosedCreepTask<TargetedAction>):CallbackBehavior<AnyAction>{
-    const main: CallbackBehavior<TargetedAction> = {...{bhvr_name:'callbackful'},...posed}
-    const move: CallbackBehavior<'approach'> = {...{bhvr_name:'callbackful'},
-            ...{action:"approach",args:[posed.pos,1]}}
-    main[OK] = TASK_COMPLETE
-    main[ERR_NOT_IN_RANGE] = move
-    switch(main.action){
-        case 'withdraw':
-        case 'pickup':
-            return main
-        case 'transfer':
-            return main
-        case 'generateSafeMode':
-            return main
-        default: throw new Error("Unexpected state.")
     }
 }

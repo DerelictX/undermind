@@ -36,6 +36,7 @@ interface CarrierMemory {
 type EnergyRole =
     |"HarvesterSource0"|"HarvesterSource1"|"HarvesterSource2"
     |"Upgrader"|"Builder"|"Maintainer"|'EnergySupplier'
+    |"RMaintainer"
 interface WorkerMemory {
     bhvr_name:  "worker"
     
@@ -46,4 +47,14 @@ interface WorkerMemory {
     fromRoom:   string
     toRoom:     string
     priority:   EnergyRole
+}
+
+interface StaticMemory {
+    bhvr_name:  "static"
+    
+    state:      "collect"|"consume"
+    collect:    CallbackBehavior<'harvest'|'withdraw'>[]
+    consume:    CallbackBehavior<'repair'|'build'|'transfer'>[]
+    buff_in:    CallbackBehavior<'withdraw'>[]
+    buff_out:   CallbackBehavior<'transfer'>[]
 }

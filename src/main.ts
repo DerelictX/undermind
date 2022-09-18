@@ -12,9 +12,9 @@ import { terminal_run } from "./structure/terminal";
 import { holdPlace } from "./move/hold";
 import { factory_run } from "./structure/factory";
 import { power_spawn_run } from "./structure/power_spawn";
-import { run_carrier } from "./role/role.carrier";
-import { run_worker } from "./role/role.worker";
+import { run_carrier } from "./role/driver/carrier";
 import { observer_run } from "./structure/observer";
+import { run_worker } from "./role/driver/worker";
 
 export const loop = function () {
 
@@ -101,6 +101,7 @@ const run_creeps = function(){
             const creep_cpv = Game.cpu.getUsed() - creep_cpu
         }catch(error){
             console.log(name + ':\t' + error);
+            throw(error)
         }
     }
 }

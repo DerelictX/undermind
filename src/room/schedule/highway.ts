@@ -3,7 +3,7 @@ export const highway_room_loop_handler: RoomLoopHandler<'highway'> = {
         if (room.memory._typed._type != 'highway')
             return null
         const deposit = room.find(FIND_DEPOSITS, {
-            filter: (deposit) => deposit.cooldown < 50
+            filter: (deposit) => deposit.lastCooldown < 50
         })[0]
         const storage = Game.rooms[room.memory._spawn]?.storage
         if (!deposit || !storage)
@@ -27,8 +27,9 @@ export const highway_room_loop_handler: RoomLoopHandler<'highway'> = {
         }
         full_store[OK] = main
         full_store[ERR_FULL] = back
+        const workload = deposit.lastCooldown < 10 ? 15 : 20
         return {
-            _body: { generator: 'DH', workload: 25, mobility: 1 },
+            _body: { generator: 'DH', workload: workload, mobility: 1 },
             _class: full_store
         }
     },

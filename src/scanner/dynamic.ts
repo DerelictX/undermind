@@ -451,6 +451,10 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         if (!room.memory._typed._static.T_src0)
             return []
         for (let task of room.memory._typed._static.T_src0) {
+            if (task.action == 'build') {
+                const structure = Game.getObjectById(task.args[0])
+                if (structure) return [task]
+            }
             if (task.action == 'repair') {
                 const structure = Game.getObjectById(task.args[0])
                 if (structure && structure.hits < structure.hitsMax)
@@ -468,6 +472,10 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         if (!room.memory._typed._static.T_src1)
             return []
         for (let task of room.memory._typed._static.T_src1) {
+            if (task.action == 'build') {
+                const structure = Game.getObjectById(task.args[0])
+                if (structure) return [task]
+            }
             if (task.action == 'repair') {
                 const structure = Game.getObjectById(task.args[0])
                 if (structure && structure.hits < structure.hitsMax)

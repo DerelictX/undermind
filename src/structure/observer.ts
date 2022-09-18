@@ -36,7 +36,9 @@ export const observer_run = function(room: Room){
         if(!next) continue
         const next_node = Memory._closest_owned[next]
         if(next_node && Game.time < next_node.time + 2000){
-            if(curr_node.dist + 1 >= next_node.dist)
+            if(next_node.root != room.name && curr_node.dist + 1 >= next_node.dist)
+                continue
+            if(next_node.root == room.name && curr_node.dist + 1 != next_node.dist)
                 continue
         }
         Memory._closest_owned[next] = {

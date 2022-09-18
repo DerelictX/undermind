@@ -17,8 +17,8 @@ interface DynamicTaskPool {
     H_src0:     Posed<RestrictedPrimitiveDescript<'harvest'|'withdraw','energy'>>[]
     H_src1:     Posed<RestrictedPrimitiveDescript<'harvest'|'withdraw','energy'>>[]
     H_src2:     Posed<RestrictedPrimitiveDescript<'harvest','energy'>>[]
-    T_src0:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]
-    T_src1:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]
+    T_src0:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair'|'build','energy'>>[]
+    T_src1:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair'|'build','energy'>>[]
     T_src2:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]
     //controller
     W_ctrl:     Posed<RestrictedPrimitiveDescript<'withdraw','energy'>>[]

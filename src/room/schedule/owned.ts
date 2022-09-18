@@ -1,5 +1,6 @@
-import { init_carrier_behavior, init_worker_behavior } from "@/role/config.behavior"
+import { init_carrier_behavior, init_worker_behavior } from "@/role/initializer/config.behavior"
 import { static_updater } from "@/scanner/static"
+import { change_reaction } from "@/structure/lab"
 import { update_export, update_import } from "@/structure/terminal"
 import { structure_updater } from "../../scanner/structure.updater"
 
@@ -119,7 +120,7 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
             return null
         looper.interval = 1500
         return {
-            _body: { generator: 'Wc', workload: 15 },
+            _body: { generator: 'Wc', workload: 25 },
             _class: init_worker_behavior('Upgrader', room.name, room.name)
         }
     },
@@ -186,6 +187,7 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
             return null
         update_import(room)
         update_export(room)
+        change_reaction(room)
         Memory._closest_owned[room.name] = {
             root:   room.name,
             prev:   room.name,
