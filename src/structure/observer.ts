@@ -17,18 +17,26 @@ export const observer_run = function(room: Room){
     config.observing = null
     const curr_node = Memory._closest_owned[curr]
     const curr_room = Game.rooms[curr]
-    if(!curr_node || !curr_room || curr_node.dist >= 4) return
+    if(!curr_node || !curr_room) return
 
     if(curr_room.controller){
         //开外矿
         if(!curr_room.controller.owner && curr_node.dist == 1 && !Memory.rooms[curr]){
             _format_room(curr,'reserved',room.name)
-            spawn_loop(curr_room)   //房间第一次定时任务
+            spawn_loop(curr_room)
         }
         //别人的房
         if(curr_room.controller.owner && !curr_room.controller.my) return
+    } else {
+        //挖过道
+        const isHighway = curr.indexOf('0') != -1
+        if(isHighway && !Memory.rooms[curr]) {
+            _format_room(curr,'highway',room.name)
+            spawn_loop(curr_room)
+        }
     }
 
+    if(curr_node.dist >= 4) return
     const exits = Game.map.describeExits(curr)
     let exit: ExitKey
     for(exit in exits){

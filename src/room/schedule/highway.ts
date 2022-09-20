@@ -1,13 +1,15 @@
 export const highway_room_loop_handler: RoomLoopHandler<'highway'> = {
-    Deposit: function (room: Room) {
+    Deposit: function (room: Room, pool: HighwayTaskPool, looper: Looper) {
         if (room.memory._typed._type != 'highway')
             return null
         const deposit = room.find(FIND_DEPOSITS, {
             filter: (deposit) => deposit.lastCooldown < 50
         })[0]
         const storage = Game.rooms[room.memory._spawn]?.storage
-        if (!deposit || !storage)
+        if (!deposit || !storage){
+            looper.interval = 500
             return null
+        }
 
         const main: CallbackBehavior<'harvest'> = {
             bhvr_name: 'callbackful', action: 'harvest', args: [deposit.id]
@@ -28,6 +30,7 @@ export const highway_room_loop_handler: RoomLoopHandler<'highway'> = {
         full_store[OK] = main
         full_store[ERR_FULL] = back
         const workload = deposit.lastCooldown < 10 ? 15 : 20
+        looper.interval = 1400
         return {
             _body: { generator: 'DH', workload: workload, mobility: 1 },
             _class: full_store

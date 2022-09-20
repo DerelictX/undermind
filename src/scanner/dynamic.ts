@@ -1,4 +1,4 @@
-import { compressed } from "@/structure/factory"
+import { compressed, product_tier } from "@/structure/factory"
 import { change_reaction, reactions } from "@/structure/lab"
 import { T_term_thre } from "@/structure/terminal"
 
@@ -673,8 +673,9 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         if(room.memory._typed._type != 'owned') return[]
         if (!room.memory._typed._struct.factory) return []
         const storage = room.storage
+        const terminal = room.terminal
         const factory = Game.getObjectById(room.memory._typed._struct.factory)
-        if (!storage || !factory) return []
+        if (!storage || !terminal || !factory) return []
 
         var tasks: Posed<PrimitiveDescript<'transfer'>>[] = []
         for(let res of compressed){
@@ -682,8 +683,22 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
             let component: keyof typeof components
             for(component in components){
                 //console.log(factory.store[component])
-                if(storage.store[component] > 60000
+                if(storage.store[component] >= 60000
                         && factory.store[component] < components[component] * 10){
+                    tasks.push({
+                        action: 'transfer',
+                        args: [factory.id, component],
+                        pos: factory.pos
+                    })
+                }
+            }
+        }
+        for(let res of product_tier[0]){
+            const components = COMMODITIES[res].components
+            let component: keyof typeof components
+            for(component in components){
+                if(terminal.store[component] >= 100
+                        && factory.store[component] < components[component] * 2){
                     tasks.push({
                         action: 'transfer',
                         args: [factory.id, component],

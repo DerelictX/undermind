@@ -29,7 +29,7 @@ const productions: {[d in DepositConstant]:CommodityConstant[]} = {
     silicon:    ['wire','switch','transistor','microchip','circuit','device']
 }
 
-const product_tier:CommodityConstant[][]  = [
+export const product_tier:CommodityConstant[][]  = [
     ['alloy','cell','wire','condensate'],
     ['tube','phlegm','switch','concentrate','composite'],
     ['fixtures','tissue','transistor','extract','crystal'],

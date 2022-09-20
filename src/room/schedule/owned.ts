@@ -185,7 +185,6 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
     Observe: function (room: Room, pool: {}, looper: Looper) {
         if (room.memory._typed._type != 'owned')
             return null
-        update_import(room)
         update_export(room)
         change_reaction(room)
         Memory._closest_owned[room.name] = {
