@@ -1,21 +1,7 @@
 
-interface CreepMemory {
+interface CreepMemory extends MoveMemory {
     _class:     CarrierMemory|WorkerMemory|CallbackBehavior<AnyAction>
     _caller:    SpawnTask['_caller']
-    _move?:{
-        dest: {x:number,y:number,room:string},
-        time: number,
-        path: string,
-        room: string
-    }
-    _hike?:{
-        from:   string
-        to:     string
-        route:{
-            exit: ExitConstant
-            room: string
-        }[]
-    }
 }
 
 type CarrierRole =

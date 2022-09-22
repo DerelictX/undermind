@@ -1,4 +1,4 @@
-interface PowerCreepMemory {
+interface MoveMemory {
     _move?:{
         dest: {x:number,y:number,room:string},
         time: number,
@@ -11,8 +11,12 @@ interface PowerCreepMemory {
         route:{
             exit: ExitConstant
             room: string
+            exitPos?: RoomPosition
         }[]
     }
+}
+
+interface PowerCreepMemory extends MoveMemory {
     _tasks: PowerActionDescript<PowerAction>[]
     _power: {power:PowerConstant, target:Id<Structure|Source|Mineral>}[]
 }

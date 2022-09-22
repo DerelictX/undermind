@@ -1,3 +1,4 @@
+import { autoRoadCallback } from "@/move/roomCallback"
 import { init_carrier_behavior, init_worker_behavior } from "@/role/initializer/config.behavior"
 import { static_updater } from "@/scanner/static"
 
@@ -113,7 +114,7 @@ export const reserved_room_loop_handler: RoomLoopHandler<'reserved'> = {
         if (!controller)
             return null
         const reservation = controller.reservation
-        if (reservation && reservation.username == 'absGeist' && reservation.ticksToEnd > 3000) {
+        if (reservation && reservation.username == Memory.username && reservation.ticksToEnd > 3000) {
             return null
         }
         const reserve: CallbackBehavior<'reserveController'> = {
@@ -181,29 +182,4 @@ export const reserved_room_loop_handler: RoomLoopHandler<'reserved'> = {
             _class: init_carrier_behavior('Collector', room.name, _spawn)
         }
     }
-}
-
-const autoRoadCallback = function(roomName:string):boolean | CostMatrix{
-    let room = Game.rooms[roomName];
-    if (!room) return false;
-    let costs = new PathFinder.CostMatrix;
-
-    room.find(FIND_STRUCTURES).forEach(function(struct) {
-        if (struct.structureType === STRUCTURE_ROAD) {
-            costs.set(struct.pos.x, struct.pos.y, 1);
-        } else if (struct.structureType !== STRUCTURE_CONTAINER
-                && (struct.structureType !== STRUCTURE_RAMPART
-                || !struct.my)) {
-            costs.set(struct.pos.x, struct.pos.y, 0xff);
-        }
-    });
-    room.find(FIND_MY_CONSTRUCTION_SITES).forEach(function(struct) {
-        if (struct.structureType === STRUCTURE_ROAD) {
-            costs.set(struct.pos.x, struct.pos.y, 1);
-        } else if (struct.structureType !== STRUCTURE_CONTAINER
-                && struct.structureType !== STRUCTURE_RAMPART) {
-            costs.set(struct.pos.x, struct.pos.y, 0xff);
-        }
-    });
-    return costs;
 }

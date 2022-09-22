@@ -1,43 +1,57 @@
 import _ from "lodash";
 
-export const crawlTo = function(creep:Creep|PowerCreep, targetPos:RoomPosition){
+export const crawlTo = function(creep:AnyCreep, targetPos:RoomPosition){
+    /**powerCreep未召唤 */
     if(!creep.room) return ERR_NOT_FOUND
-    let pos_str = ''
-    pos_str += creep.pos.x > 9 ? creep.pos.x : '0' + creep.pos.x
-    pos_str += creep.pos.y > 9 ? creep.pos.y : '0' + creep.pos.y
-    delete Memory._pos_hold[creep.room.name]?.[pos_str]
-
-    var x=targetPos.x, y=targetPos.y, roomName=targetPos.roomName
+    const roomName = targetPos.roomName
+    /**房间不正确 */
     if(creep.room.name != roomName){
         creep.say('???')
-        return ERR_INVALID_ARGS
+        return ERR_TIRED
     }
+
+    /**房内寻路信息储存在_move */
     let _move = creep.memory._move;
+    /**缓存目标位置不正确 */
     if(!_move || _move.room != roomName
             || _move.dest.room != roomName
-            || _move.dest.x != x
-            || _move.dest.y != y){
-        if(seekTo(creep, targetPos) == ERR_NO_PATH){
+            || _move.dest.x != targetPos.x
+            || _move.dest.y != targetPos.y){
+        if(seekTo(creep, targetPos) == ERR_NO_PATH)
             return ERR_NO_PATH
-        }
+        _move = creep.memory._move;
     }
-    _move = creep.memory._move;
     if(!_move) return ERR_NO_PATH
 
+    /**获取path */
     const path = Room.deserializePath(_move.path)
-    const idx = _.findIndex(path, {x: creep.pos.x, y: creep.pos.y});
+    const pos = creep.pos
+    const idx = _.findIndex(path, {x: pos.x, y: pos.y});
     if(idx != -1) {
+        //从creep的位置截断path
         path.splice(0,idx+1);
-        try {_move.path = Room.serializePath(path);}
-        catch(e) {console.log('$ERR',creep.pos,x,y,roomName,JSON.stringify(path)); throw e;}
+        _move.path = Room.serializePath(path)
     }
     if(path.length == 0) {
         return creep.pos.isNearTo(targetPos) ? OK : ERR_NO_PATH;
     }
-    return moveByPath(creep,path)
+
+    /**获取step */
+    const step = _.find(path, (i) => i.x - i.dx == pos.x && i.y - i.dy == pos.y);
+    if(!step) {
+        //path无效
+        delete creep.memory._move
+        return ERR_TIRED;
+    }
+    /**设置intent */
+    const _move_intents = Memory._move_intents[roomName] ?? (Memory._move_intents[roomName] = {})
+    const pos_str = base64table[pos.x] + base64table[pos.y]
+    _move_intents[pos_str] = {id: creep.id, step: [step.direction]}
+    return OK
 }
 
-const seekTo = function(creep:Creep|PowerCreep, targetPos:RoomPosition){
+/**房内寻路 */
+const seekTo = function(creep:AnyCreep, targetPos:RoomPosition){
     if(!creep.room) return ERR_NOT_FOUND
     var x=targetPos.x, y=targetPos.y, roomName=targetPos.roomName
     delete creep.memory._move;
@@ -56,47 +70,4 @@ const seekTo = function(creep:Creep|PowerCreep, targetPos:RoomPosition){
     }
     console.log(creep.pos + ' -> ' + targetPos + ' : ' + path.length)
     return ERR_NO_PATH
-}
-
-const moveByPath = function(creep:Creep|PowerCreep, path: PathStep[]) {
-    if(!creep.room) return ERR_NOT_FOUND
-    const pos = creep.pos
-    let cur = _.find(path, (i) => i.x - i.dx == pos.x && i.y - i.dy == pos.y);
-    if(!cur) {
-        delete creep.memory._move
-        return ERR_TIRED;
-    }
-    let pos_str = ''
-    pos_str += cur.x > 9 ? cur.x : '0' + cur.x
-    pos_str += cur.y > 9 ? cur.y : '0' + cur.y
-
-    const block_id = Memory._pos_hold[creep.room.name]?.[pos_str]
-    if(block_id){
-        const block_creep = Game.getObjectById(block_id)
-        if(block_creep?.pos.roomName == pos.roomName){
-            if(block_creep.pos.x == cur.x && block_creep.pos.y == cur.y){
-                if(block_creep.memory._move?.path
-                        && !block_creep.pos.isNearTo(real_roomPos(block_creep.memory._move.dest))){
-                    block_creep.moveByPath(block_creep.memory._move?.path)
-                } else block_creep.move(reverse_dir[cur.direction])
-            }
-        }
-        delete Memory._pos_hold[creep.room.name]?.[pos_str]
-    }
-    return creep.move(cur.direction);
-}
-
-export const real_roomPos = function(fake:{x:number,y:number,room:string}){
-    return new RoomPosition(fake.x,fake.y,fake.room)
-}
-
-const reverse_dir: {[dir in DirectionConstant]: DirectionConstant} = {
-    1: 5,
-    2: 6,
-    3: 7,
-    4: 8,
-    5: 1,
-    6: 2,
-    7: 3,
-    8: 4
 }

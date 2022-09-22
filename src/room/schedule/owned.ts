@@ -186,6 +186,7 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
         if (room.memory._typed._type != 'owned')
             return null
         update_export(room)
+        structure_updater.labs(room, room.memory._typed._struct)
         change_reaction(room)
         Memory._closest_owned[room.name] = {
             root:   room.name,
