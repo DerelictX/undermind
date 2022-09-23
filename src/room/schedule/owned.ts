@@ -1,5 +1,6 @@
 import { init_carrier_behavior, init_worker_behavior } from "@/role/initializer/config.behavior"
 import { static_updater } from "@/scanner/static"
+import { check_components } from "@/structure/factory"
 import { change_reaction } from "@/structure/lab"
 import { structure_updater } from "../../scanner/structure.updater"
 
@@ -184,6 +185,7 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
             return null
         structure_updater.labs(room, room.memory._typed._struct)
         change_reaction(room)
+        check_components(room)
         Memory._closest_owned[room.name] = {
             root:   room.name,
             prev:   room.name,

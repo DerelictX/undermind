@@ -4,12 +4,14 @@ export const structure_updater = {
 
     unique: function(room:Room,pool:RoomStructureList) {
         //factory
-        pool.factory = null
-        const factory = room.find(FIND_MY_STRUCTURES,{
+        const factory: StructureFactory[] = room.find(FIND_MY_STRUCTURES,{
             filter: {structureType: STRUCTURE_FACTORY}
-        })[0];
-        if(factory instanceof StructureFactory)
-            pool.factory = factory.id
+        });
+        pool.factory = {
+            fact_id:    factory[0]?.id ?? null,
+            level:      0,
+            cd_bucket:  0
+        }
 
         //nuker
         pool.nuker = null

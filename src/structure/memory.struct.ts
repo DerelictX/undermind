@@ -3,8 +3,8 @@ interface RoomStructureList {
     towers:         Id<StructureTower>[]
     links:          LinkConfig
     labs:           LabConfig
+    factory:        FactoryConfig
     
-    factory:        Id<StructureFactory>|null
     power_spawn:    Id<StructurePowerSpawn>|null
     nuker:          Id<StructureNuker>|null
     observer:       ObserverConfig
@@ -30,6 +30,12 @@ interface LabConfig {
     outs:       Id<StructureLab>[]
     reaction:   MineralCompoundConstant|null
     boosts:     MineralBoostConstant[]
+}
+
+interface FactoryConfig {
+    fact_id:    Id<StructureFactory>|null
+    level:      number
+    cd_bucket:  number
 }
 
 interface ObserverConfig {

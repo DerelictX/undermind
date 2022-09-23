@@ -1,6 +1,9 @@
 import _ from "lodash"
 
 export const terminal_run = function(){
+    if(Game.time % 10 != 3){
+        return
+    }
     let resourceType: ResourceConstant
     for(resourceType in Memory.terminal.demand) {
         const demand = Memory.terminal.demand[resourceType]
@@ -45,6 +48,10 @@ export const T_term = function (room: Room) {
                 args: [terminal.id, resourceType],
                 pos: terminal.pos
             })
+        } else if (storage_store[resourceType] > target_amount){
+            const supply = Memory.terminal.supply[resourceType]
+                ?? (Memory.terminal.supply[resourceType] = {})
+            supply[room.name] = true
         }
     }
     return tasks

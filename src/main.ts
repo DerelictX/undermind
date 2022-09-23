@@ -30,6 +30,7 @@ export const loop = function () {
     run_creeps()
     run_power_creeps()
     handle_moves()
+    terminal_run()
 
     for(let name in Memory._closest_owned){
         const qwer = Memory._closest_owned[name]
@@ -41,9 +42,7 @@ export const loop = function () {
         Game.map.visual.text('' + qwer.dist,
             new RoomPosition(25,25,name), {color: '#FF0000', fontSize:15}); 
     }
-    if(Game.time % 20 == 3){
-        terminal_run()
-    }
+
     if(Game.shard.name == 'shard2')
         Game.cpu.generatePixel()
 }
