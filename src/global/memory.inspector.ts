@@ -1,3 +1,14 @@
+import { _format_room } from "@/room/memory.inspector"
+import _ from "lodash"
+
+export const _reboot_all = function() {
+    for(let name in Game.rooms){
+        if(Game.rooms[name].controller?.my)
+        _format_room(name,'owned',name)
+    }
+}
+_.assign(global, {_reboot_all:_reboot_all})
+
 export const inspect_global = function(){
     let k: keyof typeof global_memory_initializer
     for(k in global_memory_initializer){

@@ -46,6 +46,9 @@ export const inspect_memory = function (room_name: string, restart_room: boolean
         }
     }
     const mem = Memory.rooms[room_name]
+    if(restart_room){
+        console.log('restart_room\t' + room_name + '\t' + mem._typed._type)
+    }
     switch(mem._typed._type){
         case 'neutral':
             return

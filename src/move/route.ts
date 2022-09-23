@@ -27,7 +27,7 @@ export const hikeTo = function(creep:AnyCreep, targetPos:RoomPosition){
     }
     /**当前房间不正确，可能是被exit或portal传回上个房间了 */
     if(creep.room.name != _hike.from){
-        console.log(creep.pos + '\t' + targetPos + '\t' + JSON.stringify(_hike) + '...')
+        console.log(creep.pos + '.roomName != ' + _hike.from)
         return ERR_TIRED
     }
 
@@ -65,14 +65,16 @@ export const hikeTo = function(creep:AnyCreep, targetPos:RoomPosition){
     if(exit){
         const a = (_hike.route[0].exit == TOP || _hike.route[0].exit == BOTTOM) ? exit.y : exit.x
         const b = (_hike.route[0].exit == TOP || _hike.route[0].exit == LEFT) ? 0 : 49
-        if(a == b && exit.roomName == creep.room.name){
+        if(/**a != b && */exit.roomName != creep.room.name){
+            creep.say('false exit')
+            console.log('false exit: ' + exit)
+            delete _hike.route[0].exitPos
+            return ERR_NO_PATH
+        } else {
             _hike.route[0].exitPos = exit
             return crawlTo(creep,exit)
         }
-        creep.say('false exit')
-        delete _hike.route[0].exitPos
     }
-    console.log('exit: ' + exit)
     return ERR_TIRED
 }
 

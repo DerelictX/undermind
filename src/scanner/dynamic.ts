@@ -1,6 +1,6 @@
-import { compressed, product_tier } from "@/structure/factory"
+import { T_fact, W_fact } from "@/structure/factory"
 import { change_reaction, reactions } from "@/structure/lab"
-import { T_term_thre } from "@/structure/terminal"
+import { T_term, W_term } from "@/structure/terminal"
 
 export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
     /**
@@ -618,113 +618,11 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
                 pos: controller.pos
             }]
         }
-
-
         else
             return []
     },
-    T_term: function (room: Room) {
-        const storage = room.storage
-        const terminal = room.terminal
-        if (!storage || !terminal)
-            return []
-        if (terminal.store.getFreeCapacity() < 50000)
-            return []
-
-        var tasks: Posed<PrimitiveDescript<'transfer'>>[] = []
-        var storage_store: StorePropertiesOnly = storage.store
-        var resourceType: keyof typeof storage_store
-        for (resourceType in storage_store) {
-            let target_amount = T_term_thre[resourceType]
-            if (terminal.store[resourceType] < target_amount) {
-                tasks.push({
-                    action: 'transfer',
-                    args: [terminal.id, resourceType],
-                    pos: terminal.pos
-                })
-            }
-        }
-        return tasks
-    },
-    W_term: function (room: Room) {
-        const storage = room.storage
-        const terminal = room.terminal
-        if (!storage || !terminal)
-            return []
-        if (storage.store.getFreeCapacity() < 100000)
-            return []
-
-        var tasks: Posed<PrimitiveDescript<'withdraw'>>[] = []
-        let terminal_store: StorePropertiesOnly = terminal.store
-        let resourceType: keyof typeof terminal_store
-        for (resourceType in terminal_store) {
-            let target_amount = T_term_thre[resourceType] * 2
-            if (terminal_store[resourceType] > target_amount) {
-                tasks.push({
-                    action: 'withdraw',
-                    args: [terminal.id, resourceType],
-                    pos: terminal.pos
-                })
-            }
-        }
-        return tasks
-    },
-    T_fact: function (room: Room) {
-        if(room.memory._typed._type != 'owned') return[]
-        if (!room.memory._typed._struct.factory) return []
-        const storage = room.storage
-        const terminal = room.terminal
-        const factory = Game.getObjectById(room.memory._typed._struct.factory)
-        if (!storage || !terminal || !factory) return []
-
-        var tasks: Posed<PrimitiveDescript<'transfer'>>[] = []
-        for(let res of compressed){
-            const components = COMMODITIES[res].components
-            let component: keyof typeof components
-            for(component in components){
-                //console.log(factory.store[component])
-                if(storage.store[component] >= 60000
-                        && factory.store[component] < components[component] * 10){
-                    tasks.push({
-                        action: 'transfer',
-                        args: [factory.id, component],
-                        pos: factory.pos
-                    })
-                }
-            }
-        }
-        for(let res of product_tier[0]){
-            const components = COMMODITIES[res].components
-            let component: keyof typeof components
-            for(component in components){
-                if(terminal.store[component] >= 100
-                        && factory.store[component] < components[component] * 2){
-                    tasks.push({
-                        action: 'transfer',
-                        args: [factory.id, component],
-                        pos: factory.pos
-                    })
-                }
-            }
-        }
-        return tasks
-    },
-    W_fact: function (room: Room) {
-        if(room.memory._typed._type != 'owned') return[]
-        if (!room.memory._typed._struct.factory) return []
-        const storage = room.storage
-        const factory = Game.getObjectById(room.memory._typed._struct.factory)
-        if (!storage || !factory) return []
-
-        var tasks: Posed<PrimitiveDescript<'withdraw'>>[] = []
-        for(let res of compressed){
-            if(factory.store[res] > 2000)
-                tasks.push({
-                    action: 'withdraw',
-                    args: [factory.id, res],
-                    pos: factory.pos
-                })
-        }
-        return tasks
-    }
+    T_term: T_term,
+    W_term: W_term,
+    T_fact: T_fact,
+    W_fact: W_fact
 }

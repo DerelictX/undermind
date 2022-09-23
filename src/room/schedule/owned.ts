@@ -1,7 +1,6 @@
 import { init_carrier_behavior, init_worker_behavior } from "@/role/initializer/config.behavior"
 import { static_updater } from "@/scanner/static"
 import { change_reaction } from "@/structure/lab"
-import { update_export } from "@/structure/terminal"
 import { structure_updater } from "../../scanner/structure.updater"
 
 const spawnHarvest = function(H:Posed<PrimitiveDescript<'harvest'>>,
@@ -183,7 +182,6 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
     Observe: function (room: Room, pool: {}, looper: Looper) {
         if (room.memory._typed._type != 'owned')
             return null
-        update_export(room)
         structure_updater.labs(room, room.memory._typed._struct)
         change_reaction(room)
         Memory._closest_owned[room.name] = {

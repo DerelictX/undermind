@@ -109,6 +109,8 @@ const run_power_creeps = function(){
             const powerCreep = Game.powerCreeps[name]
             if(!powerCreep.shard)
                 continue
+            if(!powerCreep.memory._tasks)
+                powerCreep.memory = { _power:[], _tasks:[] }
             switch(powerCreep.className) {
                 case 'operator':
                     operator_run(powerCreep);
