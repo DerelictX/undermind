@@ -5,6 +5,7 @@ interface Memory extends PathMemory {
         supply: {[res in ResourceConstant] ?: {[room: string]: boolean}}
         demand: {[res in ResourceConstant] ?: {[room: string]: boolean}}
     }
+    threat_level:   {[room:string] : undefined | number}
 }
 
 interface PathMemory {

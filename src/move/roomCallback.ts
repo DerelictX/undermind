@@ -1,7 +1,11 @@
-export const autoRoadCallback = function(roomName:string):boolean | CostMatrix{
-    let room = Game.rooms[roomName];
-    if (!room) return false;
-    let costs = new PathFinder.CostMatrix;
+export const autoRoadCallback = function(roomName:string) {
+    const matrix = Memory.commonMatrix[roomName]
+    if(matrix){
+        return PathFinder.CostMatrix.deserialize(matrix)
+    }
+    let room = Game.rooms[roomName]
+    if (!room) return false
+    let costs = new PathFinder.CostMatrix
 
     const structs: AnyStructure[] = room.find(FIND_STRUCTURES)
     room.find(FIND_STRUCTURES).forEach(function(struct) {
@@ -21,6 +25,8 @@ export const autoRoadCallback = function(roomName:string):boolean | CostMatrix{
             costs.set(struct.pos.x, struct.pos.y, 0xff);
         }
     });
-    Memory.commonMatrix[roomName] = costs.serialize()
+
+    console.log('autoRoadCallback(' + room.name + ')')
+    Memory.commonMatrix[room.name] = costs.serialize()
     return costs;
 }

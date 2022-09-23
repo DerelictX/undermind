@@ -1,7 +1,7 @@
 import { init_carrier_behavior, init_worker_behavior } from "@/role/initializer/config.behavior"
 import { static_updater } from "@/scanner/static"
 import { change_reaction } from "@/structure/lab"
-import { update_export, update_import } from "@/structure/terminal"
+import { update_export } from "@/structure/terminal"
 import { structure_updater } from "../../scanner/structure.updater"
 
 const spawnHarvest = function(H:Posed<PrimitiveDescript<'harvest'>>,
@@ -55,7 +55,7 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
             }
         }
         return {
-            _body: { generator: 'Wc', workload: 10 },
+            _body: { generator: 'Wc', workload: room.controller?.level == 8 ? 15 : 10 },
             _class: init_worker_behavior('HarvesterSource0', room.name, room.name)
         }
     },
@@ -78,7 +78,7 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
             }
         }
         return {
-            _body: { generator: 'Wc', workload: 10 },
+            _body: { generator: 'Wc', workload: room.controller?.level == 8 ? 15 : 10 },
             _class: init_worker_behavior('HarvesterSource1', room.name, room.name)
         }
     },
@@ -114,13 +114,11 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
         static_updater['controller'](room,pool)
         if (!pool.W_ctrl[0])
             return null
-        if (room.controller?.level == 8)
-            return null
         if (room.storage && room.storage.store.energy <= 150000)
             return null
         looper.interval = 1500
         return {
-            _body: { generator: 'Wc', workload: 25 },
+            _body: { generator: 'Wc', workload: room.controller?.level == 8 ? 15 : 25 },
             _class: init_worker_behavior('Upgrader', room.name, room.name)
         }
     },
@@ -135,7 +133,7 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
                 _class: init_worker_behavior('Builder', room.name, room.name)
             }
         } else {
-            looper.interval = 900
+            looper.interval = 1500
             if (storage.store.energy <= 180000)
                 return null
             return {
@@ -194,7 +192,7 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
             dist:   0,
             time:   Game.time
         }
-        room.memory._typed._struct.observer.BFS_open.push(room.name)
+        room.memory._typed._struct.observer.BFS_open = [room.name]
         looper.interval = 400
         return null
     }

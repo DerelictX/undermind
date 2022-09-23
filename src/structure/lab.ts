@@ -5,13 +5,16 @@ export const lab_run = function(room: Room){
     const labs = room.memory._typed._struct.labs
     const reaction = labs.reaction
     if(!reaction) return
-
     const labs_in0 = Game.getObjectById(labs.ins[0]);
     const labs_in1 = Game.getObjectById(labs.ins[1]);
     if(!labs_in0 || !labs_in1)return
+
+    room.visual.text(reactions[reaction][0],labs_in0.pos)
+    room.visual.text(reactions[reaction][1],labs_in1.pos)
     if(labs_in0.mineralType != reactions[reaction][0]
         || labs_in1.mineralType != reactions[reaction][1])
         return
+
     const labs_out = labs.outs;
     for(var id in labs_out){
         let lab = Game.getObjectById(labs_out[id]);
@@ -28,6 +31,7 @@ export const change_reaction = function(room:Room): MineralCompoundConstant|null
     const storage = room.storage
     const terminal = room.terminal
     if(!storage?.my || !terminal?.my) return null
+    const labs = room.memory._typed._struct.labs
     let reacts: MineralCompoundConstant[]
 
     reacts = compound_tier[0]
@@ -37,7 +41,7 @@ export const change_reaction = function(room:Room): MineralCompoundConstant|null
             
         const reactants = reactions[reacts[i]] 
         if(terminal.store[reactants[0]] >= 1000 && terminal.store[reactants[1]] >= 1000){
-            return reacts[i]
+            return labs.reaction = reacts[i]
         }
     }
 
@@ -45,7 +49,7 @@ export const change_reaction = function(room:Room): MineralCompoundConstant|null
     for(let i in reacts){
         const reactants = reactions[reacts[i]] 
         if(terminal.store[reactants[0]] >= 1000 && terminal.store[reactants[1]] >= 1000){
-            return reacts[i]
+            return labs.reaction = reacts[i]
         }
     }
 
@@ -53,10 +57,10 @@ export const change_reaction = function(room:Room): MineralCompoundConstant|null
     for(let i in reacts){
         const reactants = reactions[reacts[i]] 
         if(terminal.store[reactants[0]] >= 1000 && terminal.store[reactants[1]] >= 1000){
-            return reacts[i]
+            return labs.reaction = reacts[i]
         }
     }
-    return null
+    return labs.reaction = null
 }
 _.assign(global, {change_reaction:change_reaction})
 

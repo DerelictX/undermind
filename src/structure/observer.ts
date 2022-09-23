@@ -19,20 +19,34 @@ export const observer_run = function(room: Room){
     const curr_room = Game.rooms[curr]
     if(!curr_node || !curr_room) return
 
-    if(curr_room.controller){
+    const controller = curr_room.controller
+    if(controller){
         //开外矿
-        if(!curr_room.controller.owner && curr_node.dist == 1 && !Memory.rooms[curr]){
+        if(Game.shard.name != 'shard3' && !Memory.rooms[curr]
+                && !controller.owner && curr_node.dist == 1){
             _format_room(curr,'reserved',room.name)
             spawn_loop(curr_room)
         }
         //别人的房
-        if(curr_room.controller.owner && !curr_room.controller.my) return
+        if(controller.owner && !controller.my) {
+            Memory.threat_level[curr] = controller.level
+            return
+        }
     } else {
         //挖过道
         const isHighway = curr.indexOf('0') != -1
         if(isHighway && !Memory.rooms[curr]) {
             _format_room(curr,'highway',room.name)
             spawn_loop(curr_room)
+        }
+        if(!isHighway){
+            const core: StructureInvaderCore[] = room.find(FIND_HOSTILE_STRUCTURES,{
+                filter: (structure) => structure.structureType == 'invaderCore'
+            })
+            if(core[0]){
+                Memory.threat_level[curr] = core[0].level
+                return
+            }
         }
     }
 

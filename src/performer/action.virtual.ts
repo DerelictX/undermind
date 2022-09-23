@@ -1,3 +1,4 @@
+import { adjace_dir, base64table } from "@/move/Kuhn-Munkres"
 import { hikeTo } from "@/move/route"
 
 type VirtualPerformer<T extends keyof VirtualAction>
@@ -5,9 +6,20 @@ type VirtualPerformer<T extends keyof VirtualAction>
 
 const performer:{[action in keyof VirtualAction]: VirtualPerformer<action>} = {
     approach: function (creep: AnyCreep, args: VirtualAction['approach']) {
+        if(!creep.room) return ERR_NOT_FOUND
+        const roomName = creep.room.name
         const pos = new RoomPosition(args[0].x, args[0].y, args[0].roomName)
-        if (creep.pos.inRangeTo(pos, args[1]))
+
+        if (creep.pos.inRangeTo(pos, args[1])) {
+            if(args[1] <= 0 || creep.pos.inRangeTo(pos, args[1]-1)) {
+                return OK
+            }
+            let dir = creep.pos.getDirectionTo(pos)
+            const _move_intents = Memory._move_intents[roomName] ?? (Memory._move_intents[roomName] = {})
+            const pos_str = base64table[creep.pos.x] + base64table[creep.pos.y]
+            _move_intents[pos_str] = {id: creep.id, step: adjace_dir[dir]}
             return OK
+        }
         if(creep instanceof Creep && creep.fatigue){
             this.hold_place(creep,[0])
             return ERR_TIRED

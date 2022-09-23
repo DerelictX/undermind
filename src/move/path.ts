@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { base64table } from "./Kuhn-Munkres";
 
 export const crawlTo = function(creep:AnyCreep, targetPos:RoomPosition){
     /**powerCreep未召唤 */

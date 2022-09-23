@@ -20,7 +20,7 @@ export const _format_room = function (room_name: string, type:RoomTypes, spawn_r
     }
     Memory.rooms[room_name]._spawn = spawn_room
     Memory.rooms[room_name]._typed._type = type
-    inspector_memory(room_name,true)
+    inspect_memory(room_name,true)
 }
 _.assign(global, {_format_room:_format_room})
 
@@ -30,7 +30,7 @@ _.assign(global, {_format_room:_format_room})
  * @param restart_room 是否重置房间
  * @returns 
  */
-export const inspector_memory = function (room_name: string, restart_room: boolean = false) {
+export const inspect_memory = function (room_name: string, restart_room: boolean = false) {
     if(!Memory.rooms[room_name]?._typed?._type) {
         Memory.rooms[room_name] = {
             _typed:{

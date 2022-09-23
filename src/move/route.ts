@@ -55,7 +55,8 @@ export const hikeTo = function(creep:AnyCreep, targetPos:RoomPosition){
         roomCallback:function(roomName:string):CostMatrix|boolean{
             if(roomName != _hike?.from && roomName != _hike?.route[0].room) return false
             const matrix = Memory.commonMatrix[roomName]
-            return matrix ? PathFinder.CostMatrix.deserialize(matrix) : false
+            if(matrix) return PathFinder.CostMatrix.deserialize(matrix)
+            return true
         }
     })
     //在房间交界处截断，获取exit
@@ -64,9 +65,14 @@ export const hikeTo = function(creep:AnyCreep, targetPos:RoomPosition){
     if(exit){
         const a = (_hike.route[0].exit == TOP || _hike.route[0].exit == BOTTOM) ? exit.y : exit.x
         const b = (_hike.route[0].exit == TOP || _hike.route[0].exit == LEFT) ? 0 : 49
-        if(a == b && exit.roomName == creep.room.name)
+        if(a == b && exit.roomName == creep.room.name){
+            _hike.route[0].exitPos = exit
             return crawlTo(creep,exit)
+        }
+        creep.say('false exit')
+        delete _hike.route[0].exitPos
     }
+    console.log('exit: ' + exit)
     return ERR_TIRED
 }
 
@@ -91,6 +97,7 @@ const seekTo = function(creep:AnyCreep, toRoom:string){
 }
 
 const routeCallback = function(roomName:string):number {
+    if(Memory.threat_level[roomName]) return Infinity
     let isHighway = roomName.indexOf('0') != -1
     const room:Room|undefined = Game.rooms[roomName]
     let isMyRoom = room && room.controller && room.controller.my

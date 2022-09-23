@@ -1,6 +1,6 @@
 import { structure_updater } from "./scanner/structure.updater";
 import { operator_run } from "./power_creep/operator";
-import { inspector_memory, _format_room } from "./room/memory.inspector";
+import { inspect_memory, _format_room } from "./room/memory.inspector";
 import { spawn_loop } from "./room/handler.spawn";
 import { spawn_run } from "./structure/spawn";
 import { tower_run } from "./structure/tower";
@@ -14,6 +14,8 @@ import { power_spawn_run } from "./structure/power_spawn";
 import { run_carrier } from "./role/driver/carrier";
 import { observer_run } from "./structure/observer";
 import { run_worker } from "./role/driver/worker";
+import { inspect_global } from "./global/memory.inspector";
+import { handle_moves } from "./move/Kuhn-Munkres";
 
 export const loop = function () {
 
@@ -23,16 +25,19 @@ export const loop = function () {
         _format_room
     }
     
+    inspect_global()
     run_rooms()
     run_creeps()
     run_power_creeps()
+    handle_moves()
 
     for(let name in Memory._closest_owned){
         const qwer = Memory._closest_owned[name]
         if(!qwer) continue
+        const color = Memory.threat_level[name] ? '#FF0000' : '#FFFF00'
         Game.map.visual.line(
             new RoomPosition(25,25,qwer.prev),
-            new RoomPosition(25,25,name), {color: '#FFFF00', width:1, opacity:0.3});
+            new RoomPosition(25,25,name), {color: color, width:1, opacity:0.3});
         Game.map.visual.text('' + qwer.dist,
             new RoomPosition(25,25,name), {color: '#FF0000', fontSize:15}); 
     }
@@ -62,7 +67,7 @@ const run_rooms = function(){
             observer_run(room)
         }catch(error){
             console.log(name +':\t' + error);
-            inspector_memory(name,false)
+            inspect_memory(name,false)
         }
     }
 }
