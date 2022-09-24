@@ -56,7 +56,7 @@ export const change_reaction = function(room:Room): MineralCompoundConstant|null
     reacts = compound_tier[3]
     for(let i in reacts){
         const reactants = reactions[reacts[i]] 
-        if(terminal.store[reactants[0]] >= 1000 && terminal.store[reactants[1]] >= 1000){
+        if(terminal.store[reactants[0]] >= 500 && terminal.store[reactants[1]] >= 500){
             return labs.reaction = reacts[i]
         }
     }
@@ -84,6 +84,14 @@ const compound_tier:MineralCompoundConstant[][]  = [
         'XKH2O','XUHO2'
     ]
 ]
+
+export const compound_color: {[R in 'U'|'Z'|'K'|'L'|'G'] : MineralBoostConstant[]} = {
+    U:  ["UH","UH2O","XUH2O","UO","UHO2","XUHO2"],
+    Z:  ["ZH","ZH2O","XZH2O","ZO","ZHO2","XZHO2"],
+    K:  ["KH","KH2O","XKH2O","KO","KHO2","XKHO2"],
+    L:  ["LH","LH2O","XLH2O","LO","LHO2","XLHO2"],
+    G:  ["GH","GH2O","XGH2O","GO","GHO2","XGHO2"],
+}
 
 export const reactions: {[m in MineralCompoundConstant]:(MineralConstant|MineralCompoundConstant)[]} = {
     OH: ["O","H"],

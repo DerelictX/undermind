@@ -77,7 +77,13 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         var tasks: PosedCreepTask<"withdraw" | "pickup">[] = []
         const tombstones: Tombstone[] = room.find(FIND_TOMBSTONES, {
             filter: (tombstone) => {
-                return tombstone.store.getUsedCapacity() >= 200
+                if(tombstone.store.getUsedCapacity() >= 200)
+                    return true
+                if(tombstone.creep.owner.username == 'Invader')
+                    return false
+                if(tombstone.store.getUsedCapacity() > tombstone.store['energy'])
+                    return true
+                return false
             }
         })
         for (let tombstone of tombstones) {
@@ -549,7 +555,7 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
             //reactant
             if (lab_in.store.getFreeCapacity(reactantType) > 2400) {
                 if(!terminal.store[reactantType]){
-                    console.log(room.name + '.rection:\t' + change_reaction(room))
+                    //console.log(room.name + '.rection:\t' + change_reaction(room))
                     return []
                 }
                 tasks.push({

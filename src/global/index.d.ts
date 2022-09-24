@@ -2,8 +2,8 @@ interface Memory extends PathMemory {
     username:   string
     creep_SN:   number
     terminal:   {
-        supply: {[res in ResourceConstant] ?: {[room: string]: boolean}}
-        demand: {[res in ResourceConstant] ?: {[room: string]: boolean}}
+        supply: {[res in ResourceConstant] ?: {[room: string]: number}}
+        demand: {[res in ResourceConstant] ?: {[room: string]: number}}
     }
     threat_level:   {[room:string] : undefined | number}
 }

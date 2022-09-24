@@ -65,8 +65,17 @@ BFS:    while(true){
     /**根据匹配结构移动creep */
     for(const from in intents){
         const creep = Game.getObjectById(intents[from].id)
-        const to = matchedTo[from]
-        if(!to || !creep) continue
+        if(!creep) continue
+        let to = matchedTo[from]
+        if(!to) {
+            /**无法往旁边让位，对穿 */
+            creep.say('swap')
+            to = matchedFrom[from]
+        }
+        if(!to) {
+            creep.say('blocked')
+            continue
+        }
         const x = base64decode(to[0])
         const y = base64decode(to[1])
         visual.line(creep.pos.x,creep.pos.y,x,y,{color:'#FF7F00'})

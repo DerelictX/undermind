@@ -29,7 +29,7 @@ export const highway_room_loop_handler: RoomLoopHandler<'highway'> = {
         }
         full_store[OK] = main
         full_store[ERR_FULL] = back
-        const workload = deposit.lastCooldown < 10 ? 15 : 20
+        const workload = deposit.lastCooldown < 5 ? 15 : 20
         looper.interval = 1400
         console.log('Deposit:\t' + deposit.pos)
         return {

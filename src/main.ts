@@ -16,6 +16,7 @@ import { observer_run } from "./structure/observer";
 import { run_worker } from "./role/driver/worker";
 import { inspect_global } from "./global/memory.inspector";
 import { handle_moves } from "./move/Kuhn-Munkres";
+import { HelperRoomResource } from "./global/helper_roomResource";
 
 export const loop = function () {
 
@@ -23,6 +24,7 @@ export const loop = function () {
         static_updater
         structure_updater
         _format_room
+        HelperRoomResource
     }
     
     inspect_global()

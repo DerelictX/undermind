@@ -1,4 +1,4 @@
-import _ from "lodash"
+import _, { min } from "lodash"
 
 export const terminal_run = function(){
     if(Game.time % 10 != 3){
@@ -19,11 +19,11 @@ export const terminal_run = function(){
         for(let fromRoom in supply){
             terminal = Game.rooms[fromRoom]?.terminal
             if(!supply[fromRoom] || !terminal || terminal.cooldown) continue
-
-            delete supply[fromRoom]
+            const amount = min([demand[toRoom],supply[fromRoom]]) ?? 0
+            supply[fromRoom] -= amount
             delete demand[toRoom]
-            const ret = terminal.send(resourceType,3000,toRoom)
-            console.log(fromRoom + ' -> ' + toRoom + ' ' + ret + ' ' + resourceType)
+            const ret = terminal.send(resourceType, amount , toRoom)
+            console.log(`${fromRoom} -> ${toRoom} [${resourceType} : ${amount}] : ${ret}`)
             return
         }
     }
@@ -42,6 +42,7 @@ export const T_term = function (room: Room) {
     var resourceType: keyof typeof storage_store
     for (resourceType in storage_store) {
         let target_amount = 3000
+        if(resourceType == 'energy') target_amount = 30000
         if (terminal.store[resourceType] < target_amount) {
             tasks.push({
                 action: 'transfer',
@@ -51,7 +52,7 @@ export const T_term = function (room: Room) {
         } else if (storage_store[resourceType] > target_amount){
             const supply = Memory.terminal.supply[resourceType]
                 ?? (Memory.terminal.supply[resourceType] = {})
-            supply[room.name] = true
+            supply[room.name] = target_amount
         }
     }
     return tasks
@@ -80,20 +81,4 @@ export const W_term = function (room: Room) {
         }
     }
     return tasks
-}
-
-const base: {
-    [R in MineralConstant|MineralBaseCompoundsConstant]: 3000
-} = {
-    OH: 3000,
-    X: 3000,
-    O: 3000,
-    H: 3000,
-    G: 3000,
-    ZK: 3000,
-    UL: 3000,
-    U: 3000,
-    L: 3000,
-    K: 3000,
-    Z: 3000,
 }

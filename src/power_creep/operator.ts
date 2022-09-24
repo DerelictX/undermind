@@ -55,15 +55,16 @@ function find_power_task(operator: PowerCreep, room: Room) {
             args:[storage.id,'ops',operator.store['ops'] * 0.4]
         })
     }
-    if(storage && operator.store.getUsedCapacity('ops') < operator.store.getCapacity() * 0.2){
+    const terminal = room.terminal
+    if(terminal && operator.store.getUsedCapacity('ops') < operator.store.getCapacity() * 0.2){
         operator.memory._tasks.push({
             action:'withdraw',
-            args:[storage.id,'ops',operator.store.getFreeCapacity() * 0.4]
+            args:[terminal.id,'ops',operator.store.getFreeCapacity() * 0.4]
         })
     }
 
     if(operator.powers[PWR_OPERATE_EXTENSION] && !operator.powers[PWR_OPERATE_EXTENSION].cooldown){
-        if(storage && room.energyAvailable < room.energyCapacityAvailable * 0.8){
+        if(storage && room.energyAvailable < room.energyCapacityAvailable * 0.7){
             operator.memory._power.push({power: PWR_OPERATE_EXTENSION, target: storage.id})
         }
     }
@@ -72,7 +73,7 @@ function find_power_task(operator: PowerCreep, room: Room) {
         if(room.memory._typed._type == 'owned' && room.memory._typed._struct.factory){
             const config = room.memory._typed._struct.factory
             const factory = config.fact_id ? Game.getObjectById(config.fact_id) : null
-            if(!factory || config.cd_bucket < 1000) return
+            if(!factory?.level || config.cd_bucket < 1000 || factory.cooldown) return
             if(!factory.effects || !factory.effects[0]) {
                 operator.memory._power.push({power: PWR_OPERATE_FACTORY, target: factory.id})
             }
