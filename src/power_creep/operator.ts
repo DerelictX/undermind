@@ -1,4 +1,5 @@
 import { hikeTo } from "@/move/route"
+import { demand_res } from "@/structure/terminal"
 
 export const operator_run = function(operator:PowerCreep){
     if(!operator.room) return
@@ -57,6 +58,9 @@ function find_power_task(operator: PowerCreep, room: Room) {
     }
     const terminal = room.terminal
     if(terminal && operator.store.getUsedCapacity('ops') < operator.store.getCapacity() * 0.2){
+        if(terminal.store['ops'] < 1000){
+            demand_res(terminal,'ops',1000)
+        }
         operator.memory._tasks.push({
             action:'withdraw',
             args:[terminal.id,'ops',operator.store.getFreeCapacity() * 0.4]

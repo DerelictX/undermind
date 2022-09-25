@@ -11,17 +11,40 @@ export const terminal_run = function(room: Room){
     let list:(CommodityConstant|DepositConstant)[] = []
     list = list.concat(compressed).concat(deposits).concat(product_tier[0])
     if(sendList(terminal,list)) return
-
+    if(sendList(terminal,['ops','power'],storage.store)) return
     if(Game.time % 30 != 3) return
     const config = room.memory._typed._struct.factory
     if(config.level)
         sendList(terminal,product_tier[config.level])
 }
 
-const sendList = function(terminal: StructureTerminal, list: ResourceConstant[]){
+/**
+ * 请求资源
+ * @param terminal 
+ * @param resourceType 
+ * @param amount 
+ * @returns 
+ */
+export const demand_res = function(terminal: StructureTerminal,
+    resourceType:ResourceConstant,amount:number){
+    if(!terminal) return
+    const demand = Memory.terminal.demand[resourceType]
+        ?? (Memory.terminal.demand[resourceType] = {})
+    demand[terminal.room.name] = amount
+}
+
+/**
+ * 发送list中的资源到需要的地方
+ * @param terminal 终端
+ * @param list 发送的资源列表
+ * @param supply 最大发送数量，缺省值为终端中的资源数量
+ * @returns 
+ */
+const sendList = function(terminal: StructureTerminal, list: ResourceConstant[],
+        supply?: StorePropertiesOnly){
     if(terminal.cooldown) return
     for (let resourceType of list) {
-        let amount = terminal.store[resourceType]
+        let amount = supply ? supply[resourceType] : terminal.store[resourceType]
         const demand = Memory.terminal.demand[resourceType]
         if(!demand || !amount) continue
         let toRoom: string|undefined = undefined

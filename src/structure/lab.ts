@@ -1,5 +1,6 @@
-import { compound_tier, reactions } from "@/constant/resource_series";
+import { compound_tier, reactions, reaction_line } from "@/constant/resource_series";
 import _ from "lodash";
+import { demand_res } from "./terminal";
 
 export const lab_run = function(room: Room){
     if(room.memory._typed._type != 'owned') return
@@ -38,15 +39,16 @@ export const change_reaction = function(room:Room): MineralCompoundConstant|null
     const terminal = room.terminal
     if(!storage?.my || !terminal?.my) return null
 
-    if(terminal.store['X'] < 1000){
-        const demand = Memory.terminal.demand['X']
-            ?? (Memory.terminal.demand['X'] = {})
-        demand[room.name] = 1000
+    const list: ResourceConstant[] = ['X','OH','O','H']
+    for(let resourceType of list)
+    if(terminal.store[resourceType] < 1000){
+        demand_res(terminal,resourceType,1000)
     }
 
     const labs = room.memory._typed._struct.labs
     const reaction = labs.reaction
     if(reaction){
+        /**当前reaction */
         const labs_in0 = Game.getObjectById(labs.ins[0]);
         const labs_in1 = Game.getObjectById(labs.ins[1]);
         if(!labs_in0 || !labs_in1) return null
@@ -56,9 +58,10 @@ export const change_reaction = function(room:Room): MineralCompoundConstant|null
     }
 
     let reacts: MineralCompoundConstant[]
+    /**Base */
     reacts = compound_tier[0]
     for(let i in reacts){
-        if(storage.store[reacts[i]] > 24000)
+        if(storage.store[reacts[i]] > 20000)
             continue
         const reactants = reactions[reacts[i]] 
         if(terminal.store[reactants[0]] >= 1000 && terminal.store[reactants[1]] >= 1000){
@@ -66,11 +69,27 @@ export const change_reaction = function(room:Room): MineralCompoundConstant|null
         }
     }
 
+    /**T3, T2 */
     reacts = compound_tier[3]
+    reacts = reacts.concat(compound_tier[2])
     for(let i in reacts){
         const reactants = reactions[reacts[i]] 
-        if(terminal.store[reactants[0]] >= 500 && terminal.store[reactants[1]] >= 500){
+        if(terminal.store[reactants[0]] >= 1000 && terminal.store[reactants[1]] >= 1000){
             return labs.reaction = reacts[i]
+        }
+    }
+
+    /**T1 */
+    for(let tier1 of compound_tier[1]){
+        const stock = storage.store[reaction_line[tier1][0]]
+                    + storage.store[reaction_line[tier1][1]]
+                    + storage.store[reaction_line[tier1][2]]
+        //0.05 * 10 = 0.5
+        if(stock > storage.store.getCapacity() * 0.05)
+            continue
+        const reactants = reactions[tier1]
+        if(terminal.store[reactants[0]] >= 1000 && terminal.store[reactants[1]] >= 1000){
+            return labs.reaction = tier1
         }
     }
     return labs.reaction = null

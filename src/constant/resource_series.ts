@@ -61,7 +61,20 @@ export const product_tier:CommodityConstant[][]  = [
     ['machine','organism','device','essence']
 ]
 
-export const reactions: {[m in MineralCompoundConstant]:(MineralConstant|MineralCompoundConstant)[]} = {
+export const companion_base:{
+    [M in Exclude<MineralConstant|MineralBaseCompoundsConstant,'X'|'OH'|'G'>] : companion_base<M>
+} = {
+    H: "O",
+    L: "U",
+    K: "Z",
+    U: "L",
+    Z: "K",
+    O: "H",
+    ZK: "UL",
+    UL: "ZK"
+}
+
+export const reactions: {[M in MineralCompoundConstant]:(MineralConstant|MineralCompoundConstant)[]} = {
     OH: ["O","H"],
     ZK: ["Z","K"],
     UL: ["U","L"],

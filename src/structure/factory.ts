@@ -1,5 +1,6 @@
 import { compressed, product_tier } from "@/constant/resource_series"
 import _, { ceil, floor } from "lodash"
+import { demand_res } from "./terminal"
 
 export const factory_run = function(room: Room){
     if(room.memory._typed._type != 'owned') return
@@ -61,9 +62,7 @@ export const T_fact = function (room: Room) {
                 if(terminal.store[component])
                     tasks.push({ action: 'transfer', args: [factory.id, component], pos: factory.pos })
                 else if(config.cd_bucket < 1000) {
-                    const demand = Memory.terminal.demand[component]
-                        ?? (Memory.terminal.demand[component] = {})
-                    demand[room.name] = components[component] * 4
+                    demand_res(terminal,component,components[component] * 4)
                 }
             }
         }
@@ -91,9 +90,7 @@ export const check_components = function(room: Room){
                 / components[component])
             if(times < min_times) min_times = times
             if(times < times_kt) {
-                const demand = Memory.terminal.demand[component]
-                    ?? (Memory.terminal.demand[component] = {})
-                demand[room.name] = components[component] * times_kt
+                demand_res(terminal,component,components[component] * times_kt)
             }
         }
         config.cd_bucket += min_times * COMMODITIES[res].cooldown

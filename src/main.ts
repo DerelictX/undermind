@@ -24,7 +24,7 @@ export const loop = function () {
         static_updater
         structure_updater
         _format_room
-        HelperRoomResource
+        HelperRoomResource.showAllRes()
     }
     
     inspect_global()

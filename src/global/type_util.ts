@@ -1,10 +1,10 @@
 
 type StorePropertiesOnly = { [P in ResourceConstant]: number } &
-{ [P in Exclude<ResourceConstant, ResourceConstant>]: 0 }
+    { [P in Exclude<ResourceConstant, ResourceConstant>]: 0 }
 
 type Looper = {
-reload_time:    number
-interval:       number
+    reload_time:    number
+    interval:       number
 }
 
 type ValueTypes<T> = T[keyof T]
@@ -18,3 +18,8 @@ type tier3_t1<R extends tier1_comp<base>> =
 type Xides<R extends tier1_comp<base>> = R | tier2_comp<R> | tier3_t1<R>
 type Oxides = ValueTypes<typeof REACTIONS.O>
 type Hydrides = ValueTypes<typeof REACTIONS.H>
+
+type companion_base<R extends MineralConstant|MineralBaseCompoundsConstant,
+        S extends keyof typeof REACTIONS[R] = keyof typeof REACTIONS[R]>
+    = S extends keyof typeof REACTIONS[R] ?
+        typeof REACTIONS[R][S] extends MineralBaseCompoundsConstant ? S : never : never

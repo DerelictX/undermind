@@ -1,5 +1,6 @@
 import { T_fact, W_fact } from "@/structure/factory"
 import { compound, T_boost, T_react } from "@/structure/lab"
+import { T_nuker, T_power } from "@/structure/power_spawn"
 import { T_term, W_term } from "@/structure/terminal"
 
 export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
@@ -470,60 +471,8 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
     T_boost: T_boost,
     T_react: T_react,
     compound: compound,
-    T_power: function (room: Room): PosedCreepTask<"transfer">[] {
-        if (room.memory._typed._type != 'owned')
-            return []
-        if (!room.memory._typed._struct.power_spawn)
-            return []
-        const power_spawn = Game.getObjectById(room.memory._typed._struct.power_spawn)
-        if (!power_spawn)
-            return []
-        var tasks: PosedCreepTask<'transfer'>[] = []
-
-        if (room.storage && room.storage.store['energy'] > 180000
-            && power_spawn.store['energy'] <= 3000) {
-            tasks.push({
-                action: 'transfer',
-                args: [power_spawn.id, 'energy'],
-                pos: power_spawn.pos
-            })
-        }
-        if (room.terminal?.store['power'] && power_spawn.store['power'] <= 50) {
-            tasks.push({
-                action: 'transfer',
-                args: [power_spawn.id, 'power', power_spawn.store.getFreeCapacity('power')],
-                pos: power_spawn.pos
-            })
-        }
-        return tasks
-    },
-    T_nuker: function (room: Room): PosedCreepTask<"transfer">[] {
-        if (room.memory._typed._type != 'owned')
-            return []
-        if (!room.memory._typed._struct.nuker)
-            return []
-        const nuker = Game.getObjectById(room.memory._typed._struct.nuker)
-        if (!nuker)
-            return []
-        var tasks: PosedCreepTask<'transfer'>[] = []
-
-        if (room.storage && room.storage.store['energy'] > 150000
-            && nuker.store.getFreeCapacity('energy')) {
-            tasks.push({
-                action: 'transfer',
-                args: [nuker.id, 'energy'],
-                pos: nuker.pos
-            })
-        }
-        if (room.terminal?.store['G'] && nuker.store.getFreeCapacity('G')) {
-            tasks.push({
-                action: 'transfer',
-                args: [nuker.id, 'G', nuker.store.getFreeCapacity('G')],
-                pos: nuker.pos
-            })
-        }
-        return tasks
-    },
+    T_power: T_power,
+    T_nuker: T_nuker,
     gen_safe: function (room: Room): PosedCreepTask<"generateSafeMode">[] {
         const controller = room.controller
         if (controller && controller.my && controller.level > 3 && controller.safeModeAvailable == 0) {
