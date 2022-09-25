@@ -34,7 +34,7 @@ const global_memory_initializer: { [k in keyof FilterOptional<Memory>]: () => vo
         Memory.creep_SN = 1
     },
     terminal: function (): void {
-        Memory.terminal = { supply: {}, demand: {} }
+        Memory.terminal = { demand: {} }
     },
     threat_level: function (): void {
         Memory.threat_level = {}

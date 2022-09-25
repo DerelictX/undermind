@@ -1,6 +1,9 @@
 import { perform_primitive } from "./action.primitive";
 import { perform_virtual } from "./action.virtual";
-import { TASK_COMPLETE, TASK_DOING, TASK_FAILED } from "./behavior.any";
+
+export const TASK_DOING:       TASK_DOING      = -16
+export const TASK_COMPLETE:    TASK_COMPLETE   = -17
+export const TASK_FAILED:      TASK_FAILED     = -18
 
 export const perform_callback = function(creep:Creep, behavior:CallbackBehavior<AnyAction>): TaskReturnCode {
     let ret: ScreepsReturnCode

@@ -1,5 +1,5 @@
 import { T_fact, W_fact } from "@/structure/factory"
-import { change_reaction, reactions } from "@/structure/lab"
+import { compound, T_boost, T_react } from "@/structure/lab"
 import { T_term, W_term } from "@/structure/terminal"
 
 export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
@@ -29,7 +29,8 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         return tasks
     },
     W_link: function (room: Room) {
-        if(room.memory._typed._type != 'owned') return[]
+        if (room.memory._typed._type != 'owned')
+            return []
         const nexus = room.memory._typed._struct.links.nexus
             .map(id => Game.getObjectById(id))[0]
         if (!nexus || nexus.store['energy'] < 600)
@@ -77,11 +78,11 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         var tasks: PosedCreepTask<"withdraw" | "pickup">[] = []
         const tombstones: Tombstone[] = room.find(FIND_TOMBSTONES, {
             filter: (tombstone) => {
-                if(tombstone.store.getUsedCapacity() >= 200)
+                if (tombstone.store.getUsedCapacity() >= 200)
                     return true
-                if(tombstone.creep.owner.username == 'Invader')
+                if (tombstone.creep.owner.username == 'Invader')
                     return false
-                if(tombstone.store.getUsedCapacity() > tombstone.store['energy'])
+                if (tombstone.store.getUsedCapacity() > tombstone.store['energy'])
                     return true
                 return false
             }
@@ -129,59 +130,6 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         }
         return tasks
     },
-    /**
-     * 收集反应产物
-     * @param room
-     * @returns
-     */
-    compound: function (room: Room) {
-        if(room.memory._typed._type != 'owned') return[]
-        var tasks: PosedCreepTask<"withdraw">[] = []
-        const labs = room.memory._typed._struct.labs
-        const compoundType = labs.reaction
-
-        for (let i in labs.ins) {
-            const reactantType = compoundType ? reactions[compoundType][i] : null
-            const lab_in = Game.getObjectById(labs.ins[i])
-            if (!lab_in)
-                continue
-            /**反应底物不对，取出来 */
-            if (lab_in.mineralType && reactantType != lab_in.mineralType) {
-                tasks.push({
-                    action: 'withdraw',
-                    args: [lab_in.id, lab_in.mineralType],
-                    pos: lab_in.pos
-                })
-            }
-        }
-
-        for (let i in labs.outs) {
-            const boostType: MineralBoostConstant | undefined = labs.boosts[i]
-            const lab_out = Game.getObjectById(labs.outs[i])
-            if (!lab_out)
-                continue
-
-            if (boostType) {
-                if (lab_out.mineralType && boostType != lab_out.mineralType) {
-                    tasks.push({
-                        action: 'withdraw',
-                        args: [lab_out.id, lab_out.mineralType, lab_out.store[lab_out.mineralType]],
-                        pos: lab_out.pos
-                    })
-                }
-            } else {
-                if (lab_out.mineralType && (compoundType != lab_out.mineralType
-                        || lab_out.store[compoundType] >= (tasks.length ? 200 : 300))) {
-                    tasks.push({
-                        action: 'withdraw',
-                        args: [lab_out.id, lab_out.mineralType, lab_out.store[lab_out.mineralType]],
-                        pos: lab_out.pos
-                    })
-                }
-            }
-        }
-        return tasks
-    },
     recycle: function (room: Room): PosedCreepTask<"dismantle">[] {
         return []
     },
@@ -198,14 +146,16 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
     },
     H_src0: function (room: Room) {
         const task = room.memory._typed._static.H_srcs?.[0]
-        if (!task) return []
+        if (!task)
+            return []
         if (Game.getObjectById(task.args[0])?.energy)
             return [task]
         return []
     },
     H_src1: function (room: Room) {
         const task = room.memory._typed._static.H_srcs?.[1]
-        if (!task) return []
+        if (!task)
+            return []
         if (Game.getObjectById(task.args[0])?.energy)
             return [task]
         return []
@@ -272,7 +222,8 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         return tasks
     },
     W_ctrl: function (room: Room) {
-        if(room.memory._typed._type != 'owned') return[]
+        if (room.memory._typed._type != 'owned')
+            return []
         for (let task of room.memory._typed._static.W_ctrl) {
             const structure = Game.getObjectById(task.args[0])
             if (structure && structure.store.getUsedCapacity(task.args[1]) >= 50)
@@ -329,7 +280,8 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
     },
 
     fortify: function (room: Room) {
-        if(room.memory._typed._type != 'owned') return[]
+        if (room.memory._typed._type != 'owned')
+            return []
         var tasks: PosedCreepTask<"repair">[] = []
         var wallHits = room.memory._typed._struct.wall_hits
         let walls = room.find(FIND_STRUCTURES, {
@@ -426,7 +378,8 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         return tasks
     },
     T_tower: function (room: Room): Posed<RestrictedPrimitiveDescript<'transfer', 'energy'>>[] {
-        if(room.memory._typed._type != 'owned') return[]
+        if (room.memory._typed._type != 'owned')
+            return []
         var tasks: Posed<RestrictedPrimitiveDescript<'transfer', 'energy'>>[] = []
         const towers = room.memory._typed._struct.towers
             .map(id => Game.getObjectById(id))
@@ -459,7 +412,8 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         for (let task of room.memory._typed._static.T_src0) {
             if (task.action == 'build') {
                 const structure = Game.getObjectById(task.args[0])
-                if (structure) return [task]
+                if (structure)
+                    return [task]
             }
             if (task.action == 'repair') {
                 const structure = Game.getObjectById(task.args[0])
@@ -480,7 +434,8 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         for (let task of room.memory._typed._static.T_src1) {
             if (task.action == 'build') {
                 const structure = Game.getObjectById(task.args[0])
-                if (structure) return [task]
+                if (structure)
+                    return [task]
             }
             if (task.action == 'repair') {
                 const structure = Game.getObjectById(task.args[0])
@@ -512,70 +467,21 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         }
         return []
     },
-    T_boost: function (room: Room): PosedCreepTask<"transfer">[] {
-        if(room.memory._typed._type != 'owned') return[]
-        const labs = room.memory._typed._struct.labs
-        var tasks: PosedCreepTask<'transfer'>[] = []
-        for (let i in labs.outs) {
-            const boostType: MineralBoostConstant | undefined = labs.boosts[i]
-            const lab_out = Game.getObjectById(labs.outs[i])
-            if (!lab_out)
-                continue
-
-            if (boostType && lab_out.store.getFreeCapacity(boostType) >= 1800) {
-                tasks.push({
-                    action: 'transfer',
-                    args: [lab_out.id, boostType, 1200],
-                    pos: lab_out.pos
-                })
-            }
-            if (lab_out.store['energy'] <= 1200) {
-                tasks.push({
-                    action: 'transfer',
-                    args: [lab_out.id, 'energy', 800],
-                    pos: lab_out.pos
-                })
-            }
-        }
-        return tasks
-    },
-    T_react: function (room: Room): PosedCreepTask<"transfer">[] {
-        if(room.memory._typed._type != 'owned') return[]
-        const terminal = room.terminal
-        const labs = room.memory._typed._struct.labs
-        const compoundType = labs.reaction
-        if (!terminal || !compoundType) return []
-
-        var tasks: PosedCreepTask<'transfer'>[] = []
-        for (let i in labs.ins) {
-            const reactantType = reactions[compoundType][i]
-            const lab_in = Game.getObjectById(labs.ins[i])
-            if (!lab_in) continue
-
-            //reactant
-            if (lab_in.store.getFreeCapacity(reactantType) > 2400) {
-                if(!terminal.store[reactantType]){
-                    //console.log(room.name + '.rection:\t' + change_reaction(room))
-                    return []
-                }
-                tasks.push({
-                    action: 'transfer',
-                    args: [lab_in.id, reactantType, 400],
-                    pos: lab_in.pos
-                })
-            }
-        }
-        return tasks
-    },
+    T_boost: T_boost,
+    T_react: T_react,
+    compound: compound,
     T_power: function (room: Room): PosedCreepTask<"transfer">[] {
-        if(room.memory._typed._type != 'owned') return[]
-        if (!room.memory._typed._struct.power_spawn) return []
+        if (room.memory._typed._type != 'owned')
+            return []
+        if (!room.memory._typed._struct.power_spawn)
+            return []
         const power_spawn = Game.getObjectById(room.memory._typed._struct.power_spawn)
-        if (!power_spawn) return []
+        if (!power_spawn)
+            return []
         var tasks: PosedCreepTask<'transfer'>[] = []
-            
+
         if (room.storage && room.storage.store['energy'] > 180000
-                && power_spawn.store['energy'] <= 3000) {
+            && power_spawn.store['energy'] <= 3000) {
             tasks.push({
                 action: 'transfer',
                 args: [power_spawn.id, 'energy'],
@@ -592,14 +498,17 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         return tasks
     },
     T_nuker: function (room: Room): PosedCreepTask<"transfer">[] {
-        if(room.memory._typed._type != 'owned') return[]
-        if (!room.memory._typed._struct.nuker) return []
+        if (room.memory._typed._type != 'owned')
+            return []
+        if (!room.memory._typed._struct.nuker)
+            return []
         const nuker = Game.getObjectById(room.memory._typed._struct.nuker)
-        if (!nuker) return []
+        if (!nuker)
+            return []
         var tasks: PosedCreepTask<'transfer'>[] = []
-        
+
         if (room.storage && room.storage.store['energy'] > 150000
-                && nuker.store.getFreeCapacity('energy')) {
+            && nuker.store.getFreeCapacity('energy')) {
             tasks.push({
                 action: 'transfer',
                 args: [nuker.id, 'energy'],
@@ -624,6 +533,7 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
                 pos: controller.pos
             }]
         }
+
         else
             return []
     },

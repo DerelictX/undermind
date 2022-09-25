@@ -1,31 +1,38 @@
-import _, { min } from "lodash"
+import { compressed, deposits, product_tier } from "@/constant/resource_series"
+import _ from "lodash"
 
-export const terminal_run = function(){
-    if(Game.time % 10 != 3){
-        return
-    }
-    let resourceType: ResourceConstant
-    for(resourceType in Memory.terminal.demand) {
+export const terminal_run = function(room: Room){
+    if(Game.time % 20 != 3) return
+    if(room.memory._typed._type != 'owned') return
+    const storage = room.storage
+    const terminal = room.terminal
+    if (!storage || !terminal || terminal.cooldown) return
+
+    let list:(CommodityConstant|DepositConstant)[] = []
+    list = list.concat(compressed).concat(deposits).concat(product_tier[0])
+    if(sendList(terminal,list)) return
+
+    if(Game.time % 30 != 3) return
+    const config = room.memory._typed._struct.factory
+    if(config.level)
+        sendList(terminal,product_tier[config.level])
+}
+
+const sendList = function(terminal: StructureTerminal, list: ResourceConstant[]){
+    if(terminal.cooldown) return
+    for (let resourceType of list) {
+        let amount = terminal.store[resourceType]
         const demand = Memory.terminal.demand[resourceType]
-        const supply = Memory.terminal.supply[resourceType]
-        if(!demand || !supply) continue
-
+        if(!demand || !amount) continue
         let toRoom: string|undefined = undefined
-        for(toRoom in demand)
-            if(demand[toRoom]) break
+        for(toRoom in demand) if(demand[toRoom]) break
         if(!toRoom) continue
-
-        let terminal: StructureTerminal|undefined
-        for(let fromRoom in supply){
-            terminal = Game.rooms[fromRoom]?.terminal
-            if(!supply[fromRoom] || !terminal || terminal.cooldown) continue
-            const amount = min([demand[toRoom],supply[fromRoom]]) ?? 0
-            supply[fromRoom] -= amount
-            delete demand[toRoom]
-            const ret = terminal.send(resourceType, amount , toRoom)
-            console.log(`${fromRoom} -> ${toRoom} [${resourceType} : ${amount}] : ${ret}`)
-            return
-        }
+        
+        if(demand[toRoom] < amount) amount = demand[toRoom]
+        delete demand[toRoom]
+        const ret = terminal.send(resourceType, amount , toRoom)
+        console.log(`${terminal.room.name} -> ${toRoom}\t[${resourceType} : ${amount}] : ${ret}`)
+        return resourceType
     }
 }
 
@@ -49,10 +56,6 @@ export const T_term = function (room: Room) {
                 args: [terminal.id, resourceType],
                 pos: terminal.pos
             })
-        } else if (storage_store[resourceType] > target_amount){
-            const supply = Memory.terminal.supply[resourceType]
-                ?? (Memory.terminal.supply[resourceType] = {})
-            supply[room.name] = target_amount
         }
     }
     return tasks

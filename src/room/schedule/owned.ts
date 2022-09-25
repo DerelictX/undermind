@@ -159,6 +159,7 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
         }
     },
     Collector: function (room: Room, pool: SourceTaskPool, looper: Looper) {
+        looper.interval = 1450
         static_updater.containers(room,pool)
         if (!room.storage?.my)
             return null

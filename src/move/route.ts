@@ -52,6 +52,7 @@ export const hikeTo = function(creep:AnyCreep, targetPos:RoomPosition){
         exits.push(targetPos)
     }
     const path = PathFinder.search(creep.pos,exits,{
+        plainCost: 2, swampCost: 10, maxRooms: 2,
         roomCallback:function(roomName:string):CostMatrix|boolean{
             if(roomName != _hike?.from && roomName != _hike?.route[0].room) return false
             const matrix = Memory.commonMatrix[roomName]

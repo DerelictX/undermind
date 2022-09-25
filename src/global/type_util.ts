@@ -8,19 +8,13 @@ interval:       number
 }
 
 type ValueTypes<T> = T[keyof T]
-type tier1_comp = keyof typeof REACTIONS.OH
-type Oxides = tier1_comp & ValueTypes<typeof REACTIONS.O>
-type Hydrides = tier1_comp & ValueTypes<typeof REACTIONS.O>
-type tier2_comp = ValueTypes<typeof REACTIONS.X>
-type tier3_comp = ValueTypes<typeof REACTIONS.X>
+type base = keyof typeof REACTIONS.O & keyof typeof REACTIONS.H
+type tier1_comp<R extends base> = ValueTypes<typeof REACTIONS[R]> & keyof typeof REACTIONS.OH
+type tier2_comp<R extends tier1_comp<base>> = ValueTypes<typeof REACTIONS[R]>
+type tier3_comp<R extends tier2_comp<tier1_comp<base>>> = ValueTypes<typeof REACTIONS[R]>
+type tier3_t1<R extends tier1_comp<base>> =
+    tier2_comp<R> extends tier2_comp<tier1_comp<base>> ? tier3_comp<tier2_comp<R>> : never
 
-interface store_item_config {
-    storage_max:    number
-    import_thresh:  number
-    export_thresh:  number
-}
-
-interface storage_config {
-    mineral:    {[m in MineralConstant|MineralBaseCompoundsConstant]:store_item_config}
-    boost:      {[m in MineralBoostConstant]:store_item_config}
-}
+type Xides<R extends tier1_comp<base>> = R | tier2_comp<R> | tier3_t1<R>
+type Oxides = ValueTypes<typeof REACTIONS.O>
+type Hydrides = ValueTypes<typeof REACTIONS.H>

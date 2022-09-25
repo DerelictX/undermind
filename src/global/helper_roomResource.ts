@@ -1,4 +1,3 @@
-import { compound_color } from "@/structure/lab";
 import _ from "lodash";
 
 /**
@@ -168,3 +167,13 @@ export const HelperRoomResource = {
     },
 }
 _.assign(global, {HelperRoomResource:HelperRoomResource})
+
+const compound_color: {
+    [R in base] : MineralBoostConstant[]
+} = {
+    U:  ["UH","UH2O","XUH2O","UO","UHO2","XUHO2"],
+    Z:  ["ZH","ZH2O","XZH2O","ZO","ZHO2","XZHO2"],
+    K:  ["KH","KH2O","XKH2O","KO","KHO2","XKHO2"],
+    L:  ["LH","LH2O","XLH2O","LO","LHO2","XLHO2"],
+    G:  ["GH","GH2O","XGH2O","GO","GHO2","XGHO2"],
+}

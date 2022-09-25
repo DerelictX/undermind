@@ -1,7 +1,6 @@
 import { carry_priority } from "@/role/initializer/config.behavior"
 import { posed_task_updater } from "@/scanner/dynamic"
-import { TASK_COMPLETE, TASK_DOING, TASK_FAILED } from "../../performer/behavior.any"
-import { parse_posed_task, perform_callback } from "../../performer/behavior.callback"
+import { parse_posed_task, perform_callback, TASK_DOING } from "../../performer/behavior.callback"
 
 export const run_carrier = function(creep:Creep,fb:CarrierMemory){
     if(fb.state == 'idle'){

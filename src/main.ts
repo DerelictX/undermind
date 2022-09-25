@@ -32,7 +32,6 @@ export const loop = function () {
     run_creeps()
     run_power_creeps()
     handle_moves()
-    terminal_run()
 
     for(let name in Memory._closest_owned){
         const qwer = Memory._closest_owned[name]
@@ -66,6 +65,7 @@ const run_rooms = function(){
             factory_run(room)
             power_spawn_run(room)
             observer_run(room)
+            terminal_run(room)
         }catch(error){
             console.log(name +':\t' + error);
             inspect_memory(name,false)

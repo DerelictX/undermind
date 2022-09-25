@@ -1,4 +1,5 @@
-import _, { floor } from "lodash"
+import { compressed, product_tier } from "@/constant/resource_series"
+import _, { ceil, floor } from "lodash"
 
 export const factory_run = function(room: Room){
     if(room.memory._typed._type != 'owned') return
@@ -20,6 +21,7 @@ export const factory_run = function(room: Room){
     }
 }
 
+/**工厂补充原料 */
 export const T_fact = function (room: Room) {
     if(room.memory._typed._type != 'owned') return[]
     const storage = room.storage
@@ -27,8 +29,9 @@ export const T_fact = function (room: Room) {
     const config = room.memory._typed._struct.factory
     const factory = config.fact_id ? Game.getObjectById(config.fact_id) : null
     if (!storage || !terminal || !factory) return []
-
     var tasks: Posed<PrimitiveDescript<'transfer'>>[] = []
+
+    /**压缩资源 */
     for(let res of compressed){
         if(storage.store[res] >= 0.03 * storage.store.getCapacity())
             continue
@@ -47,16 +50,17 @@ export const T_fact = function (room: Room) {
         }
     }
     
+    /**高级商品 */
     const levels = factory.level ? [factory.level,0] : [0]
     for(let level of levels)
     for(let res of product_tier[level]){
         const components = COMMODITIES[res].components
         let component: keyof typeof components
         for(component in components){
-            if(factory.store[component] < components[component] * 2){
+            if(factory.store[component] < components[component] * 3){
                 if(terminal.store[component])
                     tasks.push({ action: 'transfer', args: [factory.id, component], pos: factory.pos })
-                if(config.cd_bucket < 1000) {
+                else if(config.cd_bucket < 1000) {
                     const demand = Memory.terminal.demand[component]
                         ?? (Memory.terminal.demand[component] = {})
                     demand[room.name] = components[component] * 4
@@ -67,15 +71,18 @@ export const T_fact = function (room: Room) {
     return tasks
 }
 
+/**更新可用于生产高级商品的时长，大于1000ticks说明不会浪费ops */
 export const check_components = function(room: Room){
     if(room.memory._typed._type != 'owned') return
     const terminal = room.terminal
     const config = room.memory._typed._struct.factory
     const factory = config.fact_id ? Game.getObjectById(config.fact_id) : null
     if (!terminal || !factory?.level) return
+    config.level = factory.level
 
     config.cd_bucket = 0
-    for(let res of product_tier[factory.level]){
+    for(let res of product_tier[config.level]){
+        const times_kt = ceil(1000/COMMODITIES[res].cooldown)
         let min_times = 255
         const components = COMMODITIES[res].components
         let component: keyof typeof components
@@ -83,10 +90,15 @@ export const check_components = function(room: Room){
             const times = floor((factory.store[component] + terminal.store[component])
                 / components[component])
             if(times < min_times) min_times = times
+            if(times < times_kt) {
+                const demand = Memory.terminal.demand[component]
+                    ?? (Memory.terminal.demand[component] = {})
+                demand[room.name] = components[component] * times_kt
+            }
         }
         config.cd_bucket += min_times * COMMODITIES[res].cooldown
     }
-    console.log(room.name + '.fact_cd_bucket:\t' + config.cd_bucket)
+    console.log(`${room.name}\tfact_level: ${config.level}\tcd_bucket: ${config.cd_bucket}`)
 }
 _.assign(global, {check_components:check_components})
 
@@ -112,16 +124,12 @@ export const W_fact = function (room: Room) {
         }
     }
     for(let res of product_tier[0]){
-        if(factory.store[res] > 500){
+        if(factory.store[res] >= 1200){
             tasks.push({
                 action: 'withdraw',
-                args: [factory.id, res, factory.store[res] - 500],
+                args: [factory.id, res, factory.store[res] - 1000],
                 pos: factory.pos
             })
-        } else if(terminal.store[res] > 500){
-            const supply = Memory.terminal.supply[res]
-                ?? (Memory.terminal.supply[res] = {})
-            supply[room.name] = terminal.store[res]
         }
     }
     if(!factory.level) return tasks
@@ -132,32 +140,7 @@ export const W_fact = function (room: Room) {
                 args: [factory.id, res],
                 pos: factory.pos
             })
-        } else {
-            const supply = Memory.terminal.supply[res]
-                ?? (Memory.terminal.supply[res] = {})
-            supply[room.name] = terminal.store[res]
         }
     }
     return tasks
 }
-
-const compressed:CommodityConstant[] = [
-    'utrium_bar','keanium_bar','zynthium_bar','lemergium_bar',
-    'ghodium_melt','oxidant','reductant','purifier','battery'
-]
-
-const productions: {[d in DepositConstant]:CommodityConstant[]} = {
-    mist:       ['condensate','concentrate','extract','spirit','emanation','essence'],
-    biomass:    ['cell','phlegm','tissue','muscle','organoid','organism'],
-    metal:      ['alloy','tube','fixtures','frame','hydraulics','machine'],
-    silicon:    ['wire','switch','transistor','microchip','circuit','device']
-}
-
-const product_tier:CommodityConstant[][]  = [
-    ['alloy','cell','wire','condensate'],
-    ['tube','phlegm','switch','concentrate','composite'],
-    ['fixtures','tissue','transistor','extract','crystal'],
-    ['frame','muscle','microchip','spirit','liquid'],
-    ['hydraulics','organoid','circuit','emanation'],
-    ['machine','organism','device','essence']
-]

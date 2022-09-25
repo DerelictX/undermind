@@ -1,7 +1,6 @@
 import { work_priority } from "@/role/initializer/config.behavior"
 import { hikeTo } from "@/move/route"
-import { TASK_COMPLETE, TASK_DOING, TASK_FAILED } from "@/performer/behavior.any"
-import { parse_posed_task, perform_callback } from "@/performer/behavior.callback"
+import { parse_posed_task, perform_callback, TASK_COMPLETE, TASK_DOING } from "@/performer/behavior.callback"
 import { posed_task_updater } from "@/scanner/dynamic"
 
 export const run_worker = function(creep:Creep,fb:WorkerMemory){

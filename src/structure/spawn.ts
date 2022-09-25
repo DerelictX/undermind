@@ -1,4 +1,4 @@
-import { body_generator } from "@/creep/config.body";
+import { body_generator } from "@/constant/config.body";
 import { ceil, floor } from "lodash";
 
 export const spawn_run = function(room: Room) {
