@@ -1,5 +1,4 @@
-import { TASK_DOING } from "@/performer/behavior.any"
-import { perform_callback } from "@/performer/behavior.callback"
+import { perform_callback, TASK_DOING } from "@/performer/behavior.callback"
 
 export const run_static = function(creep:Creep,fb:StaticMemory){
     if(fb.state == 'collect'){

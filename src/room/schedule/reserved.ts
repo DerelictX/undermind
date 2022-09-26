@@ -148,7 +148,6 @@ export const reserved_room_loop_handler: RoomLoopHandler<'reserved'> = {
         }
         if (workload < 12) workload = 12
         if (workload > 12) workload = 24
-        let _spawn = room.memory._spawn
         looper.interval = 1500
         return {
             _body: { generator: 'WC', workload: 12 },

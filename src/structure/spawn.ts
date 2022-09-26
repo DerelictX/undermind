@@ -45,6 +45,10 @@ export const spawn_run = function(room: Room) {
         case 'highway':
             if(_typed._type == spawn_task._caller.room_type)
                 looper = _typed._looper[spawn_task._caller.loop_key]
+                break
+        case 'neutral':
+            if(_typed._type == spawn_task._caller.room_type)
+                looper = _typed._looper[spawn_task._caller.loop_key]
             break
     }
     if(!looper) return

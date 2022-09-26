@@ -17,6 +17,8 @@ import { run_worker } from "./role/driver/worker";
 import { inspect_global } from "./global/memory.inspector";
 import { handle_moves } from "./move/Kuhn-Munkres";
 import { HelperRoomResource } from "./global/helper_roomResource";
+import { expand_commo } from "./constant/commodity_tree";
+import { send_claimer } from "./role/initializer/static";
 
 export const loop = function () {
 
@@ -25,6 +27,10 @@ export const loop = function () {
         structure_updater
         _format_room
         HelperRoomResource.showAllRes()
+        expand_commo
+        //Game.market.createOrder('buy','pixel',0.001,1,'sim')
+        //send_claimer(Memory.rooms.E55S53._typed._struct.spawns.t2,new RoomPosition(27,7,'W43N26'))
+        send_claimer
     }
     
     inspect_global()

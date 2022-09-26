@@ -39,14 +39,12 @@ export const observer_run = function(room: Room){
             _format_room(curr,'highway',room.name)
             spawn_loop(curr_room)
         }
-        if(!isHighway){
-            const core: StructureInvaderCore[] = room.find(FIND_HOSTILE_STRUCTURES,{
-                filter: (structure) => structure.structureType == 'invaderCore'
-            })
-            if(core[0]){
-                Memory.threat_level[curr] = core[0].level
-                return
-            }
+        const core: StructureInvaderCore[] = room.find(FIND_STRUCTURES,{
+            filter: (structure) => structure.structureType == 'invaderCore'
+        })
+        if(core[0]){
+            Memory.threat_level[curr] = core[0].level
+            return
         }
     }
 

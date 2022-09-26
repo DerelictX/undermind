@@ -1,4 +1,4 @@
-import { compound_tier, reactions, reaction_line } from "@/constant/resource_series";
+import { companion_base, compound_tier, reactions, reaction_line } from "@/constant/resource_series";
 import _ from "lodash";
 import { demand_res } from "./terminal";
 
@@ -57,25 +57,29 @@ export const change_reaction = function(room:Room): MineralCompoundConstant|null
             return reaction
     }
 
-    let reacts: MineralCompoundConstant[]
     /**Base */
-    reacts = compound_tier[0]
-    for(let i in reacts){
-        if(storage.store[reacts[i]] > 20000)
+    let reactant0: keyof typeof companion_base
+    for(reactant0 in companion_base){
+        const reactant1 = companion_base[reactant0][0]
+        const target = companion_base[reactant0][1]
+        if(storage.store[target] > 20000)
             continue
-        const reactants = reactions[reacts[i]] 
-        if(terminal.store[reactants[0]] >= 1000 && terminal.store[reactants[1]] >= 1000){
-            return labs.reaction = reacts[i]
+        if(terminal.store[reactant0] < 1000)
+            continue
+        if(terminal.store[reactant1] >= 1000){
+            return labs.reaction = target
+        } else {
+            demand_res(terminal,reactant1,1000)
         }
     }
 
     /**T3, T2 */
-    reacts = compound_tier[3]
+    let reacts: MineralCompoundConstant[] = compound_tier[3]
     reacts = reacts.concat(compound_tier[2])
-    for(let i in reacts){
-        const reactants = reactions[reacts[i]] 
+    for(let target of reacts){
+        const reactants = reactions[target] 
         if(terminal.store[reactants[0]] >= 1000 && terminal.store[reactants[1]] >= 1000){
-            return labs.reaction = reacts[i]
+            return labs.reaction = target
         }
     }
 
@@ -88,7 +92,7 @@ export const change_reaction = function(room:Room): MineralCompoundConstant|null
         if(stock > storage.store.getCapacity() * 0.05)
             continue
         const reactants = reactions[tier1]
-        if(terminal.store[reactants[0]] >= 1000 && terminal.store[reactants[1]] >= 1000){
+        if(storage.store[reactants[0]] >= 1000 && terminal.store[reactants[1]] >= 1000){
             return labs.reaction = tier1
         }
     }

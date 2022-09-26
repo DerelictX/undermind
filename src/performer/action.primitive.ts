@@ -5,13 +5,15 @@ const performer:{[action in PrimitiveAction]:PrimitivePerformer<action>} = {
     harvest: function (creep: Creep, args: [target: Id<Source | Mineral<MineralConstant> | Deposit>]) {
         const target = Game.getObjectById(args[0])
         if(!target) return ERR_NOT_FOUND
-        if(!creep.store.getFreeCapacity()) return ERR_FULL
+        if(!creep.store.getFreeCapacity() && creep.store.getCapacity())
+            return ERR_FULL
         return creep.harvest(target);
     },
     dismantle: function (creep: Creep, args: [target: Id<Structure<StructureConstant>>]) {
         const target = Game.getObjectById(args[0])
         if(!target) return ERR_NOT_FOUND
-        if(!creep.store.getFreeCapacity()) return ERR_FULL
+        if(!creep.store.getFreeCapacity() && creep.store.getCapacity())
+            return ERR_FULL
         return creep.dismantle(target);
     },
     build: function (creep: Creep, args: [target: Id<ConstructionSite<BuildableStructureConstant>>]) {

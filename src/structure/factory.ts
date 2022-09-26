@@ -120,23 +120,25 @@ export const W_fact = function (room: Room) {
             })
         }
     }
+
+    if(!factory.level) {
+        for(let res of product_tier[0]){
+            if(factory.store[res] > terminal.store[res]){
+                tasks.push({ action: 'withdraw', args: [factory.id, res], pos: factory.pos })
+            }
+        }
+        return tasks
+    }
     for(let res of product_tier[0]){
         if(factory.store[res] >= 1200){
             tasks.push({
-                action: 'withdraw',
-                args: [factory.id, res, factory.store[res] - 1000],
-                pos: factory.pos
+                action: 'withdraw', args: [factory.id, res, factory.store[res] - 1000], pos: factory.pos
             })
         }
     }
-    if(!factory.level) return tasks
     for(let res of product_tier[factory.level]){
         if(factory.store[res] > terminal.store[res]){
-            tasks.push({
-                action: 'withdraw',
-                args: [factory.id, res],
-                pos: factory.pos
-            })
+            tasks.push({ action: 'withdraw', args: [factory.id, res], pos: factory.pos })
         }
     }
     return tasks

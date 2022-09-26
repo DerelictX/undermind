@@ -1,21 +1,29 @@
-import { compressed, deposits, product_tier } from "@/constant/resource_series"
+import { base_mineral, compressed, product_tier } from "@/constant/resource_series"
 import _ from "lodash"
 
 export const terminal_run = function(room: Room){
-    if(Game.time % 20 != 3) return
+    if(Game.time % 10 != 0) return
     if(room.memory._typed._type != 'owned') return
     const storage = room.storage
     const terminal = room.terminal
-    if (!storage || !terminal || terminal.cooldown) return
+    if (!storage || !terminal?.my || terminal.cooldown) return
 
-    let list:(CommodityConstant|DepositConstant)[] = []
-    list = list.concat(compressed).concat(deposits).concat(product_tier[0])
-    if(sendList(terminal,list)) return
-    if(sendList(terminal,['ops','power'],storage.store)) return
-    if(Game.time % 30 != 3) return
-    const config = room.memory._typed._struct.factory
-    if(config.level)
-        sendList(terminal,product_tier[config.level])
+    switch(Game.time % 40){
+        case 0:
+            sendList(terminal,compressed.concat(product_tier[0])) 
+            return
+        case 10:
+            sendList(terminal,['ops','power','metal','biomass','silicon','mist'],storage.store)
+            return
+        case 20:
+            const config = room.memory._typed._struct.factory
+            if(config.level)
+                sendList(terminal,product_tier[config.level])
+            return
+        case 30:
+            sendList(terminal,base_mineral,storage.store)
+            return
+    }
 }
 
 /**
@@ -44,9 +52,13 @@ const sendList = function(terminal: StructureTerminal, list: ResourceConstant[],
         supply?: StorePropertiesOnly){
     if(terminal.cooldown) return
     for (let resourceType of list) {
-        let amount = supply ? supply[resourceType] : terminal.store[resourceType]
+        let amount = terminal.store[resourceType]
+        if(supply){
+            if(!supply[resourceType]) continue
+            amount += supply[resourceType] - 3000
+        }
         const demand = Memory.terminal.demand[resourceType]
-        if(!demand || !amount) continue
+        if(!demand || amount <= 0) continue
         let toRoom: string|undefined = undefined
         for(toRoom in demand) if(demand[toRoom]) break
         if(!toRoom) continue

@@ -32,7 +32,8 @@ export const hikeTo = function(creep:AnyCreep, targetPos:RoomPosition){
     }
 
     /**进入下一个房间的入口 */
-    let exit = _hike.route[0].exitPos
+    const step = _hike.route[0]
+    let exit = step.exitPos
     if(exit){
         exit = new RoomPosition(exit.x,exit.y,exit.roomName)
         const ret = crawlTo(creep,exit)
@@ -41,12 +42,30 @@ export const hikeTo = function(creep:AnyCreep, targetPos:RoomPosition){
 
     //分段寻路优化，在当前房间和下一个房间寻路，用来优化通往下个房间的exit
     const exits: RoomPosition[] = []
-    if(_hike.route[1]){
-        //从内存获取下个房间通往下下个房间的exits
-        const exit_cache = Memory._edge_exits[_hike.route[0].room]?.[_hike.route[1].room]
+    if(step.exit == 'portal'){
+        //穿星门通往下个房间
+        const exit_cache = Memory._edge_exits[_hike.from]
         if(!exit_cache) return ERR_TIRED
-        for(const pos of exit_cache)
+        const portals: StructurePortal[] = creep.room.find(FIND_STRUCTURES,{
+            filter: portal => {
+                return portal.structureType == 'portal'
+                    && portal.destination instanceof RoomPosition
+                    && portal.destination.roomName == step.room
+            }
+        })
+        for(let portal of portals){
+            exits.push(portal.pos)
+            break
+        }
+        exit_cache[step.room] = exits
+    } else if(_hike.route[1]){
+        //从内存获取下个房间通往下下个房间的exits
+        const exit_cache = Memory._edge_exits[step.room]?.[_hike.route[1].room]
+        if(!exit_cache) {
+            exits.push(new RoomPosition(25,25,step.room))
+        } else for(const pos of exit_cache) {
             exits.push(new RoomPosition(pos.x,pos.y,pos.roomName))
+        }
     } else {
         //终点在下个房间
         exits.push(targetPos)
@@ -54,7 +73,7 @@ export const hikeTo = function(creep:AnyCreep, targetPos:RoomPosition){
     const path = PathFinder.search(creep.pos,exits,{
         plainCost: 2, swampCost: 10, maxRooms: 2,
         roomCallback:function(roomName:string):CostMatrix|boolean{
-            if(roomName != _hike?.from && roomName != _hike?.route[0].room) return false
+            if(roomName != _hike?.from && roomName != step.room) return false
             const matrix = Memory.commonMatrix[roomName]
             if(matrix) return PathFinder.CostMatrix.deserialize(matrix)
             return true
@@ -64,15 +83,15 @@ export const hikeTo = function(creep:AnyCreep, targetPos:RoomPosition){
     exit = _.findLast(path.path, (pos) => pos.roomName == _hike?.from)
 
     if(exit){
-        const a = (_hike.route[0].exit == TOP || _hike.route[0].exit == BOTTOM) ? exit.y : exit.x
-        const b = (_hike.route[0].exit == TOP || _hike.route[0].exit == LEFT) ? 0 : 49
+        const a = (step.exit == TOP || step.exit == BOTTOM) ? exit.y : exit.x
+        const b = (step.exit == TOP || step.exit == LEFT) ? 0 : 49
         if(/**a != b && */exit.roomName != creep.room.name){
             creep.say('false exit')
             console.log('false exit: ' + exit)
-            delete _hike.route[0].exitPos
+            delete step.exitPos
             return ERR_NO_PATH
         } else {
-            _hike.route[0].exitPos = exit
+            step.exitPos = exit
             return crawlTo(creep,exit)
         }
     }

@@ -1,3 +1,5 @@
+import _ from "lodash"
+
 export const init_harvester = function(pos:RoomPosition): StaticMemory{
     const ret: StaticMemory = {
         bhvr_name: "static",
@@ -32,3 +34,21 @@ export const init_harvester = function(pos:RoomPosition): StaticMemory{
     link.forEach(s => ret.consume.push({bhvr_name:'callbackful',action:'transfer',args:[s.id,'energy']}))
     return ret
 }
+
+export const send_claimer = function(_spawn: SpawnTask[], pos: RoomPosition) {
+    const move: CallbackBehavior<'approach'> = {
+        bhvr_name: 'callbackful',
+        action: "approach",
+        args: [pos, 1]
+    }
+    _spawn.push({
+        _caller:{
+            room_name:  pos.roomName,
+            room_type:  'neutral',
+            loop_key:   'Observe'
+        },
+        _body: { generator: 'Cl', workload: 1, mobility: 1 },
+        _class: move
+    })
+}
+_.assign(global, {send_claimer:send_claimer})
