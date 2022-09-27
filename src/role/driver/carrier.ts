@@ -1,6 +1,7 @@
+import { approach } from "@/move/action.virtual"
 import { carry_priority } from "@/role/initializer/config.behavior"
 import { update_pool } from "@/scanner/dynamic"
-import { parse_posed_task, perform_callback, TASK_DOING } from "../../performer/behavior.callback"
+import { action_range, parse_posed_task, perform_callback, TASK_DOING } from "../../performer/behavior.callback"
 
 export const run_carrier = function(creep:Creep,fb:CarrierMemory){
     if(fb.state == 'idle'){
@@ -89,7 +90,9 @@ const run_carrier_consume = function(creep:Creep,fb:CarrierMemory){
     const ret = perform_callback(creep,fb.consume[0])
     if(ret != TASK_DOING) {
         fb.consume.shift()
-        if(!fb.consume.length && creep.store.getUsedCapacity('energy') == 0){
+        if(fb.consume.length){
+            approach(creep,fb.consume[0].pos,action_range[fb.consume[0].action])
+        } else if(creep.store.getUsedCapacity('energy') == 0){
             return 'idle'
         }
     }

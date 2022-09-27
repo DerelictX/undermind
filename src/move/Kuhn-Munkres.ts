@@ -35,6 +35,10 @@ BFS:    while(true){
             const x = base64decode(from[0])
             const y = base64decode(from[1])
 
+            if(!intents[from].step){
+                visual.circle(x,y,{radius:0.5})
+                continue
+            }
             for(let dir of intents[from].step){
                 const offset = offsetsByDirection[dir]
                 const xx = x + offset[0]

@@ -56,9 +56,19 @@ const global_memory_initializer: { [k in keyof FilterOptional<Memory>]: () => vo
         Memory._closest_owned = {}
     },
 
-    creeps: function (): void { },
-    powerCreeps: function (): void { },
-    flags: function (): void { },
-    rooms: function (): void { },
-    spawns: function (): void { },
+    creeps: function (): void {
+        Memory.creeps = {}
+    },
+    powerCreeps: function (): void {
+        Memory.powerCreeps = {}
+    },
+    flags: function (): void {
+        Memory.flags = {}
+    },
+    rooms: function (): void {
+        Memory.rooms = {}
+    },
+    spawns: function (): void {
+        Memory.spawns = {}
+    },
 }

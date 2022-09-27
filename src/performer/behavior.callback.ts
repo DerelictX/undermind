@@ -15,6 +15,7 @@ export const perform_callback = function(creep:Creep, behavior:CallbackBehavior<
         if(callback == TASK_DOING || callback == TASK_COMPLETE || callback == TASK_FAILED)
             return callback
     }while(callback)
+    if(ret) creep.say('' + ret)
     return ret ? TASK_FAILED : TASK_DOING
 }
 
@@ -25,8 +26,7 @@ export const perform_callback = function(creep:Creep, behavior:CallbackBehavior<
  */
  export const parse_posed_task = function(posed:PosedCreepTask<PrimitiveAction>):CallbackBehavior<PrimitiveAction>{
     const main: CallbackBehavior<PrimitiveAction> = {
-        bhvr_name:'callbackful',
-        ...posed
+        bhvr_name:'callbackful', ...posed
     }
     switch(main.action){
         case 'withdraw':
@@ -34,11 +34,16 @@ export const perform_callback = function(creep:Creep, behavior:CallbackBehavior<
         case 'pickup':
         case 'generateSafeMode':
             main[OK] = TASK_COMPLETE
+            break
+        case 'harvest':
+            main[ERR_TIRED] = TASK_DOING
+            break
     }
+    main[ERR_NOT_IN_RANGE] = TASK_DOING
     return main
 }
 
-const action_range: {[A in PrimitiveAction]: number} = {
+export const action_range: {[A in PrimitiveAction]: number} = {
     harvest: 1,
     dismantle: 1,
     build: 3,

@@ -4,6 +4,7 @@ import { hikeTo } from "@/move/route"
 export const approach = function (creep: AnyCreep, pos:RoomPosition, range:number) {
     if(!creep.room) return ERR_NOT_FOUND
     const roomName = creep.room.name
+    pos = new RoomPosition(pos.x,pos.y,pos.roomName)
 
     /**站着不动 */
     if(range <= 0 || creep instanceof Creep && creep.fatigue){

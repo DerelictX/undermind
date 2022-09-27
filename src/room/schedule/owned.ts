@@ -55,9 +55,11 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
         if (storage.store[mineral.mineralType] > 60000)
             return null
 
-        const main: CallbackBehavior<PrimitiveAction> = parse_posed_task(posed)
+        const main = parse_posed_task(posed)
+        const back = parse_posed_task(stand)
+        main[ERR_FULL] = back
         return {
-            _body: { generator: 'W', workload: 24 },
+            _body: { generator: 'Wc', workload: 24 },
             _class: { ...{ bhvr_name: 'callbackful' }, ...main }
         }
     },
