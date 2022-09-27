@@ -1,7 +1,7 @@
 import { work_priority } from "@/role/initializer/config.behavior"
 import { hikeTo } from "@/move/route"
 import { parse_posed_task, perform_callback, TASK_COMPLETE, TASK_DOING } from "@/performer/behavior.callback"
-import { posed_task_updater } from "@/scanner/dynamic"
+import { update_pool } from "@/scanner/dynamic"
 
 export const run_worker = function(creep:Creep,fb:WorkerMemory){
     if(fb.state == 'collect'){
@@ -65,7 +65,7 @@ const change_flow = function(creep:Creep,fb:WorkerMemory) {
         }
         for(let source of flow[0]){
             if(!pool[source]?.length){
-                pool[source] = posed_task_updater[source](room)
+                update_pool(pool,source,room)
             }
             const tasks = pool[source]
             if(tasks && tasks.length) {
@@ -86,7 +86,7 @@ const change_flow = function(creep:Creep,fb:WorkerMemory) {
         }
         for(let sink of flow[1]){
             if(!pool[sink]?.length){
-                pool[sink] = posed_task_updater[sink](room)
+                update_pool(pool,sink,room)
             }
             const tasks = pool[sink]
             if(tasks && tasks.length) {

@@ -1,24 +1,16 @@
+import { approach } from "@/move/action.virtual";
 import { perform_primitive } from "./action.primitive";
-import { perform_virtual } from "./action.virtual";
 
 export const TASK_DOING:       TASK_DOING      = -16
 export const TASK_COMPLETE:    TASK_COMPLETE   = -17
 export const TASK_FAILED:      TASK_FAILED     = -18
 
-export const perform_callback = function(creep:Creep, behavior:CallbackBehavior<AnyAction>): TaskReturnCode {
+export const perform_callback = function(creep:Creep, behavior:CallbackBehavior<PrimitiveAction>): TaskReturnCode {
     let ret: ScreepsReturnCode
-    let callback: CallbackBehavior<AnyAction> | TaskReturnCode | undefined = behavior
+    let callback: CallbackBehavior<PrimitiveAction> | TaskReturnCode | undefined = behavior
     do{
-        switch(callback.action){
-            case 'approach':
-            case 'escape':
-            case 'hold_place':
-            case 'prejudge_empty':
-            case 'prejudge_full':
-            case 'full_hits':
-                ret = perform_virtual(creep,callback); break;
-            default: ret = perform_primitive(creep,callback)
-        }
+        ret = perform_primitive(creep,callback.action,callback.args)
+        approach(creep,callback.pos,action_range[callback.action])
         callback = callback[ret]
         if(callback == TASK_DOING || callback == TASK_COMPLETE || callback == TASK_FAILED)
             return callback
@@ -31,17 +23,42 @@ export const perform_callback = function(creep:Creep, behavior:CallbackBehavior<
  * @param posed 
  * @returns 
  */
- export const parse_posed_task = function(posed:PosedCreepTask<TargetedAction>):CallbackBehavior<AnyAction>{
-    const main: CallbackBehavior<TargetedAction> = {...{bhvr_name:'callbackful'},...posed}
-    const move: CallbackBehavior<'approach'> = {...{bhvr_name:'callbackful'},
-            ...{action:"approach",args:[posed.pos,1]}}
-    main[ERR_NOT_IN_RANGE] = move
+ export const parse_posed_task = function(posed:PosedCreepTask<PrimitiveAction>):CallbackBehavior<PrimitiveAction>{
+    const main: CallbackBehavior<PrimitiveAction> = {
+        bhvr_name:'callbackful',
+        ...posed
+    }
     switch(main.action){
         case 'withdraw':
         case 'transfer':
         case 'pickup':
         case 'generateSafeMode':
             main[OK] = TASK_COMPLETE
-        default: return main
     }
+    return main
+}
+
+const action_range: {[A in PrimitiveAction]: number} = {
+    harvest: 1,
+    dismantle: 1,
+    build: 3,
+    repair: 3,
+    upgradeController: 3,
+
+    withdraw: 1,
+    transfer: 1,
+    pickup: 1,
+
+    generateSafeMode: 1,
+    attackController: 1,
+    reserveController: 1,
+    claimController: 1,
+
+    attack: 1,
+    rangedAttack: 3,
+    heal: 1,
+    rangedHeal: 3,
+
+    drop: 0,
+    rangedMassAttack: 0
 }

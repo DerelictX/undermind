@@ -1,63 +1,55 @@
-
-type TaskUpdater<T extends {[P in keyof T]: Posed<PrimitiveDescript<TargetedAction>>[]}> = {
-    [P in keyof T]: (room:Room) => T[P]
-}
-
-type Posed<T extends PrimitiveDescript<TargetedAction>> = {pos: RoomPosition} & T
-
-type PosedCreepTask<T extends TargetedAction> =
-    Posed<PrimitiveDescript<T>>
-
 type FilterPoolKey<T extends WorkAction|CarryAction, R extends ResourceConstant> =
     ValueTypes<{[K in keyof DynamicTaskPool]: 
         DynamicTaskPool[K] extends RestrictedPrimitiveDescript<T,R>[] ? K : never}>
 
 interface DynamicTaskPool {
     //sources
-    H_src0:     Posed<RestrictedPrimitiveDescript<'harvest'|'withdraw','energy'>>[]
-    H_src1:     Posed<RestrictedPrimitiveDescript<'harvest'|'withdraw','energy'>>[]
-    H_src2:     Posed<RestrictedPrimitiveDescript<'harvest','energy'>>[]
-    T_src0:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair'|'build','energy'>>[]
-    T_src1:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair'|'build','energy'>>[]
-    T_src2:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]
+    H_src0:     RestrictedPrimitiveDescript<'harvest','energy'>[]
+    H_src1:     RestrictedPrimitiveDescript<'harvest','energy'>[]
+    H_src2:     RestrictedPrimitiveDescript<'harvest','energy'>[]
+    T_src0:     RestrictedPrimitiveDescript<'transfer'|'repair'|'build','energy'>[]
+    T_src1:     RestrictedPrimitiveDescript<'transfer'|'repair'|'build','energy'>[]
+    T_src2:     RestrictedPrimitiveDescript<'transfer'|'repair'|'build','energy'>[]
     //controller
-    W_ctrl:     Posed<RestrictedPrimitiveDescript<'withdraw','energy'>>[]
-    U_ctrl:     Posed<PrimitiveDescript<'upgradeController'>>[]
-    downgraded: Posed<PrimitiveDescript<'upgradeController'>>[]
-    gen_safe:   Posed<PrimitiveDescript<'generateSafeMode'>>[]
+    W_ctrl:     RestrictedPrimitiveDescript<'withdraw','energy'>[]
+    U_ctrl:     RestrictedPrimitiveDescript<'upgradeController'>[]
+    downgraded: RestrictedPrimitiveDescript<'upgradeController'>[]
     //get energy
-    recycle:    Posed<PrimitiveDescript<'dismantle'>>[]
-    H_srcs:     Posed<RestrictedPrimitiveDescript<'harvest','energy'>>[]
-    W_energy:   Posed<RestrictedPrimitiveDescript<'withdraw'|'pickup','energy'>>[]
+    recycle:    RestrictedPrimitiveDescript<'dismantle'>[]
+    H_srcs:     RestrictedPrimitiveDescript<'harvest','energy'>[]
+    W_energy:   RestrictedPrimitiveDescript<'withdraw'|'pickup','energy'>[]
     //consume energy
-    build:      Posed<PrimitiveDescript<'build'>>[]
-    fortify:    Posed<PrimitiveDescript<'repair'>>[]
-    decayed:    Posed<PrimitiveDescript<'repair'>>[]
-    repair:     Posed<PrimitiveDescript<'repair'>>[]
-    anti_nuke:  Posed<PrimitiveDescript<'repair'>>[]
+    build:      RestrictedPrimitiveDescript<'build'>[]
+    fortify:    RestrictedPrimitiveDescript<'repair'>[]
+    decayed:    RestrictedPrimitiveDescript<'repair'>[]
+    repair:     RestrictedPrimitiveDescript<'repair'>[]
+    anti_nuke:  RestrictedPrimitiveDescript<'repair'>[]
     //collect
-    W_cntn:     Posed<PrimitiveDescript<'withdraw'>>[]
-    W_link:     Posed<RestrictedPrimitiveDescript<'withdraw','energy'>>[]
-    loot:       Posed<PrimitiveDescript<'withdraw'>>[]
-    sweep:      Posed<PrimitiveDescript<'withdraw'|'pickup'>>[]
-    compound:   Posed<PrimitiveDescript<'withdraw'>>[]
+    W_cntn:     RestrictedPrimitiveDescript<'withdraw'>[]
+    W_link:     RestrictedPrimitiveDescript<'withdraw'>[]
+    loot:       RestrictedPrimitiveDescript<'withdraw'>[]
+    sweep:      RestrictedPrimitiveDescript<'withdraw'|'pickup'>[]
+    compound:   RestrictedPrimitiveDescript<'withdraw'>[]
     //supply
-    T_ext:      Posed<RestrictedPrimitiveDescript<'transfer','energy'>>[]
-    T_tower:    Posed<RestrictedPrimitiveDescript<'transfer','energy'>>[]
-    T_cntn:     Posed<RestrictedPrimitiveDescript<'transfer','energy'>>[]
-    T_boost:    Posed<PrimitiveDescript<'transfer'>>[]
-    T_react:    Posed<PrimitiveDescript<'transfer'>>[]
-    T_power:    Posed<PrimitiveDescript<'transfer'>>[]
-    T_nuker:    Posed<PrimitiveDescript<'transfer'>>[]
+    T_ext:      RestrictedPrimitiveDescript<'transfer','energy'>[]
+    T_tower:    RestrictedPrimitiveDescript<'transfer','energy'>[]
+    T_cntn:     RestrictedPrimitiveDescript<'transfer','energy'>[]
+    T_boost:    RestrictedPrimitiveDescript<'transfer'>[]
+    T_react:    RestrictedPrimitiveDescript<'transfer'>[]
+    T_power:    RestrictedPrimitiveDescript<'transfer'>[]
+    T_nuker:    RestrictedPrimitiveDescript<'transfer'>[]
     //central
-    T_term:     Posed<PrimitiveDescript<'transfer'>>[]
-    W_term:     Posed<PrimitiveDescript<'withdraw'>>[]
-    T_fact:     Posed<PrimitiveDescript<'transfer'>>[]
-    W_fact:     Posed<PrimitiveDescript<'withdraw'>>[]
+    T_term:     RestrictedPrimitiveDescript<'transfer'>[]
+    W_term:     RestrictedPrimitiveDescript<'withdraw'>[]
+    T_fact:     RestrictedPrimitiveDescript<'transfer'>[]
+    W_fact:     RestrictedPrimitiveDescript<'withdraw'>[]
 }
 
 type EnSource = FilterPoolKey<(WorkAction|CarryAction)&CollectAction,'energy'>
 type EnSink =   FilterPoolKey<(WorkAction|CarryAction)&ConsumeAction,'energy'>
+type ResSource = FilterPoolKey<CarryAction&CollectAction,ResourceConstant>
+type ResSink =   FilterPoolKey<CarryAction&ConsumeAction,ResourceConstant>
 type ResFlow = [
-    from:   FilterPoolKey<CarryAction&CollectAction,ResourceConstant>|'storage',
-    to:     FilterPoolKey<CarryAction&ConsumeAction,ResourceConstant>|'storage']
+    from:   'storage' | ResSource,
+    to:     'storage' | ResSink
+]

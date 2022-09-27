@@ -7,6 +7,21 @@ type Looper = {
     interval:       number
 }
 
+type CachedArgs<T extends Parameters<Creep[PrimitiveAction]>> = {
+    [P in keyof T] : T[P] extends _HasId
+        ? Id<T[P]> : T[P];
+}
+
+type ShadowedPick<T, K extends keyof T> = {
+    [P in K]: T[P];
+} & {
+    [P in Exclude<keyof T, K>]?: undefined
+}
+type FilterOptional<T extends object> = Pick<T, Exclude<{
+    [K in keyof T]: T extends Record<K, T[K]>
+    ? K : never
+}[keyof T], undefined>>;
+
 type ValueTypes<T> = T[keyof T]
 type base = keyof typeof REACTIONS.O & keyof typeof REACTIONS.H
 type tier1_comp<R extends base> = ValueTypes<typeof REACTIONS[R]> & keyof typeof REACTIONS.OH

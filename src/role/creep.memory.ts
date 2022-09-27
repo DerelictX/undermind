@@ -1,6 +1,6 @@
 
 interface CreepMemory extends MoveMemory {
-    _class:     CarrierMemory|WorkerMemory|CallbackBehavior<AnyAction>
+    _class:     CarrierMemory|WorkerMemory|CallbackBehavior<PrimitiveAction>
     _caller:    SpawnTask['_caller']
 }
 
@@ -10,8 +10,8 @@ interface CarrierMemory {
     bhvr_name:  "carrier"
     
     state:      "collect"|"consume"|"idle"
-    collect:    CallbackBehavior<AnyAction>[]
-    consume:    CallbackBehavior<AnyAction>[]
+    collect:    CallbackBehavior<PrimitiveAction>[]
+    consume:    CallbackBehavior<PrimitiveAction>[]
     current:    ResFlow
 
     fromRoom:   string
@@ -27,8 +27,8 @@ interface WorkerMemory {
     bhvr_name:  "worker"
     
     state:      "collect"|"consume"
-    collect:    CallbackBehavior<AnyAction>[]
-    consume:    CallbackBehavior<AnyAction>[]
+    collect:    CallbackBehavior<PrimitiveAction>[]
+    consume:    CallbackBehavior<PrimitiveAction>[]
 
     fromRoom:   string
     toRoom:     string

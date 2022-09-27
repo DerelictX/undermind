@@ -1,17 +1,8 @@
-type ShadowedPick<T, K extends keyof T> = {
-    [P in K]: T[P];
-} & {
-    [P in Exclude<keyof T, K>]?: undefined
-}
-type FilterOptional<T extends object> = Pick<T, Exclude<{
-    [K in keyof T]: T extends Record<K, T[K]>
-    ? K : never
-}[keyof T], undefined>>;
 
 type RoomTypes = RoomMemory['_typed']['_type']
 interface RoomMemory {
     _typed:     OwnedRoomMemory | ReservedRoomMemory | HighwayRoomMemory | NeutralRoomMemory
-    _dynamic:   {[k in keyof DynamicTaskPool]?: PosedCreepTask<TargetedAction>[]}
+    _dynamic:   {[k in keyof DynamicTaskPool]?: DynamicTaskPool[k]}
     _spawn:     string  //生爬的房间名
 }
 

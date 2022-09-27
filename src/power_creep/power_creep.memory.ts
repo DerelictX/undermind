@@ -1,21 +1,3 @@
-interface MoveMemory {
-    _move?:{
-        dest: {x:number,y:number,room:string},
-        time: number,
-        path: string,
-        room: string
-    }
-    _hike?:{
-        from:   string
-        to:     string
-        route:{
-            exit: ExitConstant | STRUCTURE_PORTAL
-            room: string
-            exitPos?: RoomPosition
-        }[]
-    }
-}
-
 interface PowerCreepMemory extends MoveMemory {
     _tasks: PowerActionDescript<PowerAction>[]
     _power: {power:PowerConstant, target:Id<Structure|Source|Mineral>}[]

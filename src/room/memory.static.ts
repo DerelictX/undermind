@@ -3,30 +3,26 @@ type FullTaskPool =
     &OwnedTaskPool&ReservedTaskPool&HighwayTaskPool
 
 interface SourceTaskPool {
-    H_srcs:     Posed<RestrictedPrimitiveDescript<'harvest','energy'>>[]
-    T_src0:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair'|'build','energy'>>[]
-    T_src1:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair'|'build','energy'>>[]
-    W_cntn:     Posed<PrimitiveDescript<'withdraw'>>[]
-    T_cntn:     Posed<RestrictedPrimitiveDescript<'transfer','energy'>>[]
+    H_srcs:     RestrictedPrimitiveDescript<'harvest','energy'>[]
+    T_src0:     RestrictedPrimitiveDescript<'transfer'|'repair'|'build','energy'>[]
+    T_src1:     RestrictedPrimitiveDescript<'transfer'|'repair'|'build','energy'>[]
+    W_cntn:     RestrictedPrimitiveDescript<'withdraw',ResourceConstant>[]
+    T_cntn:     RestrictedPrimitiveDescript<'transfer','energy'>[]
 }
 
 interface MineralTaskPool {
-    H_mnrl:     Posed<RestrictedPrimitiveDescript<'harvest',MineralConstant>>[]
-    T_mnrl:     Posed<RestrictedPrimitiveDescript<'transfer',MineralConstant>>[]
+    H_mnrl:     RestrictedPrimitiveDescript<'harvest',MineralConstant>[]
+    T_mnrl:     RestrictedPrimitiveDescript<'transfer',MineralConstant>[]
 }
 
 interface OwnedTaskPool {
-    W_ctrl:     Posed<RestrictedPrimitiveDescript<'withdraw','energy'>>[]
-    U_ctrl:     Posed<PrimitiveDescript<'upgradeController'>>[]
+    W_ctrl:     RestrictedPrimitiveDescript<'withdraw','energy'>[]
+    U_ctrl:     RestrictedPrimitiveDescript<'upgradeController'>[]
 }
 
 interface ReservedTaskPool {
-    T_src2:     Posed<RestrictedPrimitiveDescript<'transfer'|'repair','energy'>>[]
-    A_core:     Posed<PrimitiveDescript<'attack'>>[]
-    A_ctrl:     Posed<PrimitiveDescript<'attackController'>>[]
-    R_ctrl:     Posed<PrimitiveDescript<'reserveController'>>[]
+    T_src2:     RestrictedPrimitiveDescript<'transfer'|'repair','energy'>[]
 }
 
 interface HighwayTaskPool {
-    A_bank:     Posed<PrimitiveDescript<'attack'>>[]
 }

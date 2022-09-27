@@ -1,39 +1,9 @@
+import { parse_posed_task } from "@/performer/behavior.callback"
 import { init_carrier_behavior, init_worker_behavior } from "@/role/initializer/config.behavior"
 import { static_updater } from "@/scanner/static"
 import { check_components } from "@/structure/factory"
 import { change_reaction } from "@/structure/lab"
 import { structure_updater } from "../../scanner/structure.updater"
-
-const spawnHarvest = function(H:Posed<PrimitiveDescript<'harvest'>>,
-        T?:Posed<PrimitiveDescript<'transfer'>>|undefined): RoleImpl|null{
-    const main: CallbackBehavior<'harvest'> = {
-        bhvr_name: 'callbackful', action: 'harvest', args: H.args
-    }
-    main[ERR_NOT_IN_RANGE] = main[ERR_NOT_FOUND] = {
-        bhvr_name: 'callbackful', action: 'approach', args: [H.pos, 1]
-    }
-    if(!T) return {
-        _body: { generator: 'W', workload: 5 },
-        _class: { ...{ bhvr_name: 'callbackful' }, ...main }
-    }
-
-    const back: CallbackBehavior<'transfer'> = {
-        bhvr_name: 'callbackful', action: 'transfer', args: T.args
-    }
-    back[ERR_NOT_IN_RANGE] = {
-        bhvr_name: 'callbackful', action: 'approach', args: [T.pos, 1]
-    }
-
-    const full_store: CallbackBehavior<'prejudge_full'> = {
-        bhvr_name: 'callbackful', action: "prejudge_full", args: [0]
-    }
-    full_store[OK] = main
-    full_store[ERR_FULL] = back
-    return {
-        _body: { generator: 'Wc', workload: 15 },
-        _class: full_store
-    }
-}
 
 export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
     Source0: function (room: Room, pool: SourceTaskPool, looper: Looper) {
@@ -42,13 +12,7 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
             return null
         if (!pool.T_src0[0]) {
             const posed = pool.H_srcs[0]
-            const main: CallbackBehavior<TargetedAction> = { ...{ bhvr_name: 'callbackful' }, ...posed }
-            const move: CallbackBehavior<'approach'> = {
-                ...{ bhvr_name: 'callbackful' },
-                ...{ action: "approach", args: [posed.pos, 1] }
-            }
-            main[ERR_NOT_FOUND] = move
-            main[ERR_NOT_IN_RANGE] = move
+            const main: CallbackBehavior<PrimitiveAction> = parse_posed_task(posed)
             return {
                 _body: { generator: 'W', workload: 5 },
                 _class: { ...{ bhvr_name: 'callbackful' }, ...main }
@@ -65,13 +29,7 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
             return null
         if (!pool.T_src1[0]) {
             const posed = pool.H_srcs[1]
-            const main: CallbackBehavior<TargetedAction> = { ...{ bhvr_name: 'callbackful' }, ...posed }
-            const move: CallbackBehavior<'approach'> = {
-                ...{ bhvr_name: 'callbackful' },
-                ...{ action: "approach", args: [posed.pos, 1] }
-            }
-            main[ERR_NOT_FOUND] = move
-            main[ERR_NOT_IN_RANGE] = move
+            const main: CallbackBehavior<PrimitiveAction> = parse_posed_task(posed)
             return {
                 _body: { generator: 'W', workload: 5 },
                 _class: { ...{ bhvr_name: 'callbackful' }, ...main }
@@ -97,15 +55,10 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
         if (storage.store[mineral.mineralType] > 60000)
             return null
 
-        const main: CallbackBehavior<'harvest'> = { ...{ bhvr_name: 'callbackful' }, ...posed }
-        const move: CallbackBehavior<'approach'> = {
-            ...{ bhvr_name: 'callbackful' },
-            ...{ action: "approach", args: [stand.pos, 0] }
-        }
-        move[OK] = main
+        const main: CallbackBehavior<PrimitiveAction> = parse_posed_task(posed)
         return {
             _body: { generator: 'W', workload: 24 },
-            _class: { ...{ bhvr_name: 'callbackful' }, ...move }
+            _class: { ...{ bhvr_name: 'callbackful' }, ...main }
         }
     },
     Upgrade: function (room: Room, pool: OwnedTaskPool, looper: Looper) {

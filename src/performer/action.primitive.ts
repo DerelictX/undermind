@@ -1,19 +1,24 @@
-type PrimitivePerformer<T extends PrimitiveAction>
-    = (creep: Creep, args:CachedArgs<Parameters<Creep[T]>>) => ScreepsReturnCode
+export const perform_primitive = function
+    <T extends PrimitiveAction>
+    (creep:Creep, action:T, args:CachedArgs<Parameters<Creep[T]>>): ScreepsReturnCode
+    {return performer[action](creep,args)}
 
-const performer:{[action in PrimitiveAction]:PrimitivePerformer<action>} = {
+const performer:{
+    [action in PrimitiveAction]:
+    (creep: Creep, args:CachedArgs<Parameters<Creep[action]>>) => ScreepsReturnCode
+} = {
     harvest: function (creep: Creep, args: [target: Id<Source | Mineral<MineralConstant> | Deposit>]) {
         const target = Game.getObjectById(args[0])
-        if(!target) return ERR_NOT_FOUND
         if(!creep.store.getFreeCapacity() && creep.store.getCapacity())
             return ERR_FULL
+        if(!target) return ERR_NOT_FOUND
         return creep.harvest(target);
     },
     dismantle: function (creep: Creep, args: [target: Id<Structure<StructureConstant>>]) {
         const target = Game.getObjectById(args[0])
-        if(!target) return ERR_NOT_FOUND
         if(!creep.store.getFreeCapacity() && creep.store.getCapacity())
             return ERR_FULL
+        if(!target) return ERR_NOT_FOUND
         return creep.dismantle(target);
     },
     build: function (creep: Creep, args: [target: Id<ConstructionSite<BuildableStructureConstant>>]) {
@@ -120,35 +125,4 @@ const performer:{[action in PrimitiveAction]:PrimitivePerformer<action>} = {
         if(!target) return ERR_NOT_FOUND
         return creep.rangedHeal(target);
     }
-}
-
-export const perform_primitive = function(creep:Creep, behavior:PrimitiveDescript<PrimitiveAction>): ScreepsReturnCode {
-    const action = behavior.action
-    let ret: ScreepsReturnCode
-    switch(action){
-        //WORK
-        case 'harvest':             ret = performer[action](creep,behavior.args); break;
-        case 'dismantle':
-        //WORK & CARRY
-        case 'repair':              ret = performer[action](creep,behavior.args); break;
-        case 'build':               ret = performer[action](creep,behavior.args); break;
-        case 'upgradeController':
-        //CLAIM
-        case 'claimController':
-        case 'attackController':
-        case 'reserveController':
-        //CARRY
-        case 'generateSafeMode':    ret = performer[action](creep,behavior.args); break;
-        case "withdraw":            ret = performer[action](creep,behavior.args); break;
-        case 'transfer':            ret = performer[action](creep,behavior.args); break;
-        case 'pickup':              ret = performer[action](creep,behavior.args); break;
-        case 'drop':                ret = performer[action](creep,behavior.args); break;
-        //ATTACK
-        case 'attack':
-        case 'rangedAttack':        ret = performer[action](creep,behavior.args); break;
-        case 'heal':
-        case 'rangedHeal':          ret = performer[action](creep,behavior.args); break;
-        case 'rangedMassAttack':    ret = performer[action](creep,behavior.args); break;
-    }
-    return ret
 }

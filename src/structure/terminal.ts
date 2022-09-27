@@ -79,7 +79,7 @@ export const T_term = function (room: Room) {
     if (terminal.store.getFreeCapacity() < 50000)
         return []
 
-    var tasks: Posed<PrimitiveDescript<'transfer'>>[] = []
+    var tasks: RestrictedPrimitiveDescript<'transfer'>[] = []
     var storage_store: StorePropertiesOnly = storage.store
     var resourceType: keyof typeof storage_store
     for (resourceType in storage_store) {
@@ -104,7 +104,7 @@ export const W_term = function (room: Room) {
     if (storage.store.getFreeCapacity() < 100000)
         return []
 
-    var tasks: Posed<PrimitiveDescript<'withdraw'>>[] = []
+    var tasks: RestrictedPrimitiveDescript<'withdraw'>[] = []
     let terminal_store: StorePropertiesOnly = terminal.store
     let resourceType: keyof typeof terminal_store
     for (resourceType in terminal_store) {

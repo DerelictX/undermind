@@ -168,9 +168,6 @@ const reserved_memory_initializer: {[k in keyof FilterOptional<ReservedRoomMemor
 
             W_cntn: [],
             T_cntn: [],
-            A_core: [],
-            A_ctrl: [],
-            R_ctrl: [],
         }
     },
     _looper: function (mem: ReservedRoomMemory): void {
@@ -198,7 +195,6 @@ const highway_memory_initializer: {[k in keyof FilterOptional<HighwayRoomMemory>
     },
     _static: function (mem: HighwayRoomMemory): void {
         mem._static = {
-            A_bank: [],
         }
     },
     _looper: function (mem: HighwayRoomMemory): void {

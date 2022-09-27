@@ -4,6 +4,14 @@ type TASK_DOING     = -16
 type TASK_COMPLETE  = -17
 type TASK_FAILED    = -18
 
-type CallbackBehavior<T extends AnyAction> = T extends AnyAction ? {
-    [R in ScreepsReturnCode] ?: CallbackBehavior<AnyAction> | TaskReturnCode
-} & {bhvr_name: "callbackful"} & AnyDescript<T> : never
+type CallbackBehavior<T extends PrimitiveAction> = T extends PrimitiveAction ? {
+    bhvr_name: "callbackful",
+} & PosedCreepTask<T> & {
+    [R in ScreepsReturnCode] ?: CallbackBehavior<PrimitiveAction> | TaskReturnCode
+} : never
+
+type PosedCreepTask<T extends PrimitiveAction> = T extends PrimitiveAction ? {
+    action: T extends PrimitiveAction ? T : never
+    args:   CachedArgs<Parameters<Creep[T]>>
+    pos:    RoomPosition
+} : never

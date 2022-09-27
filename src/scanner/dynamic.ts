@@ -3,7 +3,14 @@ import { compound, T_boost, T_react } from "@/structure/lab"
 import { T_nuker, T_power } from "@/structure/power_spawn"
 import { T_term, W_term } from "@/structure/terminal"
 
-export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
+export const update_pool = function
+    <T extends keyof DynamicTaskPool>
+    (pool: Partial<DynamicTaskPool>, key: T, room: Room)
+    {pool[key] = posed_task_updater[key](room)}
+
+const posed_task_updater: {
+    [P in keyof DynamicTaskPool]: (room:Room) => DynamicTaskPool[P]
+} = {
     /**
      * 从container取所有类型资源
      * @param room
@@ -12,7 +19,7 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
     W_cntn: function (room: Room) {
         if (!room.memory._typed._static.W_cntn)
             return []
-        var tasks: Posed<PrimitiveDescript<'withdraw'>>[] = []
+        var tasks: RestrictedPrimitiveDescript<'withdraw',ResourceConstant>[] = []
         for (let task of room.memory._typed._static.W_cntn) {
             const container = Game.getObjectById(task.args[0])
             if (!container || container.store.getFreeCapacity('energy') > 800)
@@ -138,7 +145,7 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
     H_srcs: function (room: Room) {
         if (!room.memory._typed._static.H_srcs)
             return []
-        var tasks: Posed<RestrictedPrimitiveDescript<'harvest', 'energy'>>[] = []
+        var tasks: RestrictedPrimitiveDescript<'harvest', 'energy'>[] = []
         for (let task of room.memory._typed._static.H_srcs) {
             if (Game.getObjectById(task.args[0])?.energy)
                 tasks.push(task)
@@ -168,7 +175,7 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
     },
 
     W_energy: function (room: Room) {
-        var tasks: Posed<RestrictedPrimitiveDescript<'withdraw' | 'pickup', 'energy'>>[] = []
+        var tasks: RestrictedPrimitiveDescript<'withdraw' | 'pickup', 'energy'>[] = []
         const storage = room.storage
         if (storage && storage.store['energy'] >= 10000) {
             tasks.push({
@@ -355,8 +362,8 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         }
         return []
     },
-    T_ext: function (room: Room): Posed<RestrictedPrimitiveDescript<'transfer', 'energy'>>[] {
-        var tasks: Posed<RestrictedPrimitiveDescript<'transfer', 'energy'>>[] = []
+    T_ext: function (room: Room): RestrictedPrimitiveDescript<'transfer', 'energy'>[] {
+        var tasks: RestrictedPrimitiveDescript<'transfer', 'energy'>[] = []
         if (room.energyAvailable == room.energyCapacityAvailable)
             return []
         const extensions: (AnyStoreStructure & AnyOwnedStructure)[] = room.find(FIND_MY_STRUCTURES, {
@@ -378,10 +385,10 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         }
         return tasks
     },
-    T_tower: function (room: Room): Posed<RestrictedPrimitiveDescript<'transfer', 'energy'>>[] {
+    T_tower: function (room: Room): RestrictedPrimitiveDescript<'transfer', 'energy'>[] {
         if (room.memory._typed._type != 'owned')
             return []
-        var tasks: Posed<RestrictedPrimitiveDescript<'transfer', 'energy'>>[] = []
+        var tasks: RestrictedPrimitiveDescript<'transfer', 'energy'>[] = []
         const towers = room.memory._typed._struct.towers
             .map(id => Game.getObjectById(id))
             .filter(s => s && s.store.getFreeCapacity('energy') >= 400)
@@ -396,10 +403,10 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
         }
         return tasks
     },
-    T_cntn: function (room: Room): Posed<RestrictedPrimitiveDescript<'transfer', 'energy'>>[] {
+    T_cntn: function (room: Room): RestrictedPrimitiveDescript<'transfer', 'energy'>[] {
         if (!room.memory._typed._static.W_cntn)
             return []
-        var tasks: Posed<RestrictedPrimitiveDescript<'transfer', 'energy'>>[] = []
+        var tasks: RestrictedPrimitiveDescript<'transfer', 'energy'>[] = []
         for (let task of room.memory._typed._static.T_cntn) {
             const container = Game.getObjectById(task.args[0])
             if (container && container.store.getFreeCapacity('energy') >= 1000)
@@ -473,19 +480,6 @@ export const posed_task_updater: TaskUpdater<DynamicTaskPool> = {
     compound: compound,
     T_power: T_power,
     T_nuker: T_nuker,
-    gen_safe: function (room: Room): PosedCreepTask<"generateSafeMode">[] {
-        const controller = room.controller
-        if (controller && controller.my && controller.level > 3 && controller.safeModeAvailable == 0) {
-            return [{
-                action: 'generateSafeMode',
-                args: [controller.id],
-                pos: controller.pos
-            }]
-        }
-
-        else
-            return []
-    },
     T_term: T_term,
     W_term: W_term,
     T_fact: T_fact,

@@ -12,17 +12,9 @@ export const reserved_room_loop_handler: RoomLoopHandler<'reserved'> = {
         })[0]
         if(!core) return null
         const attack: CallbackBehavior<'attack'> = {
-            bhvr_name: 'callbackful',
-            action: 'attack',
-            args: [core.id]
+            bhvr_name: 'callbackful', action: 'attack',
+            args: [core.id], pos: core.pos
         }
-        const move: CallbackBehavior<'approach'> = {
-            bhvr_name: 'callbackful',
-            action: "approach",
-            args: [core.pos, 1]
-        }
-        attack[ERR_NOT_FOUND] = move
-        attack[ERR_NOT_IN_RANGE] = move
         return {
             _body: { generator: 'A', workload: 12, mobility: 1 },
             _class: attack
@@ -51,13 +43,7 @@ export const reserved_room_loop_handler: RoomLoopHandler<'reserved'> = {
 
         if (!pool.T_src0[0]) {
             const posed = pool.H_srcs[0]
-            const main: CallbackBehavior<TargetedAction> = { ...{ bhvr_name: 'callbackful' }, ...posed }
-            const move: CallbackBehavior<'approach'> = {
-                ...{ bhvr_name: 'callbackful' },
-                ...{ action: "approach", args: [posed.pos, 1] }
-            }
-            main[ERR_NOT_FOUND] = move
-            main[ERR_NOT_IN_RANGE] = move
+            const main: CallbackBehavior<'harvest'> = { bhvr_name: 'callbackful', ...posed }
             return {
                 _body: { generator: 'W', workload: 5, mobility: 1 },
                 _class: { ...{ bhvr_name: 'callbackful' }, ...main }
@@ -91,13 +77,7 @@ export const reserved_room_loop_handler: RoomLoopHandler<'reserved'> = {
 
         if (!pool.T_src1[0]) {
             const posed = pool.H_srcs[1]
-            const main: CallbackBehavior<TargetedAction> = { ...{ bhvr_name: 'callbackful' }, ...posed }
-            const move: CallbackBehavior<'approach'> = {
-                ...{ bhvr_name: 'callbackful' },
-                ...{ action: "approach", args: [posed.pos, 1] }
-            }
-            main[ERR_NOT_FOUND] = move
-            main[ERR_NOT_IN_RANGE] = move
+            const main: CallbackBehavior<'harvest'> = { bhvr_name: 'callbackful', ...posed }
             return {
                 _body: { generator: 'W', workload: 5, mobility: 1 },
                 _class: { ...{ bhvr_name: 'callbackful' }, ...main }
@@ -120,21 +100,16 @@ export const reserved_room_loop_handler: RoomLoopHandler<'reserved'> = {
         const reserve: CallbackBehavior<'reserveController'> = {
             bhvr_name: 'callbackful',
             action: 'reserveController',
-            args: [controller.id]
+            args: [controller.id],
+            pos: controller.pos
         }
         const attack: CallbackBehavior<'attackController'> = {
             bhvr_name: 'callbackful',
             action: 'attackController',
-            args: [controller.id]
+            args: [controller.id],
+            pos: controller.pos
         }
-        const move: CallbackBehavior<'approach'> = {
-            bhvr_name: 'callbackful',
-            action: "approach",
-            args: [controller.pos, 1]
-        }
-        reserve[ERR_NOT_FOUND] = move
         reserve[ERR_INVALID_TARGET] = attack
-        reserve[ERR_NOT_IN_RANGE] = move
         return {
             _body: { generator: 'Cl', workload: 4, mobility: 1 },
             _class: reserve

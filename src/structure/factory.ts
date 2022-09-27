@@ -30,7 +30,7 @@ export const T_fact = function (room: Room) {
     const config = room.memory._typed._struct.factory
     const factory = config.fact_id ? Game.getObjectById(config.fact_id) : null
     if (!storage || !terminal || !factory) return []
-    var tasks: Posed<PrimitiveDescript<'transfer'>>[] = []
+    var tasks: RestrictedPrimitiveDescript<'transfer'>[] = []
 
     /**压缩资源 */
     for(let res of compressed){
@@ -108,7 +108,7 @@ export const W_fact = function (room: Room) {
     const factory = config.fact_id ? Game.getObjectById(config.fact_id) : null
     if (!storage || !terminal || !factory) return []
 
-    var tasks: Posed<PrimitiveDescript<'withdraw'>>[] = []
+    var tasks: RestrictedPrimitiveDescript<'withdraw'>[] = []
     for(let res of compressed){
         if(res == 'battery' && storage.store['energy'] < 240000)
             continue

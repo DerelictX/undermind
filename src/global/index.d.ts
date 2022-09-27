@@ -23,10 +23,3 @@ interface PathMemory {
         time:   number
     }}
 }
-
-type RoomMoveIntents = {
-    [pos:string]:{
-        id:     Id<AnyCreep>
-        step:   (0 | DirectionConstant)[]
-    }
-}

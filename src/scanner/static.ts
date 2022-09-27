@@ -37,7 +37,7 @@ export const static_updater = {
 
     sources: function (room:Room, pool:SourceTaskPool) {
         pool.H_srcs = []
-        var T_srcs: Posed<RestrictedPrimitiveDescript<'transfer'|'repair'|'build','energy'>>[][] = [[],[],[]]
+        var T_srcs: RestrictedPrimitiveDescript<'transfer'|'repair'|'build','energy'>[][] = [[],[],[]]
         const sources = room.find(FIND_SOURCES)
         for(let i in sources) {
             const source = sources[i]

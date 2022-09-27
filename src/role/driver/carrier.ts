@@ -1,5 +1,5 @@
 import { carry_priority } from "@/role/initializer/config.behavior"
-import { posed_task_updater } from "@/scanner/dynamic"
+import { update_pool } from "@/scanner/dynamic"
 import { parse_posed_task, perform_callback, TASK_DOING } from "../../performer/behavior.callback"
 
 export const run_carrier = function(creep:Creep,fb:CarrierMemory){
@@ -103,14 +103,14 @@ const change_flow = function(fb:CarrierMemory) {
     for(let flow of carry_priority[fb.priority]){
         if(flow[0] != 'storage' && !pool[flow[0]]?.length) {
             if(!fromRoom) return null
-            pool[flow[0]] = posed_task_updater[flow[0]](fromRoom)
+            update_pool(pool,flow[0],fromRoom)
         }
         if(flow[0] != 'storage' && !pool[flow[0]]?.length) {
             continue
         }
         if(flow[1] != 'storage' && !pool[flow[1]]?.length) {
             if(!toRoom) return null
-            pool[flow[1]] = posed_task_updater[flow[1]](toRoom)
+            update_pool(pool,flow[1],fromRoom)
         }
         if(flow[1] != 'storage' && !pool[flow[1]]?.length) {
             continue
@@ -142,17 +142,7 @@ const find_consume = function(creep:Creep,fb:CarrierMemory){
                 fb.consume.push(parse_posed_task(task))
                 pool.shift()
             }
-        }
-        else if(task.action == 'generateSafeMode'){
-            if(free < 1000){
-                break
-            }else{
-                free -= 1000
-                fb.consume.push(parse_posed_task(task))
-                pool.shift()
-            }
-        }
-        else {
+        } else {
             fb.consume.push(parse_posed_task(task))
             pool.shift()
             break
@@ -167,7 +157,7 @@ const find_collect = function(creep:Creep,fb:CarrierMemory){
     if(!collect[fb.current[0]]?.length){
         const fromRoom = Game.rooms[fb.fromRoom]
         if(fromRoom){
-            collect[fb.current[0]] = posed_task_updater[fb.current[0]](fromRoom)
+            update_pool(collect,fb.current[0],fromRoom)
         }
     }
     
@@ -240,10 +230,9 @@ const lazy_storage = function(fb:CarrierMemory) {
             action: 'withdraw',
             args:   [storage.id,'energy']
         }
-        if(consume.action == 'generateSafeMode')
-            collect.args = [storage.id,'G',1000]
-        else if(consume.action == 'transfer')
+        if(consume.action == 'transfer'){
             collect.args = [storage.id,consume.args[1],consume.args[2]]
+        }
 
         if(!storage.store[collect.args[1]]) {
             if(terminal?.store[collect.args[1]]){

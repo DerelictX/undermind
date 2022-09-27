@@ -1,5 +1,3 @@
-type AnyAction = PrimitiveAction | keyof VirtualAction
-
 type PrimitiveAction =
     | WorkAction
     | CarryAction
@@ -27,36 +25,24 @@ type FightAction =
     |"attack"|"rangedAttack"|"rangedMassAttack"
     |"heal"|"rangedHeal"
 
-type TargetedAction = Exclude<PrimitiveAction,"drop"|"rangedMassAttack">
-    
-type VirtualAction = {
-    approach:   [pos:RoomPosition, range:number],
-    escape:     [pos:RoomPosition, range:number],
-    hold_place: [priority:number],
-    prejudge_full:  [amount:number],
-    prejudge_empty: [amount:number],
-    full_hits:      [target:Id<Structure>,amount:number],
-}
-
-type CachedArgs<T extends any[]> = {
-    [P in keyof T] : T[P] extends _HasId
-        ? Id<T[P]> : T[P];
-}
-
-type AnyDescript<T extends AnyAction> =
-    T extends PrimitiveAction ? PrimitiveDescript<T> :
-    T extends keyof VirtualAction ? VirtualDescript<T> :
-    never
-
+/**动作描述 */
+/*
 type PrimitiveDescript<T extends PrimitiveAction> = T extends PrimitiveAction ? {
     action: T
     args:   CachedArgs<Parameters<Creep[T]>>
 } : never
 
-type RestrictedPrimitiveDescript<T extends WorkAction|CarryAction,Res extends ResourceConstant> =
-        T extends WorkAction|CarryAction ? {
+type Posed<T extends PrimitiveDescript<TargetedAction>> = 
+    {pos: RoomPosition} & T
+*/
+
+/**限定work和carry动作的资源类型 */
+type RestrictedPrimitiveDescript<
+    T extends WorkAction|CarryAction,
+    Res extends ResourceConstant = ResourceConstant
+> = T extends WorkAction|CarryAction ? {
     action: T
-    args:CachedArgs<
+    args:   CachedArgs<
         T extends "harvest"
             ? [target: ("energy" extends Res ? Source : never)
             | (MineralConstant extends Res ? Mineral : never)
@@ -71,9 +57,5 @@ type RestrictedPrimitiveDescript<T extends WorkAction|CarryAction,Res extends Re
         : T extends "generateSafeMode"
             ? Res extends "G" ? Parameters<Creep[T]> : never
         : never>
-} : never
-
-type VirtualDescript<T extends keyof VirtualAction> = T extends keyof VirtualAction ? {
-    action: T
-    args:   VirtualAction[T]
+    pos:    RoomPosition
 } : never
