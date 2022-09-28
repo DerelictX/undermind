@@ -1,9 +1,6 @@
 type EnWorkerPriority = [from: EnSource[], to: EnSink[]]
 
 export const work_priority: {[role in EnergyRole]:EnWorkerPriority} = {
-    HarvesterSource0: [['H_src0'], ['T_src0']],
-    HarvesterSource1: [['H_src1'], ['T_src1']],
-    HarvesterSource2: [['H_src2'], ['T_src2']],
     Upgrader: [['W_ctrl'], ['U_ctrl']],
     Builder: [
         ['W_energy', 'H_srcs'],

@@ -8,36 +8,44 @@ import { structure_updater } from "../../scanner/structure.updater"
 export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
     Source0: function (room: Room, pool: SourceTaskPool, looper: Looper) {
         static_updater['sources'](room,pool)
-        if (!pool.H_srcs?.[0])
-            return null
-        if (!pool.T_src0[0]) {
-            const posed = pool.H_srcs[0]
-            const main: CallbackBehavior<PrimitiveAction> = parse_posed_task(posed)
+        const harvest = pool.H_srcs[0]
+        if (!harvest) return null
+        const bhvr: StaticMemory = {
+            bhvr_name:  "static",
+            state:      "collect",
+            collect:    [harvest],
+            consume:    pool.T_src0,
+        }
+        if (!bhvr.consume[0]) {
             return {
                 _body: { generator: 'W', workload: 5 },
-                _class: { ...{ bhvr_name: 'callbackful' }, ...main }
+                _class: bhvr
             }
         }
         return {
             _body: { generator: 'Wc', workload: room.controller?.level == 8 ? 15 : 10 },
-            _class: init_worker_behavior('HarvesterSource0', room.name, room.name)
+            _class: bhvr
         }
     },
     Source1: function (room: Room, pool: SourceTaskPool, looper: Looper) {
         static_updater['sources'](room,pool)
-        if (!pool.H_srcs?.[1])
-            return null
-        if (!pool.T_src1[0]) {
-            const posed = pool.H_srcs[1]
-            const main: CallbackBehavior<PrimitiveAction> = parse_posed_task(posed)
+        const harvest = pool.H_srcs[1]
+        if (!harvest) return null
+        const bhvr: StaticMemory = {
+            bhvr_name:  "static",
+            state:      "collect",
+            collect:    [harvest],
+            consume:    pool.T_src1,
+        }
+        if (!bhvr.consume[0]) {
             return {
                 _body: { generator: 'W', workload: 5 },
-                _class: { ...{ bhvr_name: 'callbackful' }, ...main }
+                _class: bhvr
             }
         }
         return {
             _body: { generator: 'Wc', workload: room.controller?.level == 8 ? 15 : 10 },
-            _class: init_worker_behavior('HarvesterSource1', room.name, room.name)
+            _class: bhvr
         }
     },
     Mineral: function (room: Room, pool: MineralTaskPool, looper: Looper) {
@@ -55,12 +63,15 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
         if (storage.store[mineral.mineralType] > 60000)
             return null
 
-        const main = parse_posed_task(posed)
-        const back = parse_posed_task(stand)
-        main[ERR_FULL] = back
+        const bhvr: StaticMemory = {
+            bhvr_name:  "static",
+            state:      "collect",
+            collect:    [parse_posed_task(posed)],
+            consume:    [parse_posed_task(stand)],
+        }
         return {
-            _body: { generator: 'Wc', workload: 24 },
-            _class: { ...{ bhvr_name: 'callbackful' }, ...main }
+            _body: { generator: 'Wc', workload: 25 },
+            _class: bhvr
         }
     },
     Upgrade: function (room: Room, pool: OwnedTaskPool, looper: Looper) {

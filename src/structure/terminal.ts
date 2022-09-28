@@ -53,18 +53,21 @@ const sendList = function(terminal: StructureTerminal, list: ResourceConstant[],
     if(terminal.cooldown) return
     for (let resourceType of list) {
         let amount = terminal.store[resourceType]
-        if(supply){
-            if(!supply[resourceType]) continue
-            amount += supply[resourceType] - 3000
-        }
+        if(supply && supply[resourceType] < amount)
+            amount = supply[resourceType]
+
         const demand = Memory.terminal.demand[resourceType]
         if(!demand || amount <= 0) continue
         let toRoom: string|undefined = undefined
         for(toRoom in demand) if(demand[toRoom]) break
         if(!toRoom) continue
         
-        if(demand[toRoom] < amount) amount = demand[toRoom]
-        delete demand[toRoom]
+        if(demand[toRoom] > amount) {
+            demand[toRoom] -= amount
+        } else {
+            amount = demand[toRoom]
+            delete demand[toRoom]
+        }
         const ret = terminal.send(resourceType, amount , toRoom)
         console.log(`${terminal.room.name} -> ${toRoom}\t[${resourceType} : ${amount}] : ${ret}`)
         return resourceType

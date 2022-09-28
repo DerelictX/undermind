@@ -3,13 +3,6 @@ type FilterPoolKey<T extends WorkAction|CarryAction, R extends ResourceConstant>
         DynamicTaskPool[K] extends RestrictedPrimitiveDescript<T,R>[] ? K : never}>
 
 interface DynamicTaskPool {
-    //sources
-    H_src0:     RestrictedPrimitiveDescript<'harvest','energy'>[]
-    H_src1:     RestrictedPrimitiveDescript<'harvest','energy'>[]
-    H_src2:     RestrictedPrimitiveDescript<'harvest','energy'>[]
-    T_src0:     RestrictedPrimitiveDescript<'transfer'|'repair'|'build','energy'>[]
-    T_src1:     RestrictedPrimitiveDescript<'transfer'|'repair'|'build','energy'>[]
-    T_src2:     RestrictedPrimitiveDescript<'transfer'|'repair'|'build','energy'>[]
     //controller
     W_ctrl:     RestrictedPrimitiveDescript<'withdraw','energy'>[]
     U_ctrl:     RestrictedPrimitiveDescript<'upgradeController'>[]

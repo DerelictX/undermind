@@ -10,22 +10,24 @@ export const highway_room_loop_handler: RoomLoopHandler<'highway'> = {
             looper.interval = 500
             return null
         }
-
-        const main: CallbackBehavior<'harvest'> = {
-            bhvr_name: 'callbackful', action: 'harvest',
-            args: [deposit.id], pos: deposit.pos
+        const bhvr: StaticMemory = {
+            bhvr_name:  "static",
+            state:      "collect",
+            collect:    [{
+                action: 'harvest',
+                args: [deposit.id], pos: deposit.pos
+            }],
+            consume:    [{
+                action: 'transfer',
+                args: [storage.id, deposit.depositType], pos: storage.pos
+            }],
         }
-        const back: CallbackBehavior<'transfer'> = {
-            bhvr_name: 'callbackful', action: 'transfer',
-            args: [storage.id, deposit.depositType], pos: storage.pos
-        }
-        main[ERR_FULL] = back
         const workload = deposit.lastCooldown < 5 ? 15 : 20
         looper.interval = 1400
         console.log(room.name + ' -> Deposit:\t' + deposit.pos)
         return {
             _body: { generator: 'DH', workload: workload, mobility: 1 },
-            _class: main
+            _class: bhvr
         }
     },
     Observe: function (room: Room, pool: HighwayTaskPool, looper: Looper): RoleImpl | null {

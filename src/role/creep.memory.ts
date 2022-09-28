@@ -1,6 +1,6 @@
 
 interface CreepMemory extends MoveMemory {
-    _class:     CarrierMemory|WorkerMemory|CallbackBehavior<PrimitiveAction>
+    _class:     | CarrierMemory | WorkerMemory | StaticMemory
     _caller:    SpawnTask['_caller']
 }
 
@@ -20,7 +20,6 @@ interface CarrierMemory {
 }
 
 type EnergyRole =
-    |"HarvesterSource0"|"HarvesterSource1"|"HarvesterSource2"
     |"Upgrader"|"Builder"|"Maintainer"|'EnergySupplier'
     |"RMaintainer"
 interface WorkerMemory {
@@ -39,8 +38,8 @@ interface StaticMemory {
     bhvr_name:  "static"
     
     state:      "collect"|"consume"
-    collect:    CallbackBehavior<'harvest'|'withdraw'>[]
-    consume:    CallbackBehavior<'repair'|'build'|'transfer'>[]
-    buff_in:    CallbackBehavior<'withdraw'>[]
-    buff_out:   CallbackBehavior<'transfer'>[]
+    collect:    CallbackBehavior<PrimitiveAction>[]
+    consume:    CallbackBehavior<PrimitiveAction>[]
+    buff_in?:    CallbackBehavior<'withdraw'>[]
+    buff_out?:   CallbackBehavior<'transfer'>[]
 }

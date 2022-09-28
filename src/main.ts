@@ -6,7 +6,6 @@ import { spawn_run } from "./structure/spawn";
 import { tower_run } from "./structure/tower";
 import { static_updater } from "./scanner/static";
 import { link_run } from "./structure/link";
-import { perform_callback } from "./performer/behavior.callback";
 import { lab_run } from "./structure/lab";
 import { terminal_run } from "./structure/terminal";
 import { factory_run } from "./structure/factory";
@@ -18,6 +17,7 @@ import { inspect_global } from "./global/memory.inspector";
 import { handle_moves } from "./move/Kuhn-Munkres";
 import { HelperRoomResource } from "./global/helper_roomResource";
 import { expand_commo } from "./constant/commodity_tree";
+import { run_static } from "./role/driver/static";
 
 export const loop = function () {
 
@@ -28,9 +28,11 @@ export const loop = function () {
         HelperRoomResource.showAllRes()
         expand_commo
         //Game.market.createOrder('buy','pixel',0.001,1,'sim')
+        //Memory.terminal.demand[resourceType][terminal.room.name] = amount
     }
     
     inspect_global()
+    Memory._move_intents = {}
     run_rooms()
     run_creeps()
     run_power_creeps()
@@ -52,7 +54,6 @@ export const loop = function () {
 }
 
 const run_rooms = function(){
-    Memory._move_intents = {}
     for(let name in Memory.rooms){
         try{
             const room = Game.rooms[name];
@@ -95,14 +96,14 @@ const run_creeps = function(){
                 case 'worker':
                     run_worker(creep,_class)
                     break
-                case 'callbackful':
-                    perform_callback(creep,_class)
+                case 'static':
+                    run_static(creep,_class)
                     break
-                default: throw new Error("Unexpected state.")
+                default:
+                    throw new Error("Unexpected state.")
             }
         }catch(error){
             console.log(name + ':\t' + error);
-            throw(error)
         }
     }
 }

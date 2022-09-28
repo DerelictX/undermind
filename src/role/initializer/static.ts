@@ -20,31 +20,21 @@ const init_harvester = function(pos:RoomPosition): StaticMemory{
     })
 
     sources.forEach(s => ret.collect.push({
-        bhvr_name:'callbackful',
-        action: 'harvest',args: [s.id],
-        pos: s.pos
+        action: 'harvest', args: [s.id], pos: s.pos
     }))
     container.forEach(s => {
         ret.consume.push({
-            bhvr_name:'callbackful',
-            action: 'repair',args: [s.id],
-            pos: s.pos
+            action: 'repair',args: [s.id], pos: s.pos
         })
-        ret.buff_in.push({
-            bhvr_name:'callbackful',
-            action:'withdraw',args:[s.id,'energy'],
-            pos: s.pos
+        ret.buff_in?.push({
+            action:'withdraw',args:[s.id,'energy'], pos: s.pos
         })
-        ret.buff_out.push({
-            bhvr_name:'callbackful',
-            action:'transfer',args:[s.id,'energy'],
-            pos: s.pos
+        ret.buff_out?.push({
+            action:'transfer',args:[s.id,'energy'], pos: s.pos
         })
     })
     sites.forEach(s => ret.consume.push({
-        bhvr_name:'callbackful',
-        action: 'build',args: [s.id],
-        pos: s.pos
+        action: 'build',args: [s.id], pos: s.pos
     }))
     
     link.sort((a, b) => {
@@ -52,9 +42,7 @@ const init_harvester = function(pos:RoomPosition): StaticMemory{
             - a.pos.getRangeTo(pos) + b.pos.getRangeTo(pos)
     })
     link.forEach(s => ret.consume.push({
-        bhvr_name:'callbackful',
-        action:'transfer',args:[s.id,'energy'],
-        pos: s.pos
+        action:'transfer',args:[s.id,'energy'], pos: s.pos
     }))
     return ret
 }

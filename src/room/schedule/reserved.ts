@@ -12,12 +12,18 @@ export const reserved_room_loop_handler: RoomLoopHandler<'reserved'> = {
         })[0]
         if(!core) return null
         const attack: CallbackBehavior<'attack'> = {
-            bhvr_name: 'callbackful', action: 'attack',
+            action: 'attack',
             args: [core.id], pos: core.pos
+        }
+        const bhvr: StaticMemory = {
+            bhvr_name:  "static",
+            state:      "collect",
+            collect:    [attack],
+            consume:    [],
         }
         return {
             _body: { generator: 'A', workload: 12, mobility: 1 },
-            _class: attack
+            _class: bhvr
         }
     },
     Source0: function (room: Room, pool: SourceTaskPool, looper: Looper) {
@@ -41,17 +47,21 @@ export const reserved_room_loop_handler: RoomLoopHandler<'reserved'> = {
                 room.createConstructionSite(containerPos,STRUCTURE_CONTAINER)
         }
 
+        const bhvr: StaticMemory = {
+            bhvr_name:  "static",
+            state:      "collect",
+            collect:    [pool.H_srcs[0]],
+            consume:    pool.T_src0,
+        }
         if (!pool.T_src0[0]) {
-            const posed = pool.H_srcs[0]
-            const main: CallbackBehavior<'harvest'> = { bhvr_name: 'callbackful', ...posed }
             return {
                 _body: { generator: 'W', workload: 5, mobility: 1 },
-                _class: { ...{ bhvr_name: 'callbackful' }, ...main }
+                _class: bhvr
             }
         }
         return {
             _body: { generator: 'Wc', workload: 10 },
-            _class: init_worker_behavior('HarvesterSource0', room.name, room.name)
+            _class: bhvr
         }
     },
     Source1: function (room: Room, pool: SourceTaskPool, looper: Looper) {
@@ -75,17 +85,21 @@ export const reserved_room_loop_handler: RoomLoopHandler<'reserved'> = {
                 room.createConstructionSite(containerPos,STRUCTURE_CONTAINER)
         }
 
+        const bhvr: StaticMemory = {
+            bhvr_name:  "static",
+            state:      "collect",
+            collect:    [pool.H_srcs[1]],
+            consume:    pool.T_src1,
+        }
         if (!pool.T_src1[0]) {
-            const posed = pool.H_srcs[1]
-            const main: CallbackBehavior<'harvest'> = { bhvr_name: 'callbackful', ...posed }
             return {
                 _body: { generator: 'W', workload: 5, mobility: 1 },
-                _class: { ...{ bhvr_name: 'callbackful' }, ...main }
+                _class: bhvr
             }
         }
         return {
             _body: { generator: 'Wc', workload: 10 },
-            _class: init_worker_behavior('HarvesterSource1', room.name, room.name)
+            _class: bhvr
         }
     },
     Reserve: function (room: Room, pool: {}, looper: Looper) {
@@ -98,21 +112,24 @@ export const reserved_room_loop_handler: RoomLoopHandler<'reserved'> = {
             return null
         }
         const reserve: CallbackBehavior<'reserveController'> = {
-            bhvr_name: 'callbackful',
             action: 'reserveController',
             args: [controller.id],
             pos: controller.pos
         }
         const attack: CallbackBehavior<'attackController'> = {
-            bhvr_name: 'callbackful',
             action: 'attackController',
             args: [controller.id],
             pos: controller.pos
         }
-        reserve[ERR_INVALID_TARGET] = attack
+        const bhvr: StaticMemory = {
+            bhvr_name:  "static",
+            state:      "collect",
+            collect:    [reserve,attack],
+            consume:    [],
+        }
         return {
             _body: { generator: 'Cl', workload: 4, mobility: 1 },
-            _class: reserve
+            _class: bhvr
         }
     },
     Build: function (room: Room, pool: {}, looper: Looper) {

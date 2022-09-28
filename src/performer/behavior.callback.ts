@@ -25,9 +25,7 @@ export const perform_callback = function(creep:Creep, behavior:CallbackBehavior<
  * @returns 
  */
  export const parse_posed_task = function(posed:PosedCreepTask<PrimitiveAction>):CallbackBehavior<PrimitiveAction>{
-    const main: CallbackBehavior<PrimitiveAction> = {
-        bhvr_name:'callbackful', ...posed
-    }
+    const main: CallbackBehavior<PrimitiveAction> = {...posed}
     switch(main.action){
         case 'withdraw':
         case 'transfer':

@@ -152,28 +152,6 @@ const posed_task_updater: {
         }
         return tasks
     },
-    H_src0: function (room: Room) {
-        const task = room.memory._typed._static.H_srcs?.[0]
-        if (!task)
-            return []
-        if (Game.getObjectById(task.args[0])?.energy)
-            return [task]
-        return []
-    },
-    H_src1: function (room: Room) {
-        const task = room.memory._typed._static.H_srcs?.[1]
-        if (!task)
-            return []
-        if (Game.getObjectById(task.args[0])?.energy)
-            return [task]
-        return []
-    },
-    H_src2: function (room: Room) {
-        if (!room.memory._typed._static.H_srcs?.[2])
-            return []
-        return [room.memory._typed._static.H_srcs[2]].slice()
-    },
-
     W_energy: function (room: Room) {
         var tasks: RestrictedPrimitiveDescript<'withdraw' | 'pickup', 'energy'>[] = []
         const storage = room.storage
@@ -413,67 +391,6 @@ const posed_task_updater: {
                 tasks.push(task)
         }
         return tasks
-    },
-    T_src0: function (room: Room) {
-        if (!room.memory._typed._static.T_src0)
-            return []
-        for (let task of room.memory._typed._static.T_src0) {
-            if (task.action == 'build') {
-                const structure = Game.getObjectById(task.args[0])
-                if (structure)
-                    return [task]
-            }
-            if (task.action == 'repair') {
-                const structure = Game.getObjectById(task.args[0])
-                if (structure && structure.hits < structure.hitsMax)
-                    return [task]
-            }
-            if (task.action == 'transfer') {
-                const structure = Game.getObjectById(task.args[0])
-                if (structure && structure.store.getFreeCapacity(task.args[1]))
-                    return [task]
-            }
-        }
-        return []
-    },
-    T_src1: function (room: Room) {
-        if (!room.memory._typed._static.T_src1)
-            return []
-        for (let task of room.memory._typed._static.T_src1) {
-            if (task.action == 'build') {
-                const structure = Game.getObjectById(task.args[0])
-                if (structure)
-                    return [task]
-            }
-            if (task.action == 'repair') {
-                const structure = Game.getObjectById(task.args[0])
-                if (structure && structure.hits < structure.hitsMax)
-                    return [task]
-            }
-            if (task.action == 'transfer') {
-                const structure = Game.getObjectById(task.args[0])
-                if (structure && structure.store.getFreeCapacity(task.args[1]))
-                    return [task]
-            }
-        }
-        return []
-    },
-    T_src2: function (room: Room) {
-        if (!room.memory._typed._static.T_src2)
-            return []
-        for (let task of room.memory._typed._static.T_src2) {
-            if (task.action == 'repair') {
-                const structure = Game.getObjectById(task.args[0])
-                if (structure && structure.hits < structure.hitsMax)
-                    return [task]
-            }
-            if (task.action == 'transfer') {
-                const structure = Game.getObjectById(task.args[0])
-                if (structure && structure.store.getFreeCapacity(task.args[1]))
-                    return [task]
-            }
-        }
-        return []
     },
     T_boost: T_boost,
     T_react: T_react,
