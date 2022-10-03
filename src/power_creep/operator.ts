@@ -73,6 +73,12 @@ function find_power_task(operator: PowerCreep, room: Room) {
         }
     }
 
+    if(operator.powers[PWR_OPERATE_STORAGE] && !operator.powers[PWR_OPERATE_STORAGE].cooldown){
+        if(storage && (!storage.effects || !storage.effects[0])) {
+            operator.memory._power.push({power: PWR_OPERATE_STORAGE, target: storage.id})
+        }
+    }
+
     if(operator.powers[PWR_OPERATE_FACTORY] && !operator.powers[PWR_OPERATE_FACTORY].cooldown){
         if(room.memory._typed._type == 'owned' && room.memory._typed._struct.factory){
             const config = room.memory._typed._struct.factory

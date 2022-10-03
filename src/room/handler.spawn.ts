@@ -1,6 +1,7 @@
 import { highway_room_loop_handler } from "@/room/schedule/highway"
 import { owned_room_loop_handler } from "@/room/schedule/owned"
 import { reserved_room_loop_handler } from "@/room/schedule/reserved"
+import { claimed_room_loop_handler } from "./schedule/claimed"
 
 /**
  * 定时任务调度程序，用于扫描房间和孵化
@@ -26,6 +27,9 @@ export const spawn_loop = function(room: Room) {
             case 'highway':
                 role_impl = highway_room_loop_handler[loop_key](room,room.memory._typed._static,spawn_loop)
                 break
+            case 'claimed':
+                role_impl = claimed_room_loop_handler[loop_key](room,room.memory._typed._static,spawn_loop)
+                break
         }
         /**限定时间间隔，防止无限生爬 */
         if(spawn_loop.interval < 200) spawn_loop.interval = 200
@@ -35,7 +39,8 @@ export const spawn_loop = function(room: Room) {
 
         if(role_impl){
             let _spawn: SpawnTask[]
-            if(room.memory._typed._type == 'owned'){
+            if(room.memory._spawn == room.name){
+                if(room.memory._typed._type != 'owned') return
                 _spawn = room.memory._typed._struct.spawns.t1
             } else {
                 /**援助爬孵化优先级更低 */

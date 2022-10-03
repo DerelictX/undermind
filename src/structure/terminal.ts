@@ -8,6 +8,23 @@ export const terminal_run = function(room: Room){
     const terminal = room.terminal
     if (!storage || !terminal?.my || terminal.cooldown) return
 
+    /*
+    if(room.name == 'E39S58'){
+        let terminal_store: StorePropertiesOnly = terminal.store
+        let resourceType: keyof typeof terminal_store
+        for (resourceType in terminal_store) {
+            if(resourceType == 'energy') continue
+            if(terminal_store[resourceType] < 3000) continue
+            terminal.send(resourceType, terminal_store[resourceType] , 'E32S56')
+            return
+        }
+        for (resourceType in terminal_store) {
+            if(resourceType == 'energy') continue
+            terminal.send(resourceType, terminal_store[resourceType] , 'E32S56')
+            return
+        }
+    } else return
+    */
     switch(Game.time % 40){
         case 0:
             sendList(terminal,compressed.concat(product_tier[0])) 

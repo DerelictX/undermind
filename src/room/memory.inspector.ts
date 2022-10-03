@@ -76,6 +76,14 @@ export const inspect_memory = function (room_name: string, restart_room: boolean
             }
             return
         }
+        case 'claimed': {
+            let k: keyof typeof claimed_memory_initializer
+            for(k in claimed_memory_initializer){
+                if(!mem._typed[k] || restart_room)
+                claimed_memory_initializer[k](mem._typed)
+            }
+            return
+        }
     }
 }
 
@@ -91,6 +99,7 @@ const owned_memory_initializer: {[k in keyof FilterOptional<OwnedRoomMemory>]:
             interval: 1500,
         }
         mem._looper = {
+            Observe: spawn_loop,
             Supplier: spawn_loop,
             Source0: spawn_loop,
             Source1: spawn_loop,
@@ -98,8 +107,7 @@ const owned_memory_initializer: {[k in keyof FilterOptional<OwnedRoomMemory>]:
             Maintain: spawn_loop,
             Mineral: spawn_loop,
             Upgrade: spawn_loop,
-            Build: spawn_loop,
-            Observe: spawn_loop
+            Build: spawn_loop
         }
     },
     _static: function (mem: OwnedRoomMemory): void {
@@ -205,6 +213,37 @@ const highway_memory_initializer: {[k in keyof FilterOptional<HighwayRoomMemory>
         mem._looper = {
             Deposit: spawn_loop,
             Collector: spawn_loop,
+            Observe: spawn_loop
+        }
+    }
+}
+
+const claimed_memory_initializer: {[k in keyof FilterOptional<ClaimedRoomMemory>]:
+    (mem: ClaimedRoomMemory) => void
+} = {
+    _type: function (mem: ClaimedRoomMemory): void {
+        mem._type = 'claimed'
+    },
+    _static: function (mem: ClaimedRoomMemory): void {
+        mem._static = {        
+            W_ctrl:     [],
+            U_ctrl:     [],
+            H_srcs:     [],
+            T_src0:     [],
+            T_src1:     [],
+            W_cntn:     [],
+            T_cntn:     [],
+        }
+    },
+    _looper: function (mem: ClaimedRoomMemory): void {
+        const spawn_loop: Looper = {
+            reload_time: Game.time,
+            interval: 1500,
+        }
+        mem._looper = {
+            Claim: spawn_loop,
+            Build: spawn_loop,
+            Upgrade: spawn_loop,
             Observe: spawn_loop
         }
     }

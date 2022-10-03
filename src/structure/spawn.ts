@@ -50,6 +50,12 @@ export const spawn_run = function(room: Room) {
             if(_typed._type == spawn_task._caller.room_type)
                 looper = _typed._looper[spawn_task._caller.loop_key]
             break
+        case 'claimed':
+            if(_typed._type == spawn_task._caller.room_type)
+                looper = _typed._looper[spawn_task._caller.loop_key]
+            break
+        default:
+                throw new Error("Unexpected state.")
     }
     if(!looper) return
     if(ret == OK){
@@ -57,7 +63,11 @@ export const spawn_run = function(room: Room) {
         /**creep内存赋值 */
         Memory.creeps[creep_name] = {
             _class:     spawn_task._class,
-            _caller:    spawn_task._caller
+            _caller:    spawn_task._caller,
+            _life:      {
+                boost:      false,
+                unboost:    false
+            }
         }
     } else {
         looper.reload_time = Game.time + 200

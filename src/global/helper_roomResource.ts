@@ -60,8 +60,8 @@ export const HelperRoomResource = {
         const factory = config.fact_id ? Game.getObjectById(config.fact_id) : null
 
         const store: Partial<StorePropertiesOnly> = {};
-        if(storage)this.addStore(store,storage.store)
-        if(terminal)this.addStore(store,terminal.store)
+        if(storage?.my)this.addStore(store,storage.store)
+        if(terminal?.my)this.addStore(store,terminal.store)
         if(factory)this.addStore(store,factory.store)
         return store
     },

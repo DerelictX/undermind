@@ -1,7 +1,8 @@
 
 interface CreepMemory extends MoveMemory {
     _class:     | CarrierMemory | WorkerMemory | StaticMemory
-    _caller:    SpawnTask['_caller']
+    _caller:    SpawnCaller<RoomTypes>
+    _life:      CreepLifeCycle
 }
 
 type CarrierRole =

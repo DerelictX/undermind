@@ -1,7 +1,8 @@
 
 type RoomTypes = RoomMemory['_typed']['_type']
 interface RoomMemory {
-    _typed:     OwnedRoomMemory | ReservedRoomMemory | HighwayRoomMemory | NeutralRoomMemory
+    _typed: | OwnedRoomMemory | ReservedRoomMemory | HighwayRoomMemory
+            | NeutralRoomMemory | ClaimedRoomMemory
     _dynamic:   {[k in keyof DynamicTaskPool]?: DynamicTaskPool[k]}
     _spawn:     string  //生爬的房间名
 }
@@ -34,6 +35,14 @@ interface HighwayRoomMemory {
     _type:      'highway'
     _static:    ShadowedPick<FullTaskPool,keyof HighwayTaskPool>
     _looper:    ObserveThis & {[R in highway_room_role]: Looper}
+}
+
+type claimed_room_role =
+    |"Claim"|"Upgrade"|"Build"
+interface ClaimedRoomMemory {
+    _type:      'claimed'
+    _static:    ShadowedPick<FullTaskPool,keyof (OwnedTaskPool & SourceTaskPool)>
+    _looper:    ObserveThis & {[R in claimed_room_role]: Looper}
 }
 
 /**白板房，啥也不干 */

@@ -80,17 +80,18 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
         static_updater['controller'](room,pool)
         if (!pool.W_ctrl[0])
             return null
-        if (room.storage && room.storage.store.energy <= 150000)
+        if (room.storage?.my && room.storage.store.energy <= 150000)
             return null
-        looper.interval = 1500
+        looper.interval = 800
+        if(room.controller?.level == 8) return null
         return {
-            _body: { generator: 'Wc', workload: room.controller?.level == 8 ? 15 : 25 },
+            _body: { generator: 'Wc', workload: 16 },
             _class: init_worker_behavior('Upgrader', room.name, room.name)
         }
     },
     Build: function (room: Room, pool: SourceTaskPool, looper: Looper) {
         const storage = room.storage
-        if (!storage) {
+        if (!storage?.my) {
             if (!room.find(FIND_MY_CONSTRUCTION_SITES).length)
                 return null
             looper.interval = 1500
@@ -127,8 +128,12 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
     Collector: function (room: Room, pool: SourceTaskPool, looper: Looper) {
         looper.interval = 1450
         static_updater.containers(room,pool)
-        if (!room.storage?.my)
-            return null
+        if (!room.storage?.my){
+            return {
+                _body: { generator: 'C', workload: 24 },
+                _class: init_worker_behavior('EnergySupplier', room.name, room.name)
+            }
+        }
         return {
             _body: { generator: 'C', workload: 16 },
             _class: init_carrier_behavior('Collector', room.name, room.name)
@@ -140,10 +145,14 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
         structure_updater.towers(room, room.memory._typed._struct)
         structure_updater.links(room, room.memory._typed._struct)
         structure_updater.unique(room, room.memory._typed._struct)
-        if (!room.storage?.my)
-            return null
+        if (!room.storage?.my){
+            return {
+                _body: { generator: 'C', workload: 16 },
+                _class: init_worker_behavior('EnergySupplier', room.name, room.name)
+            }
+        }
         return {
-            _body: { generator: 'C', workload: 16 },
+            _body: { generator: 'C', workload: 24 },
             _class: init_carrier_behavior('Supplier', room.name, room.name)
         }
     },

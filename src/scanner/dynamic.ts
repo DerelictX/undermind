@@ -316,13 +316,13 @@ const posed_task_updater: {
     },
 
     downgraded: function (room: Room) {
-        const downgraded = room.controller
-        if (downgraded && downgraded.my && !downgraded.upgradeBlocked) {
-            if (downgraded.ticksToDowngrade < CONTROLLER_DOWNGRADE[downgraded.level] - 8000) {
+        const controller = room.controller
+        if (controller && controller.my && !controller.upgradeBlocked) {
+            if (controller.ticksToDowngrade < CONTROLLER_DOWNGRADE[controller.level] * 0.5) {
                 return [{
                     action: 'upgradeController',
-                    args: [downgraded.id],
-                    pos: downgraded.pos
+                    args: [controller.id],
+                    pos: controller.pos
                 }]
             }
         }

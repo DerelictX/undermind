@@ -34,8 +34,8 @@ export const loop = function () {
     inspect_global()
     Memory._move_intents = {}
     run_rooms()
-    run_creeps()
     run_power_creeps()
+    run_creeps()
     handle_moves()
 
     for(let name in Memory._closest_owned){
@@ -86,7 +86,8 @@ const run_creeps = function(){
                 continue
             }
             if(creep.spawning) continue
-            if(Game.cpu.bucket < 8000 && Game.cpu.getUsed() > 18) return
+            if(Game.cpu.bucket < 6000 && Game.cpu.getUsed() > 10) return
+            if(Game.cpu.bucket < 8000 && Game.cpu.getUsed() > 16) return
 
             const _class = creep.memory._class
             switch(_class.bhvr_name){

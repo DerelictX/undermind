@@ -3,6 +3,7 @@ type RoomMemMap = {
     reserved:   ReservedRoomMemory
     highway:    HighwayRoomMemory
     neutral:    NeutralRoomMemory
+    claimed:    ClaimedRoomMemory
 }
 
 type RoomLoopHandler<T extends RoomTypes> = {
@@ -23,8 +24,9 @@ type SpawnTask = {
         generator:  body_generator_name
         workload:   number
         mobility?:  number
+        _boost?:    Partial<Record<BodyPartConstant,MineralBoostConstant>>
     }
-    _class:     CreepMemory['_class']
+    _class: CreepMemory['_class']
 }
 type RoleImpl = Omit<SpawnTask,'_caller'>
 
@@ -32,3 +34,8 @@ type body_generator_name =
     | "W" | "C" | "WC" | "Wc"
     | "A" | "R" | "H" | "Cl"
     | "DH"
+
+type CreepLifeCycle = {
+    boost:      boolean
+    unboost:    boolean
+}
