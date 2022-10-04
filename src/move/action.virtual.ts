@@ -19,7 +19,7 @@ export const approach = function (creep: AnyCreep, pos:RoomPosition, range:numbe
         }
         /**在范围边缘 */
         let dir = creep.pos.getDirectionTo(pos)
-        const _move_intents = Memory._move_intents[roomName] ?? (Memory._move_intents[roomName] = {})
+        const _move_intents = global._move_intents[roomName] ?? (global._move_intents[roomName] = {})
         const pos_str = base64table[creep.pos.x] + base64table[creep.pos.y]
         _move_intents[pos_str] = {id: creep.id, step: adjace_dir[dir]}
         return OK
@@ -36,7 +36,7 @@ export const hold_place = function (creep: AnyCreep): ScreepsReturnCode {
     /**设置intent */
     if(!creep.room) return ERR_NOT_FOUND
     const roomName = creep.room.name
-    const _move_intents = Memory._move_intents[roomName] ?? (Memory._move_intents[roomName] = {})
+    const _move_intents = global._move_intents[roomName] ?? (global._move_intents[roomName] = {})
     const pos_str = base64table[creep.pos.x] + base64table[creep.pos.y]
     _move_intents[pos_str] = {id: creep.id, step: [0]}
     return OK

@@ -54,9 +54,9 @@ export const production_line: {[d in DepositConstant]:CommodityConstant[]} = {
 export const deposits:DepositConstant[] = ['metal','biomass','silicon','mist']
 export const product_tier:CommodityConstant[][]  = [
     ['alloy','cell','wire','condensate'],
-    ['tube','phlegm','switch','concentrate','composite'],
-    ['fixtures','tissue','transistor','extract','crystal'],
-    ['frame','muscle','microchip','spirit','liquid'],
+    ['tube','phlegm','switch','concentrate'],
+    ['fixtures','tissue','transistor','extract'],
+    ['frame','muscle','microchip','spirit'],
     ['hydraulics','organoid','circuit','emanation'],
     ['machine','organism','device','essence']
 ]

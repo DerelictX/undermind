@@ -100,7 +100,7 @@ const run_carrier_consume = function(creep:Creep,fb:CarrierMemory){
 }
 
 const change_flow = function(fb:CarrierMemory) {
-    const pool = Memory.rooms[fb.fromRoom]._dynamic
+    const pool = global._dynamic[fb.fromRoom] ?? (global._dynamic[fb.fromRoom] = {})
     const fromRoom = Game.rooms[fb.fromRoom]
     const toRoom = Game.rooms[fb.toRoom]
     for(let flow of carry_priority[fb.priority]){
@@ -125,7 +125,7 @@ const change_flow = function(fb:CarrierMemory) {
 }
 
 const find_consume = function(creep:Creep,fb:CarrierMemory){
-    const consume = Memory.rooms[fb.toRoom]._dynamic
+    const consume = global._dynamic[fb.toRoom] ?? (global._dynamic[fb.toRoom] = {})
     if(fb.current[1] == 'storage') return
     let free = creep.store.getCapacity()
     const pool = consume[fb.current[1]]
@@ -154,7 +154,7 @@ const find_consume = function(creep:Creep,fb:CarrierMemory){
 }
 
 const find_collect = function(creep:Creep,fb:CarrierMemory){
-    const collect = Memory.rooms[fb.fromRoom]._dynamic
+    const collect = global._dynamic[fb.fromRoom] ?? (global._dynamic[fb.fromRoom] = {})
     if(fb.current[0] == 'storage') return
     let free = creep.store.getCapacity()
     if(!collect[fb.current[0]]?.length){

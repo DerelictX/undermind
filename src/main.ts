@@ -31,8 +31,10 @@ export const loop = function () {
         //Memory.terminal.demand[resourceType][terminal.room.name] = amount
     }
     
+    if(!global._dynamic) global._dynamic = {}
+    if(!global.commonMatrix) global.commonMatrix = {}
+    global._move_intents = {}
     inspect_global()
-    Memory._move_intents = {}
     run_rooms()
     run_power_creeps()
     run_creeps()

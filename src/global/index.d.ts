@@ -8,11 +8,6 @@ interface Memory extends PathMemory {
 }
 
 interface PathMemory {
-    _move_intents:  {[room:string] : undefined | RoomMoveIntents}
-
-    commonMatrix:   {[room:string] : undefined | number[]}
-    squardMatrix:   {[room:string] : undefined | number[]}
-
     _edge_exits:    {[room:string] : undefined | {
         [toRoom: string]: RoomPosition[]
     }}

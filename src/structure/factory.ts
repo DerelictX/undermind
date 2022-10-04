@@ -110,7 +110,7 @@ export const W_fact = function (room: Room) {
 
     var tasks: RestrictedPrimitiveDescript<'withdraw'>[] = []
     for(let res of compressed){
-        if(res == 'battery' && storage.store['energy'] < 240000)
+        if(res == 'battery' && storage.store['energy'] < 180000)
             continue
         if(factory.store[res] > 2000){
             tasks.push({

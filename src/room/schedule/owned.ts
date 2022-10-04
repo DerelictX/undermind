@@ -22,8 +22,12 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
                 _class: bhvr
             }
         }
+        const controller = room.controller
+        if(!controller?.my) return null
+        let workload = room.controller?.level == 8 ? 15 : 10
+        if(controller.level <= 3) workload = 4
         return {
-            _body: { generator: 'Wc', workload: room.controller?.level == 8 ? 15 : 10 },
+            _body: { generator: 'Wc', workload: workload },
             _class: bhvr
         }
     },
@@ -43,8 +47,12 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
                 _class: bhvr
             }
         }
+        const controller = room.controller
+        if(!controller?.my) return null
+        let workload = room.controller?.level == 8 ? 15 : 10
+        if(controller.level <= 3) workload = 4
         return {
-            _body: { generator: 'Wc', workload: room.controller?.level == 8 ? 15 : 10 },
+            _body: { generator: 'Wc', workload: workload },
             _class: bhvr
         }
     },
@@ -82,7 +90,7 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
             return null
         if (room.storage?.my && room.storage.store.energy <= 150000)
             return null
-        looper.interval = 800
+        looper.interval = 600
         if(room.controller?.level == 8) return null
         return {
             _body: { generator: 'Wc', workload: 16 },
@@ -100,13 +108,15 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
                 _class: init_worker_behavior('Builder', room.name, room.name)
             }
         } else {
+            return null
+            /*
             looper.interval = 1500
             if (storage.store.energy <= 180000)
                 return null
             return {
                 _body: { generator: 'WC', workload: 32 },
                 _class: init_worker_behavior('Builder', room.name, room.name)
-            }
+            }*/
         }
     },
     Maintain: function (room: Room, pool: SourceTaskPool, looper: Looper) {

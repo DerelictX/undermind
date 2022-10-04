@@ -72,7 +72,8 @@ export const HelperRoomResource = {
     },
     showAllRes(){
 
-        const rooms = _.values(Game.rooms).filter(e => e.controller?.my && (e.storage||e.terminal))
+        let rooms: Room[] = _.values(Game.rooms)
+        rooms = rooms.filter(e => e.controller?.my && (e.storage||e.terminal))
         const roomResAll: {[room : string] : Partial<StorePropertiesOnly>} = {}
         for(const room of rooms) {
             roomResAll[room.name] = this.getStorageTerminalRes(room)

@@ -1,5 +1,5 @@
 export const autoRoadCallback = function(roomName:string) {
-    const matrix = Memory.commonMatrix[roomName]
+    const matrix = global.commonMatrix[roomName]
     if(matrix){
         return PathFinder.CostMatrix.deserialize(matrix)
     }
@@ -26,6 +26,6 @@ export const autoRoadCallback = function(roomName:string) {
     });
 
     console.log('autoRoadCallback(' + room.name + ')')
-    Memory.commonMatrix[room.name] = costs.serialize()
+    global.commonMatrix[room.name] = costs.serialize()
     return costs;
 }

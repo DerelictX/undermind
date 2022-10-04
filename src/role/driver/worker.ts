@@ -57,7 +57,7 @@ const run_worker_consume = function(creep:Creep,fb:WorkerMemory){
 const change_flow = function(creep:Creep,fb:WorkerMemory) {
     const flow = work_priority[fb.priority]
     if(fb.state == 'collect'){
-        const pool = Memory.rooms[fb.fromRoom]._dynamic
+        const pool = global._dynamic[fb.fromRoom] ?? (global._dynamic[fb.fromRoom] = {})
         const room = Game.rooms[fb.fromRoom]
         if(creep.room.name != fb.fromRoom){
             hikeTo(creep,new RoomPosition(25,25,fb.fromRoom))
@@ -78,7 +78,7 @@ const change_flow = function(creep:Creep,fb:WorkerMemory) {
         delete creep.memory._move
     }
     if(fb.state == 'consume'){
-        const pool = Memory.rooms[fb.toRoom]._dynamic
+        const pool = global._dynamic[fb.toRoom] ?? (global._dynamic[fb.toRoom] = {})
         const room = Game.rooms[fb.toRoom]
         if(creep.room.name != fb.toRoom){
             hikeTo(creep,new RoomPosition(25,25,fb.toRoom))

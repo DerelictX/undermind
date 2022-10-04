@@ -74,7 +74,7 @@ export const hikeTo = function(creep:AnyCreep, targetPos:RoomPosition){
         plainCost: 2, swampCost: 10, maxRooms: 2,
         roomCallback:function(roomName:string):CostMatrix|boolean{
             if(roomName != _hike?.from && roomName != step.room) return false
-            const matrix = Memory.commonMatrix[roomName]
+            const matrix = global.commonMatrix[roomName]
             if(matrix) return PathFinder.CostMatrix.deserialize(matrix)
             return true
         }

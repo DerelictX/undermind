@@ -49,8 +49,10 @@ type RestrictedPrimitiveDescript<
             | (DepositConstant extends Res ? Deposit : never)]
         : T extends Exclude<WorkAction,"harvest">
             ? Res extends "energy" ? Parameters<Creep[T]> : never
-        : T extends "withdraw"|"transfer"
-            ? [target: Parameters<Creep[T]>[0], resourceType: Res, amount?: Parameters<Creep[T]>[2]]
+        : T extends "withdraw"
+            ? [target: Parameters<AnyCreep['withdraw']>[0], resourceType: Res, amount?: number]
+        : T extends "transfer"
+            ? [target: Parameters<AnyCreep['transfer']>[0], resourceType: Res, amount?: number]
         : T extends "drop"
             ? [resourceType: Res, amount?: Parameters<Creep[T]>[1]]
         : T extends "pickup" ? [target: Resource<Res>]

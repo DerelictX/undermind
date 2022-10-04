@@ -10,7 +10,7 @@ export const handle_moves = function(){
         if(creep.room) idle_move(creep)
     }
     for(let name in Game.rooms){
-        const _move_intents = Memory._move_intents[name]
+        const _move_intents = global._move_intents[name]
         if(!_move_intents) continue
         const matrix = autoRoadCallback(name)
         if(!matrix) continue
@@ -91,8 +91,8 @@ BFS:    while(true){
 /**没有移动计划，可以给别的爬让路 */
 const idle_move = function(creep: AnyCreep){
     const pos = creep.pos
-    const _move_intents = Memory._move_intents[pos.roomName]
-        ?? (Memory._move_intents[pos.roomName] = {})
+    const _move_intents = global._move_intents[pos.roomName]
+        ?? (global._move_intents[pos.roomName] = {})
         const pos_str = base64table[pos.x] + base64table[pos.y]
     if(_move_intents[pos_str]) return
     _move_intents[pos_str] = {id: creep.id, step: adjace_dir[0]}
@@ -127,7 +127,7 @@ const base64decode = function(char:string): number{
 
 /**相邻方向 */
 export const adjace_dir: {[dir in 0|DirectionConstant]: (0|DirectionConstant)[]} = {
-    0: [0,1,2,3,4,5,6,7,8],
+    0: [0,1,5,3,7,2,6,4,8],
     1: [0,1,2,8],
     2: [0,2,3,1],
     3: [0,3,4,2],

@@ -45,7 +45,7 @@ export const crawlTo = function(creep:AnyCreep, targetPos:RoomPosition){
         return ERR_TIRED;
     }
     /**设置intent */
-    const _move_intents = Memory._move_intents[roomName] ?? (Memory._move_intents[roomName] = {})
+    const _move_intents = global._move_intents[roomName] ?? (global._move_intents[roomName] = {})
     const pos_str = base64table[pos.x] + base64table[pos.y]
     _move_intents[pos_str] = {id: creep.id, step: [step.direction]}
     return OK

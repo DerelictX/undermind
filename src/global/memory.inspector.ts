@@ -40,15 +40,6 @@ const global_memory_initializer: { [k in keyof FilterOptional<Memory>]: () => vo
         Memory.threat_level = {}
     },
 
-    _move_intents: function (): void {
-        Memory._move_intents = {}
-    },
-    commonMatrix: function (): void {
-        Memory.commonMatrix = {}
-    },
-    squardMatrix: function (): void {
-        Memory.squardMatrix = {}
-    },
     _edge_exits: function (): void {
         Memory._edge_exits = {}
     },

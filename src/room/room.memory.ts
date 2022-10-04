@@ -3,7 +3,6 @@ type RoomTypes = RoomMemory['_typed']['_type']
 interface RoomMemory {
     _typed: | OwnedRoomMemory | ReservedRoomMemory | HighwayRoomMemory
             | NeutralRoomMemory | ClaimedRoomMemory
-    _dynamic:   {[k in keyof DynamicTaskPool]?: DynamicTaskPool[k]}
     _spawn:     string  //生爬的房间名
 }
 

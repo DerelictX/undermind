@@ -1,5 +1,4 @@
 import { base_mineral, compressed, product_tier } from "@/constant/resource_series"
-import _ from "lodash"
 
 export const terminal_run = function(room: Room){
     if(Game.time % 10 != 0) return

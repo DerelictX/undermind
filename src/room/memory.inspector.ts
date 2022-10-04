@@ -15,7 +15,6 @@ export const _format_room = function (room_name: string, type:RoomTypes, spawn_r
                 interval: 1500,
             }}
         },
-        _dynamic: {},
         _spawn: room_name
     }
     Memory.rooms[room_name]._spawn = spawn_room
@@ -41,7 +40,6 @@ export const inspect_memory = function (room_name: string, restart_room: boolean
                     interval: 1500,
                 }}
             },
-            _dynamic: {},
             _spawn: room_name
         }
     }
