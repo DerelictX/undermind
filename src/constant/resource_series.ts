@@ -43,6 +43,17 @@ export const compressed:CommodityConstant[] = [
     'utrium_bar','keanium_bar','zynthium_bar','lemergium_bar',
     'ghodium_melt','oxidant','reductant','purifier','battery'
 ]
+export const compression: {[K in 'G'|MineralConstant|'energy']:CommodityConstant} = {
+    L: 'lemergium_bar',
+    K: 'keanium_bar',
+    U: 'utrium_bar',
+    Z: 'zynthium_bar',
+    G: 'ghodium_melt',
+    O: 'oxidant',
+    H: 'reductant',
+    X: 'purifier',
+    energy: 'battery'
+}
 
 export const production_line: {[d in DepositConstant]:CommodityConstant[]} = {
     mist:       ['condensate','concentrate','extract','spirit','emanation','essence'],
@@ -61,7 +72,11 @@ export const product_tier:CommodityConstant[][]  = [
     ['machine','organism','device','essence']
 ]
 
-export const base_mineral: MineralConstant[] = ['X','O','H','Z','L','U','K']
+export const base_mineral: (MineralConstant|MineralBaseCompoundsConstant)[] = [
+    'X','OH','O','H',
+    'G','UL','ZK',
+    'Z','L','U','K'
+]
 export const companion_base: {
     [M in Exclude<MineralConstant|MineralBaseCompoundsConstant,'X'|'OH'|'G'>]
         : [companion_base<M>, typeof REACTIONS[M][companion_base<M>]]

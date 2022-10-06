@@ -36,6 +36,7 @@ interface FactoryConfig {
     fact_id:    Id<StructureFactory>|null
     level:      number
     cd_bucket:  number
+    demand:     Partial<Record<ResourceConstant,number>>
 }
 
 interface ObserverConfig {

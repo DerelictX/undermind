@@ -145,7 +145,8 @@ const owned_memory_initializer: {[k in keyof FilterOptional<OwnedRoomMemory>]:
             factory: {
                 fact_id:    null,
                 level:      0,
-                cd_bucket:  0
+                cd_bucket:  0,
+                demand:     {}
             },
             wall_hits: 100000,
             power_spawn: null,

@@ -14,8 +14,6 @@ export const claimed_room_loop_handler: RoomLoopHandler<'claimed'> = {
     },
     Build: function (room: Room, pool: SourceTaskPool, looper: Looper): RoleImpl | null {
         static_updater.sources(room,pool)
-        let workload = room.find(FIND_MY_CONSTRUCTION_SITES).length
-        if(!workload) return null
         looper.interval = 600
         return {
             _body: { generator: 'WC', workload: 24, mobility: 1 },

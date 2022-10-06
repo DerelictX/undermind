@@ -90,8 +90,8 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
             return null
         if (room.storage?.my && room.storage.store.energy <= 150000)
             return null
-        looper.interval = 600
-        if(room.controller?.level == 8) return null
+        if(!room.controller || room.controller.level == 8) return null
+        looper.interval = room.controller.level * 200
         return {
             _body: { generator: 'Wc', workload: 16 },
             _class: init_worker_behavior('Upgrader', room.name, room.name)
@@ -108,15 +108,15 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
                 _class: init_worker_behavior('Builder', room.name, room.name)
             }
         } else {
-            return null
-            /*
+            if(Game.cpu.bucket < 9950)
+                return null
             looper.interval = 1500
-            if (storage.store.energy <= 180000)
+            if (storage.store.energy <= 160000)
                 return null
             return {
                 _body: { generator: 'WC', workload: 32 },
                 _class: init_worker_behavior('Builder', room.name, room.name)
-            }*/
+            }
         }
     },
     Maintain: function (room: Room, pool: SourceTaskPool, looper: Looper) {
