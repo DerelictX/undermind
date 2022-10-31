@@ -22,7 +22,7 @@ export const work_priority: {[role in EnergyRole]:EnWorkerPriority} = {
 
 export const carry_priority: {[role in CarrierRole]:ResFlow[]} = {
     Collector: [
-        ['W_link', 'storage'], ['sweep', 'storage'], ['W_cntn', 'storage'],
+        ['W_link', 'storage'], ['W_cntn', 'storage'], ['sweep', 'storage'],
         ['loot', 'storage'], ['storage', 'T_ext'],
         ['W_term', 'storage'], ['compound','storage'], ['W_fact', 'storage']],
     Supplier: [
@@ -32,7 +32,10 @@ export const carry_priority: {[role in CarrierRole]:ResFlow[]} = {
     Chemist: [
         ['storage','T_boost'], ['storage','T_react'], ['compound','storage'],
         ['W_term','storage'], ['storage','T_term'],
-        ['storage','T_fact'], ['W_fact','storage']]
+        ['storage','T_fact'], ['W_fact','storage']],
+    Trader: [
+        ['W_link', 'storage'], ['sweep', 'storage'], ['storage', 'T_term']
+    ]
 }
 
 export const init_carrier_behavior = function(role:CarrierRole,

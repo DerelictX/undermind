@@ -6,30 +6,33 @@ export const terminal_run = function(room: Room){
     const storage = room.storage
     const terminal = room.terminal
     if (!storage || !terminal?.my || terminal.cooldown) return
-
-    /*
-    if(room.name == 'E39S58'){
+    if (!storage.store['energy'] && terminal.store['energy'] <= 60000){
+        demand_res(terminal,'energy',10000)
+        return
+    }
+    if(storage.store.getFreeCapacity() <= 110000){
         let terminal_store: StorePropertiesOnly = terminal.store
+        if(storage.store.energy > 180000 && terminal_store.energy > 30000){
+            terminal.send('energy', 10000, 'E39S39')
+            return
+        }
         let resourceType: keyof typeof terminal_store
         for (resourceType in terminal_store) {
             if(resourceType == 'energy') continue
             if(terminal_store[resourceType] < 3000) continue
-            terminal.send(resourceType, terminal_store[resourceType] , 'E32S56')
+            if(storage.store[resourceType] < 40000) continue
+            terminal.send(resourceType, terminal_store[resourceType] , 'E39S39')
             return
         }
-        for (resourceType in terminal_store) {
-            if(resourceType == 'energy') continue
-            terminal.send(resourceType, terminal_store[resourceType] , 'E32S56')
-            return
-        }
-    } else return
-    */
+    }
+
     switch(Game.time % 40){
         case 0:
             sendList(terminal,compressed.concat(product_tier[0])) 
             return
         case 10:
-            sendList(terminal,['ops','power','metal','biomass','silicon','mist'],storage.store)
+            if(!storage) return
+            sendList(terminal,['energy','ops','power','metal','biomass','silicon','mist'],storage.store)
             return
         case 20:
             const config = room.memory._typed._struct.factory
@@ -37,6 +40,7 @@ export const terminal_run = function(room: Room){
                 sendList(terminal,product_tier[config.level])
             return
         case 30:
+            if(!storage) return
             sendList(terminal,base_mineral,storage.store)
             return
     }

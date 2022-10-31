@@ -59,7 +59,7 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
     Mineral: function (room: Room, pool: MineralTaskPool, looper: Looper) {
         if (room.memory._typed._type != 'owned')
             return null
-        static_updater['mineral'](room,pool)
+        static_updater.mineral(room,pool)
         const posed = pool.H_mnrl[0]
         const stand = pool.T_mnrl[0]
         if (!posed || !stand)
@@ -83,40 +83,35 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
         }
     },
     Upgrade: function (room: Room, pool: OwnedTaskPool, looper: Looper) {
-        if (room.memory._typed._type != 'owned')
-            return null
-        static_updater['controller'](room,pool)
+        static_updater.controller(room,pool)
         if (!pool.W_ctrl[0])
             return null
-        if (room.storage?.my && room.storage.store.energy <= 150000)
+        if (!room.storage?.my || !room.controller || room.controller.level == 8)
             return null
-        if(!room.controller || room.controller.level == 8) return null
-        looper.interval = room.controller.level * 200
+        if (room.storage.store.energy <= 20000 * room.controller.level)
+            return null
+        looper.interval = 400
         return {
-            _body: { generator: 'Wc', workload: 16 },
+            _body: { generator: 'Wc', workload: 25 },
             _class: init_worker_behavior('Upgrader', room.name, room.name)
         }
     },
     Build: function (room: Room, pool: SourceTaskPool, looper: Looper) {
         const storage = room.storage
-        if (!storage?.my) {
-            if (!room.find(FIND_MY_CONSTRUCTION_SITES).length)
-                return null
-            looper.interval = 1500
-            return {
-                _body: { generator: 'WC', workload: 12 },
-                _class: init_worker_behavior('Builder', room.name, room.name)
-            }
-        } else {
-            if(Game.cpu.bucket < 9950)
-                return null
-            looper.interval = 1500
-            if (storage.store.energy <= 160000)
-                return null
-            return {
-                _body: { generator: 'WC', workload: 32 },
-                _class: init_worker_behavior('Builder', room.name, room.name)
-            }
+        looper.interval = 1500
+        if (room.controller?.level != 8 && !room.find(FIND_MY_CONSTRUCTION_SITES).length)
+            return null
+        if(Game.cpu.bucket < 9950)
+            return null
+        if (storage && storage.store.energy <= 80000)
+            return null
+        if (room.memory._typed._type == 'owned'
+                && room.memory._typed._struct.wall_hits > 50000000){
+            return null
+        }
+        return {
+            _body: { generator: 'WC', workload: 32 },
+            _class: init_worker_behavior('Builder', room.name, room.name)
         }
     },
     Maintain: function (room: Room, pool: SourceTaskPool, looper: Looper) {
@@ -140,7 +135,7 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
         static_updater.containers(room,pool)
         if (!room.storage?.my){
             return {
-                _body: { generator: 'C', workload: 24 },
+                _body: { generator: 'C', workload: 16 },
                 _class: init_worker_behavior('EnergySupplier', room.name, room.name)
             }
         }
@@ -162,7 +157,7 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
             }
         }
         return {
-            _body: { generator: 'C', workload: 24 },
+            _body: { generator: 'C', workload: 16 },
             _class: init_carrier_behavior('Supplier', room.name, room.name)
         }
     },

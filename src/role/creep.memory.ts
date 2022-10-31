@@ -6,7 +6,7 @@ interface CreepMemory extends MoveMemory {
 }
 
 type CarrierRole =
-    |"Collector"|"Supplier"|"Chemist"
+    |"Collector"|"Supplier"|"Chemist"|"Trader"
 interface CarrierMemory {
     bhvr_name:  "carrier"
     

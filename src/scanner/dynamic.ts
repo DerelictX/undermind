@@ -116,9 +116,12 @@ const posed_task_updater: {
             var store: StorePropertiesOnly = ruin.store
             var resourceType: keyof typeof store
             for (resourceType in store) {
+                if(resourceType == 'ops' ||
+                    resourceType != 'G' && resourceType.length == 1)
+                    continue
                 tasks.push({
                     action: 'withdraw',
-                    args: [ruin.id, resourceType, ruin.store[resourceType]],
+                    args: [ruin.id, resourceType],
                     pos: ruin.pos
                 })
             }
@@ -154,7 +157,7 @@ const posed_task_updater: {
     },
     W_energy: function (room: Room) {
         var tasks: RestrictedPrimitiveDescript<'withdraw' | 'pickup', 'energy'>[] = []
-        const storage = room.storage
+        const storage = room.storage ?? room.terminal
         if (storage && storage.store['energy'] >= 10000) {
             tasks.push({
                 action: 'withdraw',
@@ -318,7 +321,7 @@ const posed_task_updater: {
     downgraded: function (room: Room) {
         const controller = room.controller
         if (controller && controller.my && !controller.upgradeBlocked) {
-            if (controller.ticksToDowngrade < CONTROLLER_DOWNGRADE[controller.level] * 0.5) {
+            if (controller.ticksToDowngrade < CONTROLLER_DOWNGRADE[controller.level] * 0.75) {
                 return [{
                     action: 'upgradeController',
                     args: [controller.id],

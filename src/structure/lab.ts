@@ -47,7 +47,7 @@ export const change_reaction = function(room:Room): MineralCompoundConstant|null
 
     const labs = room.memory._typed._struct.labs
     const reaction = labs.reaction
-    if(reaction && reaction != 'OH'){
+    if(reaction && reaction.length > 2){
         /**当前reaction */
         const labs_in0 = Game.getObjectById(labs.ins[0]);
         const labs_in1 = Game.getObjectById(labs.ins[1]);
