@@ -83,7 +83,7 @@ function find_power_task(operator: PowerCreep, room: Room) {
         if(room.memory._typed._type == 'owned' && room.memory._typed._struct.factory){
             const config = room.memory._typed._struct.factory
             const factory = config.fact_id ? Game.getObjectById(config.fact_id) : null
-            if(!factory?.level || config.cd_bucket < 1000 || factory.cooldown) return
+            if(!factory?.level || !config.product || factory.cooldown) return
             if(!factory.effects || !factory.effects[0]) {
                 operator.memory._power.push({power: PWR_OPERATE_FACTORY, target: factory.id})
             }

@@ -3,6 +3,10 @@ interface Memory extends PathMemory {
     creep_SN:   number
     terminal:   {
         demand: Partial<Record<ResourceConstant,{[room: string]: number}>>
+        overflow: Order[]
+    }
+    factory:    {
+        demand: Partial<Record<ResourceConstant,number>>[]
     }
     threat_level:   {[room:string] : undefined | number}
 }

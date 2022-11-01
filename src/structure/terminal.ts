@@ -6,24 +6,17 @@ export const terminal_run = function(room: Room){
     const storage = room.storage
     const terminal = room.terminal
     if (!storage || !terminal?.my || terminal.cooldown) return
-    if (!storage.store['energy'] && terminal.store['energy'] <= 60000){
-        demand_res(terminal,'energy',10000)
+    if (storage.store.getFreeCapacity() < 100000 && terminal.store.energy > 30000) {
+        const order = Memory.terminal.overflow?.shift()
+        if(order){
+            const amount = order.amount > 10000 ? 10000 : order.amount
+            Game.market.deal(order.id,amount,room.name)
+            return
+        }
+        const orders = Game.market.getAllOrders({type: ORDER_BUY, resourceType: 'energy'})
+                .filter(order => order.price >= 9 && order.amount > 1000)
+        Memory.terminal.overflow = orders
         return
-    }
-    if(storage.store.getFreeCapacity() <= 110000){
-        let terminal_store: StorePropertiesOnly = terminal.store
-        if(storage.store.energy > 180000 && terminal_store.energy > 30000){
-            terminal.send('energy', 10000, 'E39S39')
-            return
-        }
-        let resourceType: keyof typeof terminal_store
-        for (resourceType in terminal_store) {
-            if(resourceType == 'energy') continue
-            if(terminal_store[resourceType] < 3000) continue
-            if(storage.store[resourceType] < 40000) continue
-            terminal.send(resourceType, terminal_store[resourceType] , 'E39S39')
-            return
-        }
     }
 
     switch(Game.time % 40){
@@ -36,8 +29,8 @@ export const terminal_run = function(room: Room){
             return
         case 20:
             const config = room.memory._typed._struct.factory
-            if(config.level)
-                sendList(terminal,product_tier[config.level])
+            if(config.product)
+                sendList(terminal,[config.product])
             return
         case 30:
             if(!storage) return

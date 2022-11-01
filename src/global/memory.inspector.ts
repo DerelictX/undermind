@@ -1,5 +1,6 @@
+import { product_tier } from "@/constant/resource_series"
 import { _format_room } from "@/room/memory.inspector"
-import _ from "lodash"
+import _, { ceil } from "lodash"
 
 export const _reboot_all = function() {
     for(let name in Game.rooms){
@@ -34,7 +35,10 @@ const global_memory_initializer: { [k in keyof FilterOptional<Memory>]: () => vo
         Memory.creep_SN = 1
     },
     terminal: function (): void {
-        Memory.terminal = { demand: {} }
+        Memory.terminal = {
+            demand: {},
+            overflow: []
+        }
     },
     threat_level: function (): void {
         Memory.threat_level = {}
@@ -62,4 +66,42 @@ const global_memory_initializer: { [k in keyof FilterOptional<Memory>]: () => vo
     spawns: function (): void {
         Memory.spawns = {}
     },
+    factory: function (): void {
+        Memory.factory = {
+            demand: [{}]
+        }
+        const demand0 = {
+            energy: 3000,
+            battery: 500,
+            ghodium_melt: 500,
+            purifier: 500,
+            oxidant: 500,
+            reductant: 500,
+
+            zynthium_bar: 500,
+            lemergium_bar: 500,
+            utrium_bar: 500,
+            keanium_bar: 500,
+
+            metal: 1000,
+            biomass: 1000,
+            silicon: 1000,
+            mist: 1000,
+        }
+        Memory.factory.demand[0] = { ...demand0 }
+        //高级商品
+        for(let level = 1; level <= 5; level++){
+            Memory.factory.demand[level] = { ...demand0 }
+            const demand = Memory.factory.demand[level]
+            for(let product of product_tier[level]){
+                const times_kt = ceil(1000/COMMODITIES[product].cooldown)   //1000tick能合成的次数
+                const components = COMMODITIES[product].components
+                let component: keyof typeof components
+                for(component in components){
+                    if((demand[component] ?? 0) < components[component] * times_kt)
+                        demand[component] = components[component] * times_kt
+                }
+            }
+        }
+    }
 }

@@ -202,7 +202,7 @@ const lazy_restock = function(creep:Creep,fb:CarrierMemory) {
     const toRoom = Game.rooms[fb.toRoom]
     if(!toRoom) return
     let storage:AnyStoreStructure|undefined = toRoom.storage
-    if(!storage || !storage.my || storage.store.getFreeCapacity() < 100000)
+    if(!storage || !storage.my || storage.store.getFreeCapacity() < 50000)
         storage = toRoom.terminal
     if(!storage || !storage.my || storage.store.getFreeCapacity() < 50000)
         return

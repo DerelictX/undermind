@@ -9,9 +9,7 @@ export const structure_updater = {
         });
         pool.factory = {
             fact_id:    factory[0]?.id ?? null,
-            level:      0,
-            cd_bucket:  0,
-            demand:     {}
+            product:    null
         }
 
         //nuker

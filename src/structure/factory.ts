@@ -1,27 +1,42 @@
-import { compressed, compression, production_line, product_tier } from "@/constant/resource_series"
-import _, { ceil, floor } from "lodash"
+import { compression, product_tier } from "@/constant/resource_series"
+import _ from "lodash"
 import { demand_res } from "./terminal"
 
 export const factory_run = function(room: Room){
     if(room.memory._typed._type != 'owned') return
     const config = room.memory._typed._struct.factory
+    const storage = room.storage
     const factory = config.fact_id ? Game.getObjectById(config.fact_id) : null
-    if(!factory || factory.cooldown) return
+    if(!storage || !factory) return
 
-    if(factory.level) {
-        for(let res of product_tier[factory.level]){
-            if(factory.produce(res) == OK) return
+    //显示
+    if(config.product) {
+        const opts: TextStyle = {
+            font:0.5,color:'#FF7F7F',
+            stroke:'#7F7F00',
+            strokeWidth:0.1
         }
+        room.visual.text(config.product,factory.pos,opts)
     }
-    for(let res of product_tier[0]){
-        if(factory.produce(res) == OK) return
+    if(factory.cooldown) return
+
+    //商品
+    if(config.product) {
+        factory.produce(config.product)
+        return
     }
-    /*
-    for(let res of compressed){
-        if(factory.store[res] > 2000) continue
-        if(factory.produce(res) == OK) return
+    for(let resourceType of product_tier[0]){
+        if(factory.produce(resourceType) == OK) return
     }
-    */
+
+    //解压
+    let mineral: keyof typeof compression
+    for(mineral in compression){
+        const bar = compression[mineral]
+        if(storage.store[bar] < 10000 || factory.store[bar] < 1000) continue
+        if(storage.store[mineral] > storage.store[bar]) continue
+        if(factory.produce(mineral) == OK) return
+    }
 }
 
 /**工厂补充原料 */
@@ -33,10 +48,10 @@ export const T_fact = function (room: Room) {
     if (!terminal || !factory) return []
     var tasks: RestrictedPrimitiveDescript<'transfer'>[] = []
     
-    if(!config.demand) config.demand = {}
+    const demand = Memory.factory.demand[factory.level ?? 0]
     let component: ResourceConstant
-    for(component in config.demand){
-        const amount = config.demand[component] ?? 0
+    for(component in demand){
+        const amount = demand[component] ?? 0
         if(factory.store[component] >= amount * 2)
             continue
         if(terminal.store[component])
@@ -48,21 +63,23 @@ export const T_fact = function (room: Room) {
 
 export const W_fact = function (room: Room) {
     if(room.memory._typed._type != 'owned') return[]
-    if (!room.memory._typed._struct.factory) return []
-    const storage = room.storage
     const terminal = room.terminal
     const config = room.memory._typed._struct.factory
     const factory = config.fact_id ? Game.getObjectById(config.fact_id) : null
-    if (!storage || !terminal || !factory) return []
-
+    if (!terminal || !factory) return []
     var tasks: RestrictedPrimitiveDescript<'withdraw'>[] = []
+
+    const demand = Memory.factory.demand[factory.level ?? 0]
     let resourceType: ResourceConstant
     let factory_store: StorePropertiesOnly = factory.store
     for(resourceType in factory_store){
-        if(config.demand[resourceType]) continue
+        if(demand[resourceType]) continue
         if(factory_store[resourceType] > terminal.store[resourceType]){
             tasks.push({ action: 'withdraw', args: [factory.id, resourceType], pos: factory.pos })
         }
+    }
+    if(factory.store.energy > 10000) {
+        tasks.push({ action: 'withdraw', args: [factory.id, 'energy'], pos: factory.pos })
     }
     return tasks
 }
@@ -70,38 +87,24 @@ export const W_fact = function (room: Room) {
 /**更新可用于生产高级商品的时长，大于1000ticks说明不会浪费ops */
 export const check_components = function(room: Room){
     if(room.memory._typed._type != 'owned') return
-    const terminal = room.terminal
     const config = room.memory._typed._struct.factory
     const factory = config.fact_id ? Game.getObjectById(config.fact_id) : null
-    if (!terminal || !factory) return
-    config.level = factory.level ?? 0
-    config.demand = {}
-    config.cd_bucket = 0
+    if (!factory?.level) return
 
-    //初级商品
-    for(let product of product_tier[0]){
+    for(let product of product_tier[factory.level]){
+        config.product = product
+        const demand = Memory.factory.demand[factory.level]
         const components = COMMODITIES[product].components
         let component: keyof typeof components
         for(component in components){
-            config.demand[component] = components[component] * 25
+            if(factory.store[component] < (demand[component] ?? 0)){
+                config.product = null
+                break
+            }
         }
+        if(config.product) break
     }
-    //高级商品
-    if(!config.level) return
-    for(let product of product_tier[config.level]){
-        const times_kt = ceil(1000/COMMODITIES[product].cooldown)   //1000tick能合成的次数
-        let min_times = 255
-        const components = COMMODITIES[product].components
-        let component: keyof typeof components
-        for(component in components){
-            if((config.demand[component] ?? 0) < components[component] * times_kt)
-                config.demand[component] = components[component] * times_kt
-            const times = floor((factory.store[component] + terminal.store[component])
-                / components[component])
-            if(times < min_times) min_times = times
-        }
-        config.cd_bucket += min_times * COMMODITIES[product].cooldown
-    }
-    console.log(`${room.name}\tfact_level: ${config.level}\tcd_bucket: ${config.cd_bucket}`)
+    console.log(`${room.name}.product:\t${config.product}`)
+    return config.product
 }
 _.assign(global, {check_components:check_components})

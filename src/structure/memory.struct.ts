@@ -34,9 +34,7 @@ interface LabConfig {
 
 interface FactoryConfig {
     fact_id:    Id<StructureFactory>|null
-    level:      number
-    cd_bucket:  number
-    demand:     Partial<Record<ResourceConstant,number>>
+    product:    CommodityConstant|null
 }
 
 interface ObserverConfig {

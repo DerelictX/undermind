@@ -68,7 +68,7 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
         const storage = room.storage
         if (!mineral || !storage)
             return null
-        if (storage.store[mineral.mineralType] > 60000)
+        if (storage.store[mineral.mineralType] > 30000)
             return null
 
         const bhvr: StaticMemory = {
@@ -86,13 +86,15 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
         static_updater.controller(room,pool)
         if (!pool.W_ctrl[0])
             return null
-        if (!room.storage?.my || !room.controller || room.controller.level == 8)
+        if (!room.storage?.my || !room.controller || room.controller.level == 9)
+            return null
+        if(Game.cpu.bucket < 9950)
             return null
         if (room.storage.store.energy <= 20000 * room.controller.level)
             return null
-        looper.interval = 400
+        looper.interval = 1500
         return {
-            _body: { generator: 'Wc', workload: 25 },
+            _body: { generator: 'Wc', workload: 15 },
             _class: init_worker_behavior('Upgrader', room.name, room.name)
         }
     },
