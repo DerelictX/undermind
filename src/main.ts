@@ -27,8 +27,14 @@ export const loop = function () {
         _format_room
         HelperRoomResource.showAllRes()
         expand_commo
-        //Game.market.createOrder('buy','pixel',0.001,1,'sim')
-        //Memory.terminal.demand['X']['E41S56'] = 30000
+        Game.market.createOrder({
+            type:'buy',
+            resourceType:'pixel',
+            price:0.001,
+            totalAmount:1,
+            roomName:'sim'
+        })
+        //Memory.terminal.demand['X']['E41S51'] = 60000
     }
     
     if(!global._dynamic) global._dynamic = {}

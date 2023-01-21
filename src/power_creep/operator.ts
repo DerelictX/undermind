@@ -74,7 +74,7 @@ function find_power_task(operator: PowerCreep, room: Room) {
     }
 
     if(operator.powers[PWR_OPERATE_STORAGE] && !operator.powers[PWR_OPERATE_STORAGE].cooldown){
-        if(storage && (!storage.effects || !storage.effects[0])) {
+        if(storage && !storage.effects?.[0]) {
             operator.memory._power.push({power: PWR_OPERATE_STORAGE, target: storage.id})
         }
     }
@@ -83,10 +83,9 @@ function find_power_task(operator: PowerCreep, room: Room) {
         if(room.memory._typed._type == 'owned' && room.memory._typed._struct.factory){
             const config = room.memory._typed._struct.factory
             const factory = config.fact_id ? Game.getObjectById(config.fact_id) : null
-            if(!factory?.level || !config.product || factory.cooldown) return
-            if(!factory.effects || !factory.effects[0]) {
-                operator.memory._power.push({power: PWR_OPERATE_FACTORY, target: factory.id})
-            }
+            if(operator.powers[PWR_OPERATE_FACTORY].level != config.operate) return
+            if(!factory || factory.cooldown || factory.effects?.[0]) return
+            operator.memory._power.push({power: PWR_OPERATE_FACTORY, target: factory.id})
         }
     }
 
@@ -96,7 +95,7 @@ function find_power_task(operator: PowerCreep, room: Room) {
             if(!labs.reaction) return
             for (let id of labs.outs) {
                 const lab_in = Game.getObjectById(id)
-                if(lab_in && (!lab_in.effects || !lab_in.effects[0]) && lab_in.cooldown > 0){
+                if(lab_in && !lab_in.effects?.[0] && lab_in.cooldown > 0){
                     operator.memory._power.push({power: PWR_OPERATE_LAB, target: id})
                     break
                 }

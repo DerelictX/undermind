@@ -280,7 +280,7 @@ const posed_task_updater: {
                 if (structure.structureType == STRUCTURE_RAMPART)
                     return structure.my
                 if (structure.structureType == STRUCTURE_WALL)
-                    return true
+                    return structure.hits != undefined
                 return false
             }
         })

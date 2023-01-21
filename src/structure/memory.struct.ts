@@ -3,7 +3,7 @@ interface RoomStructureList {
     towers:         Id<StructureTower>[]
     links:          LinkConfig
     labs:           LabConfig
-    factory:        FactoryConfig
+    factory:        FactoryConfig & Looper
     
     power_spawn:    Id<StructurePowerSpawn>|null
     nuker:          Id<StructureNuker>|null
@@ -34,7 +34,8 @@ interface LabConfig {
 
 interface FactoryConfig {
     fact_id:    Id<StructureFactory>|null
-    product:    CommodityConstant|null
+    product?:   CommodityConstant
+    operate?:   number
 }
 
 interface ObserverConfig {

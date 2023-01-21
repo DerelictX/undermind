@@ -14,7 +14,7 @@ export const terminal_run = function(room: Room){
             return
         }
         const orders = Game.market.getAllOrders({type: ORDER_BUY, resourceType: 'energy'})
-                .filter(order => order.price >= 9 && order.amount > 1000)
+                .filter(order => order.price >= 10 && order.amount > 1000)
         Memory.terminal.overflow = orders
         return
     }
@@ -117,7 +117,7 @@ export const W_term = function (room: Room) {
     const terminal = room.terminal
     if (!storage || !terminal)
         return []
-    if (storage.store.getFreeCapacity() < 100000)
+    if (storage.store.getFreeCapacity() < 60000)
         return []
 
     var tasks: RestrictedPrimitiveDescript<'withdraw'>[] = []

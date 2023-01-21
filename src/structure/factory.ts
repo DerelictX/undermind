@@ -20,11 +20,22 @@ export const factory_run = function(room: Room){
     }
     if(factory.cooldown) return
 
-    //商品
-    if(config.product) {
-        factory.produce(config.product)
+    //合成商品
+    if(factory.effects?.[0]){
+        delete config.operate
+        if(config.product) {
+            factory.produce(config.product)
+        }
         return
     }
+
+    if(config.reload_time > Game.time){
+        //
+    } else {
+        config.reload_time = Game.time + 1000
+        change_production(room)
+    }
+
     for(let resourceType of product_tier[0]){
         if(factory.produce(resourceType) == OK) return
     }
@@ -37,6 +48,8 @@ export const factory_run = function(room: Room){
         if(storage.store[mineral] > storage.store[bar]) continue
         if(factory.produce(mineral) == OK) return
     }
+    if(storage.store.energy < 160000)
+        factory.produce('energy')
 }
 
 /**工厂补充原料 */
@@ -85,7 +98,7 @@ export const W_fact = function (room: Room) {
 }
 
 /**更新可用于生产高级商品的时长，大于1000ticks说明不会浪费ops */
-export const check_components = function(room: Room){
+export const change_production = function(room: Room){
     if(room.memory._typed._type != 'owned') return
     const config = room.memory._typed._struct.factory
     const factory = config.fact_id ? Game.getObjectById(config.fact_id) : null
@@ -98,13 +111,16 @@ export const check_components = function(room: Room){
         let component: keyof typeof components
         for(component in components){
             if(factory.store[component] < (demand[component] ?? 0)){
-                config.product = null
+                delete config.product
                 break
             }
         }
-        if(config.product) break
+        if(config.product) {
+            config.operate = factory.level
+            break
+        }
     }
     console.log(`${room.name}.product:\t${config.product}`)
     return config.product
 }
-_.assign(global, {check_components:check_components})
+_.assign(global, {check_components:change_production})

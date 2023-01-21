@@ -143,8 +143,9 @@ const owned_memory_initializer: {[k in keyof FilterOptional<OwnedRoomMemory>]:
                 boosts: []
             },
             factory: {
-                fact_id:    null,
-                product:    null
+                fact_id:        null,
+                reload_time:    Game.time,
+                interval:       1000
             },
             wall_hits: 100000,
             power_spawn: null,

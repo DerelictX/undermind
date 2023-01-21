@@ -1,7 +1,6 @@
 import { parse_posed_task } from "@/performer/behavior.callback"
 import { init_carrier_behavior, init_worker_behavior } from "@/role/initializer/config.behavior"
 import { static_updater } from "@/scanner/static"
-import { check_components } from "@/structure/factory"
 import { change_reaction } from "@/structure/lab"
 import { structure_updater } from "../../scanner/structure.updater"
 
@@ -151,7 +150,6 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
             return null
         structure_updater.towers(room, room.memory._typed._struct)
         structure_updater.links(room, room.memory._typed._struct)
-        structure_updater.unique(room, room.memory._typed._struct)
         if (!room.storage?.my){
             return {
                 _body: { generator: 'C', workload: 16 },
@@ -168,7 +166,6 @@ export const owned_room_loop_handler: RoomLoopHandler<'owned'> = {
             return null
         structure_updater.labs(room, room.memory._typed._struct)
         change_reaction(room)
-        check_components(room)
         Memory._closest_owned[room.name] = {
             root:   room.name,
             prev:   room.name,
