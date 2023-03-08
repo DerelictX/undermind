@@ -1,6 +1,7 @@
 import { approach } from "@/move/action.virtual"
 import { carry_priority } from "@/role/initializer/config.behavior"
-import { update_pool } from "@/scanner/dynamic"
+import { update_col_cache } from "@/scanner/collect"
+import { update_con_cache } from "@/scanner/consume"
 import { action_range, parse_posed_task, perform_callback, TASK_DOING } from "../../performer/behavior.callback"
 
 export const run_carrier = function(creep:Creep,fb:CarrierMemory){
@@ -12,7 +13,8 @@ export const run_carrier = function(creep:Creep,fb:CarrierMemory){
         } else {
             const flow = change_flow(fb)
             if(!flow) return
-            fb.current = flow
+            fb.find_col = flow[0]
+            fb.find_con = flow[1]
             fb.state = 'collect'
         }
     }
@@ -25,7 +27,8 @@ export const run_carrier = function(creep:Creep,fb:CarrierMemory){
             } else {
                 const flow = change_flow(fb)
                 if(!flow) return
-                fb.current = flow
+                fb.find_col = flow[0]
+                fb.find_con = flow[1]
                 fb.state = 'collect'
             }
         }
@@ -41,7 +44,8 @@ export const run_carrier = function(creep:Creep,fb:CarrierMemory){
             } else {
                 const flow = change_flow(fb)
                 if(!flow) return
-                fb.current = flow
+                fb.find_col = flow[0]
+                fb.find_con = flow[1]
                 fb.state = 'collect'
             }
         }
@@ -56,7 +60,7 @@ const run_carrier_collect = function(creep:Creep,fb:CarrierMemory){
         if(creep.store.getFreeCapacity('energy') == 0){
             return 'consume'
         }
-        if(fb.current[0] == 'storage'){
+        if(fb.find_col == 'storage'){
             if(!fb.consume.length)
                 find_consume(creep,fb)
             lazy_storage(fb)
@@ -80,7 +84,7 @@ const run_carrier_consume = function(creep:Creep,fb:CarrierMemory){
         if(creep.store.getUsedCapacity('energy') == 0){
             return 'idle'
         }
-        if(fb.current[1] == 'storage')
+        if(fb.find_con == 'storage')
             lazy_restock(creep,fb)
         else find_consume(creep,fb)
         if(!fb.consume.length) {
@@ -100,22 +104,23 @@ const run_carrier_consume = function(creep:Creep,fb:CarrierMemory){
 }
 
 const change_flow = function(fb:CarrierMemory) {
-    const pool = global._dynamic[fb.fromRoom] ?? (global._dynamic[fb.fromRoom] = {})
+    const col_pool = global._collect[fb.fromRoom] ?? (global._collect[fb.fromRoom] = {})
+    const con_pool = global._consume[fb.fromRoom] ?? (global._consume[fb.fromRoom] = {})
     const fromRoom = Game.rooms[fb.fromRoom]
     const toRoom = Game.rooms[fb.toRoom]
     for(let flow of carry_priority[fb.priority]){
-        if(flow[0] != 'storage' && !pool[flow[0]]?.length) {
+        if(flow[0] != 'storage' && !col_pool[flow[0]]?.length) {
             if(!fromRoom) return null
-            update_pool(pool,flow[0],fromRoom)
+            update_col_cache(col_pool,flow[0],fromRoom)
         }
-        if(flow[0] != 'storage' && !pool[flow[0]]?.length) {
+        if(flow[0] != 'storage' && !col_pool[flow[0]]?.length) {
             continue
         }
-        if(flow[1] != 'storage' && !pool[flow[1]]?.length) {
+        if(flow[1] != 'storage' && !con_pool[flow[1]]?.length) {
             if(!toRoom) return null
-            update_pool(pool,flow[1],fromRoom)
+            update_con_cache(con_pool,flow[1],fromRoom)
         }
-        if(flow[1] != 'storage' && !pool[flow[1]]?.length) {
+        if(flow[1] != 'storage' && !con_pool[flow[1]]?.length) {
             continue
         }
         //console.log('\t' + flow)
@@ -125,10 +130,10 @@ const change_flow = function(fb:CarrierMemory) {
 }
 
 const find_consume = function(creep:Creep,fb:CarrierMemory){
-    const consume = global._dynamic[fb.toRoom] ?? (global._dynamic[fb.toRoom] = {})
-    if(fb.current[1] == 'storage') return
+    const consume = global._consume[fb.toRoom] ?? (global._consume[fb.toRoom] = {})
+    if(fb.find_con == 'storage') return
     let free = creep.store.getCapacity()
-    const pool = consume[fb.current[1]]
+    const pool = consume[fb.find_con]
     while(pool && pool.length && free > 0) {
         const task = pool[0]
         if(task.action == 'transfer' && task.args[2]){
@@ -154,17 +159,17 @@ const find_consume = function(creep:Creep,fb:CarrierMemory){
 }
 
 const find_collect = function(creep:Creep,fb:CarrierMemory){
-    const collect = global._dynamic[fb.fromRoom] ?? (global._dynamic[fb.fromRoom] = {})
-    if(fb.current[0] == 'storage') return
+    const collect = global._collect[fb.fromRoom] ?? (global._collect[fb.fromRoom] = {})
+    if(fb.find_col == 'storage') return
     let free = creep.store.getCapacity()
-    if(!collect[fb.current[0]]?.length){
+    if(!collect[fb.find_col]?.length){
         const fromRoom = Game.rooms[fb.fromRoom]
         if(fromRoom){
-            update_pool(collect,fb.current[0],fromRoom)
+            update_col_cache(collect,fb.find_col,fromRoom)
         }
     }
     
-    const pool = collect[fb.current[0]]
+    const pool = collect[fb.find_col]
     while(pool && pool.length && free > 0) {
         const task = pool[0]
         //console.log('\t' + JSON.stringify(task))

@@ -1,11 +1,11 @@
 import { product_tier } from "@/constant/resource_series"
-import { _format_room } from "@/room/memory.inspector"
+import { inspect_memory } from "@/room/memory.inspector"
 import _, { ceil } from "lodash"
 
 export const _reboot_all = function() {
     for(let name in Game.rooms){
         if(Game.rooms[name].controller?.my)
-        _format_room(name,'owned',name)
+            inspect_memory(name,true)
     }
 }
 _.assign(global, {_reboot_all:_reboot_all})
@@ -71,37 +71,44 @@ const global_memory_initializer: { [k in keyof FilterOptional<Memory>]: () => vo
             demand: [{}]
         }
         const demand0 = {
-            energy: 3000,
-            battery: 500,
-            ghodium_melt: 500,
-            purifier: 500,
-            oxidant: 500,
-            reductant: 500,
-
-            zynthium_bar: 500,
-            lemergium_bar: 500,
-            utrium_bar: 500,
-            keanium_bar: 500,
-
-            metal: 1000,
-            biomass: 1000,
-            silicon: 1000,
-            mist: 1000,
+            energy: 3000, battery: 500,
+            ghodium_melt: 500, purifier: 500, oxidant: 500, reductant: 500,
+            zynthium_bar: 500, lemergium_bar: 500, utrium_bar: 500, keanium_bar: 500,
+            metal: 1000, biomass: 1000, silicon: 1000, mist: 1000,
         }
         Memory.factory.demand[0] = { ...demand0 }
         //高级商品
-        for(let level = 1; level <= 5; level++){
+        for (let level = 1; level <= 5; level++) {
             Memory.factory.demand[level] = { ...demand0 }
             const demand = Memory.factory.demand[level]
-            for(let product of product_tier[level]){
-                const times_kt = ceil(1000/COMMODITIES[product].cooldown)   //1000tick能合成的次数
+            for (let product of product_tier[level]) {
+                const times_kt = ceil(1000 / COMMODITIES[product].cooldown) //1000tick能合成的次数
                 const components = COMMODITIES[product].components
                 let component: keyof typeof components
-                for(component in components){
-                    if((demand[component] ?? 0) < components[component] * times_kt)
+                for (component in components) {
+                    if ((demand[component] ?? 0) < components[component] * times_kt)
                         demand[component] = components[component] * times_kt
                 }
             }
         }
+    },
+    room_type: function (): void {
+        Memory.room_type = {}
+        for (let name in Game.rooms) {
+            if (Game.rooms[name].controller?.my)
+                Memory.room_type[name] = 'owned'
+        }
+    },
+    _loop_id: function (): void {
+        Memory._loop_id = {}
+    },
+    H_srcs: function (): void {
+        Memory.H_srcs = {}
+    },
+    W_cntn: function (): void {
+        Memory.W_cntn = {}
+    },
+    T_cntn: function (): void {
+        Memory.T_cntn = {}
     }
 }

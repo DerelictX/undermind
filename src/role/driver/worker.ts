@@ -1,7 +1,8 @@
 import { work_priority } from "@/role/initializer/config.behavior"
 import { hikeTo } from "@/move/route"
 import { parse_posed_task, perform_callback, TASK_COMPLETE, TASK_DOING } from "@/performer/behavior.callback"
-import { update_pool } from "@/scanner/dynamic"
+import { update_col_cache } from "@/scanner/collect"
+import { update_con_cache } from "@/scanner/consume"
 
 export const run_worker = function(creep:Creep,fb:WorkerMemory){
     if(fb.state == 'collect'){
@@ -57,7 +58,7 @@ const run_worker_consume = function(creep:Creep,fb:WorkerMemory){
 const change_flow = function(creep:Creep,fb:WorkerMemory) {
     const flow = work_priority[fb.priority]
     if(fb.state == 'collect'){
-        const pool = global._dynamic[fb.fromRoom] ?? (global._dynamic[fb.fromRoom] = {})
+        const pool = global._collect[fb.fromRoom] ?? (global._collect[fb.fromRoom] = {})
         const room = Game.rooms[fb.fromRoom]
         if(creep.room.name != fb.fromRoom){
             hikeTo(creep,new RoomPosition(25,25,fb.fromRoom))
@@ -65,7 +66,7 @@ const change_flow = function(creep:Creep,fb:WorkerMemory) {
         }
         for(let source of flow[0]){
             if(!pool[source]?.length){
-                update_pool(pool,source,room)
+                update_col_cache(pool,source,room)
             }
             const tasks = pool[source]
             if(tasks && tasks.length) {
@@ -78,7 +79,7 @@ const change_flow = function(creep:Creep,fb:WorkerMemory) {
         delete creep.memory._move
     }
     if(fb.state == 'consume'){
-        const pool = global._dynamic[fb.toRoom] ?? (global._dynamic[fb.toRoom] = {})
+        const pool = global._consume[fb.toRoom] ?? (global._consume[fb.toRoom] = {})
         const room = Game.rooms[fb.toRoom]
         if(creep.room.name != fb.toRoom){
             hikeTo(creep,new RoomPosition(25,25,fb.toRoom))
@@ -86,7 +87,7 @@ const change_flow = function(creep:Creep,fb:WorkerMemory) {
         }
         for(let sink of flow[1]){
             if(!pool[sink]?.length){
-                update_pool(pool,sink,room)
+                update_con_cache(pool,sink,room)
             }
             const tasks = pool[sink]
             if(tasks && tasks.length) {

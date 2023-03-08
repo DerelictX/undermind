@@ -1,46 +1,29 @@
-import { structure_updater } from "./scanner/structure.updater";
-import { operator_run } from "./power_creep/operator";
-import { inspect_memory, _format_room } from "./room/memory.inspector";
-import { spawn_loop } from "./room/handler.spawn";
-import { spawn_run } from "./structure/spawn";
-import { tower_run } from "./structure/tower";
-import { static_updater } from "./scanner/static";
-import { link_run } from "./structure/link";
-import { lab_run } from "./structure/lab";
-import { terminal_run } from "./structure/terminal";
-import { factory_run } from "./structure/factory";
-import { power_spawn_run } from "./structure/power_spawn";
-import { run_carrier } from "./role/driver/carrier";
-import { observer_run } from "./structure/observer";
-import { run_worker } from "./role/driver/worker";
+import { _format_room } from "./room/memory.inspector";
 import { inspect_global } from "./global/memory.inspector";
 import { handle_moves } from "./move/Kuhn-Munkres";
 import { HelperRoomResource } from "./global/helper_roomResource";
 import { expand_commo } from "./constant/commodity_tree";
-import { run_static } from "./role/driver/static";
+import { run_rooms } from "./run_rooms";
+import { run_creeps, run_power_creeps } from "./run_creeps";
+import { loopHarvest } from "./controller/harvest";
 
 export const loop = function () {
 
     if(false){
-        static_updater
-        structure_updater
         _format_room
         HelperRoomResource.showAllRes()
         expand_commo
-        Game.market.createOrder({
-            type:'buy',
-            resourceType:'pixel',
-            price:0.001,
-            totalAmount:1,
-            roomName:'sim'
-        })
+        Game.market.createOrder({ type:'buy', resourceType:'pixel', price:0.001, totalAmount:1, roomName:'sim' })
         //Memory.terminal.demand['X']['E41S51'] = 60000
     }
     
-    if(!global._dynamic) global._dynamic = {}
+    if(!global._collect) global._collect = {}
+    if(!global._consume) global._consume = {}
     if(!global.commonMatrix) global.commonMatrix = {}
     global._move_intents = {}
+
     inspect_global()
+    loopHarvest()
     run_rooms()
     run_power_creeps()
     run_creeps()
@@ -59,79 +42,4 @@ export const loop = function () {
 
     if(Game.shard.name == 'shard2')
         Game.cpu.generatePixel()
-}
-
-const run_rooms = function(){
-    for(let name in Memory.rooms){
-        try{
-            const room = Game.rooms[name];
-            if(!room){
-                continue
-            }
-            spawn_loop(room)
-            spawn_run(room)
-            tower_run(room)
-            link_run(room)
-
-            lab_run(room)
-            factory_run(room)
-            power_spawn_run(room)
-            observer_run(room)
-            terminal_run(room)
-        }catch(error){
-            console.log(name +':\t' + error);
-            inspect_memory(name,false)
-        }
-    }
-}
-
-const run_creeps = function(){
-    for(let name in Memory.creeps) {
-        try{
-            const creep = Game.creeps[name]
-            if(!creep){
-                delete Memory.creeps[name];
-                continue
-            }
-            if(creep.spawning) continue
-            if(Game.cpu.bucket < 6000 && Game.cpu.getUsed() > 10) return
-            if(Game.cpu.bucket < 8000 && Game.cpu.getUsed() > 16) return
-
-            const _class = creep.memory._class
-            switch(_class.bhvr_name){
-                case 'carrier':
-                    run_carrier(creep,_class)
-                    break
-                case 'worker':
-                    run_worker(creep,_class)
-                    break
-                case 'static':
-                    run_static(creep,_class)
-                    break
-                default:
-                    throw new Error("Unexpected state.")
-            }
-        }catch(error){
-            console.log(name + ':\t' + error);
-        }
-    }
-}
-
-const run_power_creeps = function(){
-    for(let name in Game.powerCreeps){
-        try{
-            const powerCreep = Game.powerCreeps[name]
-            if(!powerCreep.shard)
-                continue
-            if(!powerCreep.memory._tasks)
-                powerCreep.memory = { _power:[], _tasks:[] }
-            switch(powerCreep.className) {
-                case 'operator':
-                    operator_run(powerCreep);
-                    break;
-            }
-        }catch(error){
-            console.log(name + ':\t' + error);
-        }
-    }
 }

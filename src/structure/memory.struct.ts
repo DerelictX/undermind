@@ -1,5 +1,6 @@
 interface RoomStructureList {
     spawns:         SpawnConfig
+    wall_hits:      number
     towers:         Id<StructureTower>[]
     links:          LinkConfig
     labs:           LabConfig
@@ -8,8 +9,6 @@ interface RoomStructureList {
     power_spawn:    Id<StructurePowerSpawn>|null
     nuker:          Id<StructureNuker>|null
     observer:       ObserverConfig
-    
-    wall_hits:      number
 }
 
 interface SpawnConfig {

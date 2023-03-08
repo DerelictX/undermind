@@ -1,9 +1,9 @@
-import { spawn_loop } from "@/room/handler.spawn"
 import { _format_room } from "@/room/memory.inspector"
 
 export const observer_run = function(room: Room){
-    if(room.memory._typed._type != 'owned') return
-    const config = room.memory._typed._struct.observer
+    const config = room.memory.observer
+    if(!config) return
+
     if(!config.observing){
         const observer = config.ob_id ? Game.getObjectById(config.ob_id) : null
         config.observing = config.BFS_open.shift()
@@ -24,8 +24,7 @@ export const observer_run = function(room: Room){
         //开外矿
         if(Game.shard.name != 'shard3' && !Memory.rooms[curr]
                 && !controller.owner && curr_node.dist == 1){
-            _format_room(curr,'reserved',room.name)
-            spawn_loop(curr_room)
+            //
         }
         //别人的房
         if(controller.owner && !controller.my) {
@@ -36,8 +35,7 @@ export const observer_run = function(room: Room){
         //挖过道
         const isHighway = curr.indexOf('0') != -1
         if(isHighway && !Memory.rooms[curr]) {
-            _format_room(curr,'highway',room.name)
-            spawn_loop(curr_room)
+            //
         }
         const core: StructureInvaderCore[] = room.find(FIND_STRUCTURES,{
             filter: (structure) => structure.structureType == 'invaderCore'

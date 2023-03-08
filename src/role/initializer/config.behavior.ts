@@ -1,7 +1,8 @@
+type EnSource = FilterCollectKey<WorkAction|CarryAction,'energy'>
+type EnSink =   FilterConsumeKey<WorkAction|CarryAction,'energy'>
 type EnWorkerPriority = [from: EnSource[], to: EnSink[]]
 
 export const work_priority: {[role in EnergyRole]:EnWorkerPriority} = {
-    Upgrader: [['W_ctrl'], ['U_ctrl']],
     Builder: [
         ['W_energy', 'H_srcs'],
         ['repair', 'anti_nuke', 'build', 'fortify', 'U_ctrl']
@@ -14,12 +15,12 @@ export const work_priority: {[role in EnergyRole]:EnWorkerPriority} = {
         ['W_energy'],
         ['T_ext', 'T_tower', 'T_cntn']
     ],
-    RMaintainer: [
-        ['W_energy', 'H_srcs'],
-        ['decayed', 'build']
-    ]
 }
 
+type ResFlow = [
+    from:   'storage' | ResSource,
+    to:     'storage' | ResSink
+]
 export const carry_priority: {[role in CarrierRole]:ResFlow[]} = {
     Collector: [
         ['W_link', 'storage'], ['W_cntn', 'storage'], ['sweep', 'storage'],
@@ -45,7 +46,8 @@ export const init_carrier_behavior = function(role:CarrierRole,
         state:      "idle",
         collect:    [],
         consume:    [],
-        current:    carry_priority[role][0],
+        find_col:    carry_priority[role][0][0],
+        find_con:    carry_priority[role][0][1],
         fromRoom:   fromRoom,
         toRoom:     toRoom,
         priority:   role

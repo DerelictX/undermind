@@ -53,11 +53,10 @@ function goto(e){
 export const HelperRoomResource = {
 
     getStorageTerminalRes: function (room: Room){
-        if(room.memory._typed._type != 'owned') return{}
         const storage = room.storage
         const terminal = room.terminal
-        const config = room.memory._typed._struct.factory
-        const factory = config.fact_id ? Game.getObjectById(config.fact_id) : null
+        const config = room.memory.factory
+        const factory = config?.fact_id ? Game.getObjectById(config.fact_id) : null
 
         const store: Partial<StorePropertiesOnly> = {};
         if(storage?.my)this.addStore(store,storage.store)

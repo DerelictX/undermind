@@ -2,19 +2,18 @@ import { body_generator } from "@/constant/config.body";
 import { ceil, floor } from "lodash";
 
 export const spawn_run = function(room: Room) {
-    if(room.memory._typed._type != 'owned') return
     if(room.energyAvailable < 300) return
     const spawns = room.find(FIND_MY_SPAWNS,{
         filter: (spawn) => !spawn.spawning
     })
     const spawn = spawns[0]
-    if(!spawn) return
+    if(!room.memory.spawns || !spawn) return
 
-    let spawn_task = room.memory._typed._struct.spawns.t1.shift()
+    let spawn_task = room.memory.spawns.t1.shift()
     if(!spawn_task && spawns[1])
-        spawn_task = room.memory._typed._struct.spawns.t2.shift()
+        spawn_task = room.memory.spawns.t2.shift()
     if(!spawn_task && spawns[2])
-        spawn_task = room.memory._typed._struct.spawns.t3.shift()
+        spawn_task = room.memory.spawns.t3.shift()
     if(!spawn_task) return
 
     /**生爬 */
@@ -31,33 +30,17 @@ export const spawn_run = function(room: Room) {
         ret = spawn.spawnCreep(generator(workload, mobility), creep_name)
     }
 
-    const _typed = Memory.rooms[spawn_task._caller.room_name]._typed
+    const caller = spawn_task._caller
     let looper: Looper|undefined
-    switch(_typed._type){
-        case 'owned':
-            if(_typed._type == spawn_task._caller.room_type)
-                looper = _typed._looper[spawn_task._caller.loop_key]
-            break
-        case 'reserved':
-            if(_typed._type == spawn_task._caller.room_type)
-                looper = _typed._looper[spawn_task._caller.loop_key]
-            break
-        case 'highway':
-            if(_typed._type == spawn_task._caller.room_type)
-                looper = _typed._looper[spawn_task._caller.loop_key]
-                break
-        case 'neutral':
-            if(_typed._type == spawn_task._caller.room_type)
-                looper = _typed._looper[spawn_task._caller.loop_key]
-            break
-        case 'claimed':
-            if(_typed._type == spawn_task._caller.room_type)
-                looper = _typed._looper[spawn_task._caller.loop_key]
-            break
-        default:
-                throw new Error("Unexpected state.")
+    switch(caller.task_type){
+        case '_source':     looper = Memory._loop_id[caller.loop_key]; break;
+        case '_mineral':    looper = Memory._loop_id[caller.loop_key]; break;
+        case '_deposit':    looper = Memory._loop_id[caller.loop_key]; break;
+        case '_upgrade':    looper = Memory._loop_id[caller.loop_key]; break;
+        case '_reserve':    looper = Memory._loop_id[caller.loop_key]; break;
     }
     if(!looper) return
+
     if(ret == OK){
         looper.reload_time = Game.time + looper.interval + 1
         /**creep内存赋值 */

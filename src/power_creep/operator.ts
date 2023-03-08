@@ -1,5 +1,5 @@
 import { hikeTo } from "@/move/route"
-import { demand_res } from "@/structure/terminal"
+import { demand_res } from "@/structure/lv6_terminal"
 
 export const operator_run = function(operator:PowerCreep){
     if(!operator.room) return
@@ -38,11 +38,9 @@ export const operator_run = function(operator:PowerCreep){
 
 function find_power_task(operator: PowerCreep, room: Room) {
     if(operator.ticksToLive && operator.ticksToLive < 2000){
-        if(room.memory._typed._type == 'owned'){
-            const power_spawn_id = room.memory._typed._struct.power_spawn
-            if(power_spawn_id)
-                operator.memory._tasks.push({action:'renew',args:[power_spawn_id]})
-        }
+        const power_spawn_id = room.memory.power_spawn
+        if(power_spawn_id)
+            operator.memory._tasks.push({action:'renew',args:[power_spawn_id]})
     }
     const controller = room.controller
     if(controller && !controller.isPowerEnabled){
@@ -80,8 +78,8 @@ function find_power_task(operator: PowerCreep, room: Room) {
     }
 
     if(operator.powers[PWR_OPERATE_FACTORY] && !operator.powers[PWR_OPERATE_FACTORY].cooldown){
-        if(room.memory._typed._type == 'owned' && room.memory._typed._struct.factory){
-            const config = room.memory._typed._struct.factory
+        const config = room.memory.factory
+        if(config){
             const factory = config.fact_id ? Game.getObjectById(config.fact_id) : null
             if(operator.powers[PWR_OPERATE_FACTORY].level != config.operate) return
             if(!factory || factory.cooldown || factory.effects?.[0]) return
@@ -90,9 +88,8 @@ function find_power_task(operator: PowerCreep, room: Room) {
     }
 
     if(operator.powers[PWR_OPERATE_LAB] && !operator.powers[PWR_OPERATE_LAB].cooldown){
-        if(room.memory._typed._type == 'owned'){
-            const labs = room.memory._typed._struct.labs
-            if(!labs.reaction) return
+        const labs = room.memory.labs   
+        if(labs?.reaction){
             for (let id of labs.outs) {
                 const lab_in = Game.getObjectById(id)
                 if(lab_in && !lab_in.effects?.[0] && lab_in.cooldown > 0){

@@ -1,11 +1,10 @@
 import { companion_base, compound_tier, reactions, reaction_line } from "@/constant/resource_series";
 import _ from "lodash";
-import { demand_res } from "./terminal";
+import { demand_res } from "./lv6_terminal";
 
 export const lab_run = function(room: Room){
-    if(room.memory._typed._type != 'owned') return
-    const labs = room.memory._typed._struct.labs
-    const reaction = labs.reaction
+    const labs = room.memory.labs
+    const reaction = labs?.reaction
     if(!reaction) return
     const labs_in0 = Game.getObjectById(labs.ins[0]);
     const labs_in1 = Game.getObjectById(labs.ins[1]);
@@ -34,10 +33,10 @@ export const lab_run = function(room: Room){
 }
 
 export const change_reaction = function(room:Room): MineralCompoundConstant|null {
-    if(room.memory._typed._type != 'owned') return null
     const storage = room.storage
     const terminal = room.terminal
-    if(!storage?.my || !terminal?.my) return null
+    const labs = room.memory.labs
+    if(!storage?.my || !terminal?.my || !labs) return null
 
     const list: ResourceConstant[] = ['X','OH','O','H']
     for(let resourceType of list)
@@ -45,7 +44,6 @@ export const change_reaction = function(room:Room): MineralCompoundConstant|null
         demand_res(terminal,resourceType,1000)
     }
 
-    const labs = room.memory._typed._struct.labs
     const reaction = labs.reaction
     if(reaction && reaction.length > 2){
         /**当前reaction */
@@ -101,10 +99,10 @@ export const change_reaction = function(room:Room): MineralCompoundConstant|null
 _.assign(global, {change_reaction:change_reaction})
 
 export const T_react = function (room: Room): PosedCreepTask<"transfer">[] {
-    if(room.memory._typed._type != 'owned') return[]
+    
     const terminal = room.terminal
-    const labs = room.memory._typed._struct.labs
-    const compoundType = labs.reaction
+    const labs = room.memory.labs
+    const compoundType = labs?.reaction
     if (!terminal || !compoundType) return []
 
     var tasks: PosedCreepTask<'transfer'>[] = []
@@ -128,8 +126,8 @@ export const T_react = function (room: Room): PosedCreepTask<"transfer">[] {
     return tasks
 }
 export const T_boost = function (room: Room): PosedCreepTask<"transfer">[] {
-    if(room.memory._typed._type != 'owned') return[]
-    const labs = room.memory._typed._struct.labs
+    const labs = room.memory.labs
+    if(!labs) return []
     var tasks: PosedCreepTask<'transfer'>[] = []
     for (let i in labs.outs) {
         const boostType: MineralBoostConstant | undefined = labs.boosts[i]
@@ -161,11 +159,10 @@ export const T_boost = function (room: Room): PosedCreepTask<"transfer">[] {
  * @returns
  */
 export const compound = function (room: Room) {
-    if(room.memory._typed._type != 'owned') return[]
-    var tasks: PosedCreepTask<"withdraw">[] = []
-    const labs = room.memory._typed._struct.labs
+    const labs = room.memory.labs
+    if(!labs) return []
     const compoundType = labs.reaction
-
+    var tasks: PosedCreepTask<"withdraw">[] = []
     for (let i in labs.ins) {
         const reactantType = compoundType ? reactions[compoundType][i] : null
         const lab_in = Game.getObjectById(labs.ins[i])

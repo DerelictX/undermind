@@ -2,7 +2,6 @@ import { base_mineral, compressed, product_tier } from "@/constant/resource_seri
 
 export const terminal_run = function(room: Room){
     if(Game.time % 10 != 0) return
-    if(room.memory._typed._type != 'owned') return
     const storage = room.storage
     const terminal = room.terminal
     if (!storage || !terminal?.my || terminal.cooldown) return
@@ -28,8 +27,8 @@ export const terminal_run = function(room: Room){
             sendList(terminal,['energy','ops','power','metal','biomass','silicon','mist'],storage.store)
             return
         case 20:
-            const config = room.memory._typed._struct.factory
-            if(config.product)
+            const config = room.memory.factory
+            if(config?.product)
                 sendList(terminal,[config.product])
             return
         case 30:
@@ -90,9 +89,7 @@ const sendList = function(terminal: StructureTerminal, list: ResourceConstant[],
 export const T_term = function (room: Room) {
     const storage = room.storage
     const terminal = room.terminal
-    if (!storage || !terminal)
-        return []
-    if (terminal.store.getFreeCapacity() < 50000)
+    if (!storage || !terminal || terminal.store.getFreeCapacity() < 50000)
         return []
 
     var tasks: RestrictedPrimitiveDescript<'transfer'>[] = []
@@ -101,6 +98,7 @@ export const T_term = function (room: Room) {
     for (resourceType in storage_store) {
         let target_amount = 3000
         if(resourceType == 'energy') target_amount = 30000
+        if(resourceType == 'power') target_amount = 1000
         if (terminal.store[resourceType] < target_amount) {
             tasks.push({
                 action: 'transfer',
@@ -115,9 +113,7 @@ export const T_term = function (room: Room) {
 export const W_term = function (room: Room) {
     const storage = room.storage
     const terminal = room.terminal
-    if (!storage || !terminal)
-        return []
-    if (storage.store.getFreeCapacity() < 60000)
+    if (!storage || !terminal || storage.store.getFreeCapacity() < 60000)
         return []
 
     var tasks: RestrictedPrimitiveDescript<'withdraw'>[] = []
@@ -126,6 +122,7 @@ export const W_term = function (room: Room) {
     for (resourceType in terminal_store) {
         let target_amount = 3000
         if(resourceType == 'energy') target_amount = 30000
+        if(resourceType == 'power') target_amount = 1000
         if (terminal_store[resourceType] > target_amount * 2) {
             tasks.push({
                 action: 'withdraw',

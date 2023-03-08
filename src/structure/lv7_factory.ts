@@ -1,13 +1,12 @@
 import { compression, product_tier } from "@/constant/resource_series"
 import _ from "lodash"
-import { demand_res } from "./terminal"
+import { demand_res } from "./lv6_terminal"
 
 export const factory_run = function(room: Room){
-    if(room.memory._typed._type != 'owned') return
-    const config = room.memory._typed._struct.factory
+    const config = room.memory.factory
     const storage = room.storage
-    const factory = config.fact_id ? Game.getObjectById(config.fact_id) : null
-    if(!storage || !factory) return
+    const factory = config?.fact_id ? Game.getObjectById(config.fact_id) : null
+    if(!config || !storage || !factory) return
 
     //显示
     if(config.product) {
@@ -54,11 +53,10 @@ export const factory_run = function(room: Room){
 
 /**工厂补充原料 */
 export const T_fact = function (room: Room) {
-    if(room.memory._typed._type != 'owned') return[]
     const terminal = room.terminal
-    const config = room.memory._typed._struct.factory
-    const factory = config.fact_id ? Game.getObjectById(config.fact_id) : null
-    if (!terminal || !factory) return []
+    const config = room.memory.factory
+    const factory = config?.fact_id ? Game.getObjectById(config.fact_id) : null
+    if (!config || !terminal || !factory) return []
     var tasks: RestrictedPrimitiveDescript<'transfer'>[] = []
     
     const demand = Memory.factory.demand[factory.level ?? 0]
@@ -75,11 +73,10 @@ export const T_fact = function (room: Room) {
 }
 
 export const W_fact = function (room: Room) {
-    if(room.memory._typed._type != 'owned') return[]
     const terminal = room.terminal
-    const config = room.memory._typed._struct.factory
-    const factory = config.fact_id ? Game.getObjectById(config.fact_id) : null
-    if (!terminal || !factory) return []
+    const config = room.memory.factory
+    const factory = config?.fact_id ? Game.getObjectById(config.fact_id) : null
+    if (!config || !terminal || !factory) return []
     var tasks: RestrictedPrimitiveDescript<'withdraw'>[] = []
 
     const demand = Memory.factory.demand[factory.level ?? 0]
@@ -99,10 +96,9 @@ export const W_fact = function (room: Room) {
 
 /**更新可用于生产高级商品的时长，大于1000ticks说明不会浪费ops */
 export const change_production = function(room: Room){
-    if(room.memory._typed._type != 'owned') return
-    const config = room.memory._typed._struct.factory
-    const factory = config.fact_id ? Game.getObjectById(config.fact_id) : null
-    if (!factory?.level) return
+    const config = room.memory.factory
+    const factory = config?.fact_id ? Game.getObjectById(config.fact_id) : null
+    if (!config || !factory?.level) return
 
     for(let product of product_tier[factory.level]){
         config.product = product

@@ -1,20 +1,17 @@
-import { demand_res } from "./terminal"
+import { demand_res } from "./lv6_terminal"
 
 export const power_spawn_run = function(room: Room){
-    if(room.memory._typed._type != 'owned') return
-    if(!room.memory._typed._struct.power_spawn)
+    if(!room.memory.power_spawn)
         return
-    const power_spawn = Game.getObjectById(room.memory._typed._struct.power_spawn)
+    const power_spawn = Game.getObjectById(room.memory.power_spawn)
     if(power_spawn && power_spawn.store['power'])
         power_spawn.processPower()
 }
 
 export const T_power = function (room: Room): PosedCreepTask<"transfer">[] {
-    if (room.memory._typed._type != 'owned')
+    if (!room.memory.power_spawn)
         return []
-    if (!room.memory._typed._struct.power_spawn)
-        return []
-    const power_spawn = Game.getObjectById(room.memory._typed._struct.power_spawn)
+    const power_spawn = Game.getObjectById(room.memory.power_spawn)
     if (!power_spawn)
         return []
     var tasks: PosedCreepTask<'transfer'>[] = []
@@ -42,11 +39,9 @@ export const T_power = function (room: Room): PosedCreepTask<"transfer">[] {
 }
 
 export const T_nuker = function (room: Room): PosedCreepTask<"transfer">[] {
-    if (room.memory._typed._type != 'owned')
+    if (!room.memory.nuker)
         return []
-    if (!room.memory._typed._struct.nuker)
-        return []
-    const nuker = Game.getObjectById(room.memory._typed._struct.nuker)
+    const nuker = Game.getObjectById(room.memory.nuker)
     if (!nuker)
         return []
     var tasks: PosedCreepTask<'transfer'>[] = []

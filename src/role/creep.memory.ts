@@ -1,7 +1,7 @@
 
 interface CreepMemory extends MoveMemory {
     _class:     | CarrierMemory | WorkerMemory | StaticMemory
-    _caller:    SpawnCaller<RoomTypes>
+    _caller:    SpawnCaller
     _life:      CreepLifeCycle
 }
 
@@ -13,7 +13,8 @@ interface CarrierMemory {
     state:      "collect"|"consume"|"idle"
     collect:    CallbackBehavior<PrimitiveAction>[]
     consume:    CallbackBehavior<PrimitiveAction>[]
-    current:    ResFlow
+    find_col:   'storage' | ResSource
+    find_con:   'storage' | ResSink
 
     fromRoom:   string
     toRoom:     string
@@ -21,8 +22,7 @@ interface CarrierMemory {
 }
 
 type EnergyRole =
-    |"Upgrader"|"Builder"|"Maintainer"|'EnergySupplier'
-    |"RMaintainer"
+    |"Builder"|"Maintainer"|'EnergySupplier'
 interface WorkerMemory {
     bhvr_name:  "worker"
     

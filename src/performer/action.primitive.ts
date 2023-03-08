@@ -95,6 +95,7 @@ const performer:{
     reserveController: function (creep: Creep, args: [target: Id<StructureController>]) {
         const target = Game.getObjectById(args[0])
         if(!target) return ERR_NOT_FOUND
+        if(target.my) return OK
         return creep.reserveController(target);
     },
     claimController: function (creep: Creep, args: [target: Id<StructureController>]) {
