@@ -6,6 +6,7 @@ import { expand_commo } from "./constant/commodity_tree";
 import { run_rooms } from "./run_rooms";
 import { run_creeps, run_power_creeps } from "./run_creeps";
 import { loopHarvest } from "./controller/harvest";
+import { loopRooms } from "./controller/owned";
 
 export const loop = function () {
 
@@ -23,6 +24,7 @@ export const loop = function () {
     global._move_intents = {}
 
     inspect_global()
+    loopRooms()
     loopHarvest()
     run_rooms()
     run_power_creeps()

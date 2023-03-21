@@ -40,8 +40,12 @@ interface GlobalStaticPool {
         & StaticPoolPart<'_deposit'>
         & (StaticPoolPart<'_upgrade'>
         | StaticPoolPart<'_reserve'>)
+    _loop_room: RoomRecord<Partial<Record<RoomLoopType,Looper>>>
+    _loop_flag: RoomRecord<Partial<Record<FlagLoopType,Looper>>>
 }
 
+type RoomLoopType = '_collect' | '_supply' | '_build' | '_maintain'
+type FlagLoopType = '_observe'
 type GlobalLoopType = keyof StaticPoolKeyTypeMap
 interface StaticPoolKeyTypeMap {
     _source:    Id<Source>
@@ -51,15 +55,28 @@ interface StaticPoolKeyTypeMap {
     _reserve:   Id<StructureController>
 }
 
-type SpawnCaller<T extends GlobalLoopType = GlobalLoopType> 
-        = T extends GlobalLoopType ? {
+type AnyLoopType = GlobalLoopType | RoomLoopType | FlagLoopType
+
+type SpawnCaller<T extends AnyLoopType>
+= T extends GlobalLoopType ? {
     dest_room:  string  //creep第一个要前往的房间
+    loop_type:  '_loop_id'
     task_type:  T
     loop_key:   StaticPoolKeyTypeMap[T]
+} : T extends RoomLoopType ? {
+    dest_room:  string
+    loop_type:  '_loop_room'
+    task_type:  T
+    loop_key:   string
+} : T extends FlagLoopType ? {
+    dest_room:  string
+    loop_type:  '_loop_flag'
+    task_type:  T
+    loop_key:   string
 } : never
 
-type SpawnTask = {
-    _caller:    SpawnCaller
+type SpawnTask<T extends AnyLoopType> = T extends AnyLoopType ? {
+    _caller:    SpawnCaller<T>
     _body:  {
         generator:  body_generator_name
         workload:   number
@@ -67,7 +84,7 @@ type SpawnTask = {
         _boost?:    Partial<Record<BodyPartConstant,MineralBoostConstant>>
     }
     _class: CreepMemory['_class']
-}
+} : never
 
 type body_generator_name =
     | "W" | "C" | "WC" | "Wc"

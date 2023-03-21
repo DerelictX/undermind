@@ -1,8 +1,12 @@
-export const create_controller = function(obj: Source|StructureController){
+import { autoRoadCallback } from "@/move/roomCallback"
+import { publish_spawn_task } from "@/structure/lv1_spawn"
+
+export const create_controller_obj = function(obj: Source|StructureController){
     if(Memory._loop_id[obj.id]) return
     if(obj instanceof Source) {
         Memory._loop_id[obj.id] = {
             dest_room: obj.room.name,
+            loop_type: '_loop_id',
             task_type: '_source',
             loop_key: obj.id,
             reload_time: 0,
@@ -11,6 +15,7 @@ export const create_controller = function(obj: Source|StructureController){
     } else if(obj instanceof StructureController) {
         Memory._loop_id[obj.id] = {
             dest_room: obj.room.name,
+            loop_type: '_loop_id',
             task_type: obj.my ? '_upgrade' : '_reserve',
             loop_key: obj.id,
             reload_time: 0,
@@ -18,7 +23,7 @@ export const create_controller = function(obj: Source|StructureController){
         }
     }
 }
-_.assign(global, {create_controller:create_controller})
+_.assign(global, {create_controller_obj:create_controller_obj})
 
 export const loopHarvest = function(){
     
@@ -31,31 +36,36 @@ export const loopHarvest = function(){
         if(_loop.interval > 10000) _loop.interval = 10000
         /**重置定时器 */
         _loop.reload_time = Game.time + _loop.interval
+        console.log(`_loop\t${_loop.task_type}\t${_loop.loop_key}`)
+        let spawn_task: SpawnTask<GlobalLoopType>|null = null
 
-        let spawn_task: SpawnTask|null = null
+        const obj = Game.getObjectById(_loop.loop_key)
+        if(!obj?.room){
+            continue
+        }
         switch(_loop.task_type){
             case '_source': {
-                const obj = Game.getObjectById(_loop.loop_key)
-                if(obj) spawn_task = handlers[_loop.task_type](obj); break;
+                if(obj instanceof Source)
+                    spawn_task = handlers[_loop.task_type](obj); break;
             }
             case '_mineral': {
-                const obj = Game.getObjectById(_loop.loop_key)
-                if(obj) spawn_task = handlers[_loop.task_type](obj); break;
+                if(obj instanceof Mineral)
+                    spawn_task = handlers[_loop.task_type](obj); break;
             }
             case '_deposit': {
-                const obj = Game.getObjectById(_loop.loop_key)
-                if(obj) spawn_task = handlers[_loop.task_type](obj); break;
+                if(obj instanceof Deposit)
+                    spawn_task = handlers[_loop.task_type](obj); break;
             }
             case '_upgrade':
             case '_reserve': {
-                const obj = Game.getObjectById(_loop.loop_key)
-                if(obj) spawn_task = handlers[_loop.task_type](obj); break;
+                if(obj instanceof StructureController)
+                    spawn_task = handlers[_loop.task_type](obj); break;
             }
             default:
                 throw new Error("Unexpected _loop.task_type.")
         }
-        if(spawn_task){
-            //publish spawn task 
+        if(spawn_task){   
+            publish_spawn_task(spawn_task)
         }
         /**每tick只扫描一次，减少cpu负载波动 */
         return
@@ -63,7 +73,7 @@ export const loopHarvest = function(){
 }
 
 const handlers: {
-    [T in GlobalLoopType] : (target: fromId<StaticPoolKeyTypeMap[T]>) => SpawnTask|null
+    [T in GlobalLoopType] : (target: fromId<StaticPoolKeyTypeMap[T]>) => SpawnTask<T>|null
 } = {
     _source: function(source:Source) {
         const task: StaticMemory = {
@@ -91,13 +101,17 @@ const handlers: {
             task.consume.push({ action:'transfer', args:[struct.id,'energy'], pos:struct.pos })
         }
         //spawn
-        const caller: SpawnCaller = {
-            dest_room: source.pos.roomName,
-            task_type: '_source',
-            loop_key: source.id
+        const caller: SpawnCaller<'_source'> = {
+            dest_room:  source.room.name,
+            loop_type:  '_loop_id',
+            task_type:  '_source',
+            loop_key:   source.id
         }
-        if (!task.consume[0])
+        if (!task.consume[0]) {
+            const fromPos = source.room.storage?.pos ?? source.room.controller?.pos
+            if(fromPos) createHarvestRoad(fromPos,source.pos)
             return { _body: { generator: 'W', workload: 5, mobility: 1 }, _class: task, _caller: caller }
+        }
         return { _body: { generator: 'Wc', workload: 10 }, _class: task, _caller: caller }
     },
 
@@ -123,10 +137,11 @@ const handlers: {
             return null
         task.consume.push({ action:'transfer', args:[container.id, mineral.mineralType], pos:container.pos })
         //spawn
-        const caller: SpawnCaller = {
-            dest_room: mineral.pos.roomName,
-            task_type: '_mineral',
-            loop_key: mineral.id
+        const caller: SpawnCaller<'_mineral'> = {
+            dest_room:  mineral.room.name,
+            loop_type:  '_loop_id',
+            task_type:  '_mineral',
+            loop_key:   mineral.id
         }
         return { _body: { generator: 'Wc', workload: 25 }, _class: task, _caller: caller }
     },
@@ -150,10 +165,11 @@ const handlers: {
         task.consume.push({ action: 'transfer', args:[storage.id, deposit.depositType], pos:storage.pos })
         //spawn
         const workload = deposit.lastCooldown < 5 ? 15 : 20
-        const caller: SpawnCaller = {
-            dest_room: deposit.pos.roomName,
-            task_type: '_deposit',
-            loop_key: deposit.id
+        const caller: SpawnCaller<'_deposit'> = {
+            dest_room:  deposit.room.name,
+            loop_type:  '_loop_id',
+            task_type:  '_deposit',
+            loop_key:   deposit.id
         }
         console.log(store_room + ' -> Deposit:\t' + deposit.pos)
         return { _body: { generator: 'DH', workload: workload, mobility: 1 }, _class: task, _caller: caller }
@@ -163,7 +179,7 @@ const handlers: {
         if(Game.cpu.bucket < 9950)
             return null
         const storage = controller.room.storage
-        if (!storage?.my || storage.store.energy <= 20000 * controller.level)
+        if (storage?.my && storage.store.energy <= 20000 * controller.level)
             return null
         const task: StaticMemory = {
             bhvr_name:  'static',
@@ -182,10 +198,11 @@ const handlers: {
         for(let struct of energy_structs){
             task.collect.push({action:'withdraw',args:[struct.id,'energy'],pos:struct.pos})
         }
-        const caller: SpawnCaller = {
-            dest_room: controller.pos.roomName,
-            task_type: '_upgrade',
-            loop_key: controller.id
+        const caller: SpawnCaller<'_upgrade'> = {
+            dest_room:  controller.room.name,
+            loop_type:  '_loop_id',
+            task_type:  '_upgrade',
+            loop_key:   controller.id
         }
         return { _body: { generator: 'Wc', workload: 15 }, _class: task, _caller: caller }
     },
@@ -207,10 +224,11 @@ const handlers: {
             collect:    [reserve,attack],
             consume:    [],
         }
-        const caller: SpawnCaller = {
-            dest_room: controller.pos.roomName,
-            task_type: '_reserve',
-            loop_key: controller.id
+        const caller: SpawnCaller<'_reserve'> = {
+            dest_room:  controller.room.name,
+            loop_type:  '_loop_id',
+            task_type:  '_reserve',
+            loop_key:   controller.id
         }
         return { _body: { generator: 'Cl', workload: 4, mobility: 1 }, _class: bhvr, _caller: caller }
     },
@@ -235,4 +253,17 @@ const Claim = function (room: Room, looper: Looper) {
         _body: { generator: 'Cl', workload: 1, mobility: 1 },
         _class: bhvr
     }
+}
+
+const createHarvestRoad = function(fromPos: RoomPosition, toPos: RoomPosition) {
+    const path = PathFinder.search(fromPos, {pos:toPos,range:1}, {
+        plainCost: 2, swampCost: 10, maxRooms: 2,
+        roomCallback:autoRoadCallback
+    })
+    const containerPos = path.path.pop()
+    for (let pos of path.path) {
+        Game.rooms[pos.roomName].createConstructionSite(pos,STRUCTURE_ROAD)
+    }
+    if(containerPos)
+        Game.rooms[containerPos.roomName].createConstructionSite(containerPos,STRUCTURE_CONTAINER)
 }
