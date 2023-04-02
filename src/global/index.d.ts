@@ -41,7 +41,7 @@ interface GlobalStaticPool {
         & (StaticPoolPart<'_upgrade'>
         | StaticPoolPart<'_reserve'>)
     _loop_room: RoomRecord<Partial<Record<RoomLoopType,Looper>>>
-    _loop_flag: RoomRecord<Partial<Record<FlagLoopType,Looper>>>
+    _loop_flag: RoomRecord<Looper & SpawnCaller<FlagLoopType>>
 }
 
 type RoomLoopType = '_collect' | '_supply' | '_build' | '_maintain'
@@ -59,7 +59,7 @@ type AnyLoopType = GlobalLoopType | RoomLoopType | FlagLoopType
 
 type SpawnCaller<T extends AnyLoopType>
 = T extends GlobalLoopType ? {
-    dest_room:  string  //creep第一个要前往的房间
+    dest_room:  string
     loop_type:  '_loop_id'
     task_type:  T
     loop_key:   StaticPoolKeyTypeMap[T]

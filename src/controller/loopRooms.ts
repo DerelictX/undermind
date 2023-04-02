@@ -4,7 +4,6 @@ import { change_reaction } from "@/structure/lv6_lab"
 
 export const create_controller_room = function(room_name:string,task_type:RoomLoopType) {
     const _room_loops = Memory._loop_room[room_name] ?? (Memory._loop_room[room_name] = {})
-    if(_room_loops[task_type]) return
     _room_loops[task_type] = {
         reload_time: 0,
         interval: 1500
@@ -12,7 +11,7 @@ export const create_controller_room = function(room_name:string,task_type:RoomLo
 }
 _.assign(global, {create_controller_room:create_controller_room})
 
-export const loopRooms = function(){
+export const loop_rooms = function(){
     for(let room_name in Memory._loop_room) {
         const _room_loops = Memory._loop_room[room_name]
         const room = Game.rooms[room_name]
@@ -27,7 +26,7 @@ export const loopRooms = function(){
             /**重置定时器 */
             _loop.reload_time = Game.time + _loop.interval
 
-            console.log(`_loop\t${task_type}\t${room_name}`)
+            console.log(`_loop\t${room_name}\t${task_type}`)
             let spawn_task: SpawnTask<RoomLoopType>|null = null
             if(room) spawn_task = handlers[task_type](room)
             if(spawn_task){
@@ -86,11 +85,7 @@ const handlers: {
 
     _build: function (room: Room) {
         let workload = room.find(FIND_MY_CONSTRUCTION_SITES).length
-        if (workload < 3) {
-            //looper.interval = 600
-            return null
-        }
-        //looper.interval = 1500
+        if (!workload) return null
         const caller: SpawnCaller<'_build'> = {
             dest_room:  room.name,
             loop_type:  '_loop_room',

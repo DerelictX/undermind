@@ -5,8 +5,8 @@ import { HelperRoomResource } from "./global/helper_roomResource";
 import { expand_commo } from "./constant/commodity_tree";
 import { run_rooms } from "./run_rooms";
 import { run_creeps, run_power_creeps } from "./run_creeps";
-import { loopHarvest } from "./controller/harvest";
-import { loopRooms } from "./controller/owned";
+import { loop_objects } from "./controller/loopObjects";
+import { loop_rooms } from "./controller/loopRooms";
 
 export const loop = function () {
 
@@ -24,8 +24,8 @@ export const loop = function () {
     global._move_intents = {}
 
     inspect_global()
-    loopRooms()
-    loopHarvest()
+    loop_rooms()
+    loop_objects()
     run_rooms()
     run_power_creeps()
     run_creeps()

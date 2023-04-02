@@ -2,7 +2,6 @@ import { autoRoadCallback } from "@/move/roomCallback"
 import { publish_spawn_task } from "@/structure/lv1_spawn"
 
 export const create_controller_obj = function(obj: Source|StructureController){
-    if(Memory._loop_id[obj.id]) return
     if(obj instanceof Source) {
         Memory._loop_id[obj.id] = {
             dest_room: obj.room.name,
@@ -25,8 +24,7 @@ export const create_controller_obj = function(obj: Source|StructureController){
 }
 _.assign(global, {create_controller_obj:create_controller_obj})
 
-export const loopHarvest = function(){
-    
+export const loop_objects = function(){ 
     let id: keyof typeof Memory._loop_id
     for(id in Memory._loop_id){
         const _loop = Memory._loop_id[id]
@@ -36,7 +34,7 @@ export const loopHarvest = function(){
         if(_loop.interval > 10000) _loop.interval = 10000
         /**重置定时器 */
         _loop.reload_time = Game.time + _loop.interval
-        console.log(`_loop\t${_loop.task_type}\t${_loop.loop_key}`)
+        console.log(`_loop\t${_loop.loop_key}\t${_loop.task_type}`)
         let spawn_task: SpawnTask<GlobalLoopType>|null = null
 
         const obj = Game.getObjectById(_loop.loop_key)

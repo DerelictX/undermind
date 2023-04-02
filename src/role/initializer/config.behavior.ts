@@ -9,12 +9,16 @@ export const work_priority: {[role in EnergyRole]:EnWorkerPriority} = {
     ],
     Maintainer: [
         ['W_energy', 'H_srcs'],
-        ['repair', 'downgraded', 'decayed', 'fortify', 'U_ctrl', 'build']
+        ['repair', 'downgraded', 'decayed', 'fortify', 'U_ctrl']
     ],
     EnergySupplier: [
         ['W_energy'],
         ['T_ext', 'T_tower', 'T_cntn']
     ],
+    Upgrader: [
+        ['W_energy', 'H_srcs'],
+        ['U_ctrl']
+    ]
 }
 
 type ResFlow = [

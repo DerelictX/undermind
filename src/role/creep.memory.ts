@@ -1,7 +1,7 @@
 
 interface CreepMemory extends MoveMemory {
     _class:     | CarrierMemory | WorkerMemory | StaticMemory
-    _caller:    SpawnCaller
+    _caller:    SpawnCaller<AnyLoopType>
     _life:      CreepLifeCycle
 }
 
@@ -22,7 +22,7 @@ interface CarrierMemory {
 }
 
 type EnergyRole =
-    |"Builder"|"Maintainer"|'EnergySupplier'
+    |"Builder"|"Maintainer"|'EnergySupplier'|"Upgrader"
 interface WorkerMemory {
     bhvr_name:  "worker"
     
