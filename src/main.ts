@@ -26,6 +26,7 @@ export const loop = function () {
     inspect_global()
     loop_rooms()
     loop_objects()
+
     run_rooms()
     run_power_creeps()
     run_creeps()

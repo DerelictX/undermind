@@ -174,10 +174,10 @@ const handlers: {
     },
 
     _upgrade: function(controller:StructureController){
-        if(Game.cpu.bucket < 9950)
+        if(Game.cpu.bucket < 9950 || controller.level >= 8)
             return null
         const storage = controller.room.storage
-        if (storage?.my && storage.store.energy <= 20000 * controller.level)
+        if (storage?.my && storage.store.energy <= 15000 * controller.level)
             return null
         const task: StaticMemory = {
             bhvr_name:  'static',

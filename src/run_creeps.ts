@@ -13,7 +13,7 @@ export const run_creeps = function(){
             }
             if(creep.spawning) continue
             if(Game.cpu.bucket < 6000 && Game.cpu.getUsed() > 10) return
-            if(Game.cpu.bucket < 8000 && Game.cpu.getUsed() > 16) return
+            if(Game.cpu.bucket < 8000 && Game.cpu.getUsed() > 15) return
 
             const _class = creep.memory._class
             switch(_class.bhvr_name){

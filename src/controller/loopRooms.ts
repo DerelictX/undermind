@@ -43,12 +43,12 @@ const handlers: {
 } = {
     _collect: function (room: Room) {
         const caller: SpawnCaller<'_collect'> = {
-            dest_room:  room.name,
-            loop_type:  '_loop_room',
-            task_type:  '_collect',
-            loop_key:   room.name
+            dest_room: room.name,
+            loop_type: '_loop_room',
+            task_type: '_collect',
+            loop_key: room.name
         }
-        if (!room.storage?.my){
+        if (!room.storage?.my) {
             return {
                 _body: { generator: 'C', workload: 16 },
                 _class: init_worker_behavior('EnergySupplier', room.name, room.name),
@@ -61,15 +61,15 @@ const handlers: {
             _caller: caller
         }
     },
-    
+
     _supply: function (room: Room) {
         const caller: SpawnCaller<'_supply'> = {
-            dest_room:  room.name,
-            loop_type:  '_loop_room',
-            task_type:  '_supply',
-            loop_key:   room.name
+            dest_room: room.name,
+            loop_type: '_loop_room',
+            task_type: '_supply',
+            loop_key: room.name
         }
-        if (!room.storage?.my){
+        if (!room.storage?.my) {
             return {
                 _body: { generator: 'C', workload: 16 },
                 _class: init_worker_behavior('EnergySupplier', room.name, room.name),
@@ -87,10 +87,14 @@ const handlers: {
         let workload = room.find(FIND_MY_CONSTRUCTION_SITES).length
         if (!workload) return null
         const caller: SpawnCaller<'_build'> = {
-            dest_room:  room.name,
-            loop_type:  '_loop_room',
-            task_type:  '_build',
-            loop_key:   room.name
+            dest_room: room.name,
+            loop_type: '_loop_room',
+            task_type: '_build',
+            loop_key: room.name
+        }
+        if (room.storage && room.controller) {
+            if (room.storage.store.energy < room.controller.level * 10000)
+                return null
         }
         return {
             _body: { generator: 'WC', workload: 12 },
@@ -111,14 +115,31 @@ const handlers: {
         if (!decayed.length)
             return null
         const caller: SpawnCaller<'_maintain'> = {
-            dest_room:  room.name,
-            loop_type:  '_loop_room',
-            task_type:  '_maintain',
-            loop_key:   room.name
+            dest_room: room.name,
+            loop_type: '_loop_room',
+            task_type: '_maintain',
+            loop_key: room.name
         }
         return {
             _body: { generator: 'WC', workload: 8 },
             _class: init_worker_behavior('Maintainer', room.name, room.name),
+            _caller: caller
+        }
+    },
+    _fortify: function (room: Room) {
+        const caller: SpawnCaller<'_fortify'> = {
+            dest_room: room.name,
+            loop_type: '_loop_room',
+            task_type: '_fortify',
+            loop_key: room.name
+        }
+        if (room.storage && room.controller) {
+            if (room.storage.store.energy < room.controller.level * 20000)
+                return null
+        }
+        return {
+            _body: { generator: 'WC', workload: 32, boost: { work: 'XLH2O' } },
+            _class: init_worker_behavior('Builder', room.name, room.name),
             _caller: caller
         }
     }

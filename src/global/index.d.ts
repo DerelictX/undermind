@@ -44,7 +44,7 @@ interface GlobalStaticPool {
     _loop_flag: RoomRecord<Looper & SpawnCaller<FlagLoopType>>
 }
 
-type RoomLoopType = '_collect' | '_supply' | '_build' | '_maintain'
+type RoomLoopType = '_collect' | '_supply' | '_build' | '_maintain' | '_fortify'
 type FlagLoopType = '_observe'
 type GlobalLoopType = keyof StaticPoolKeyTypeMap
 interface StaticPoolKeyTypeMap {
@@ -81,7 +81,7 @@ type SpawnTask<T extends AnyLoopType> = T extends AnyLoopType ? {
         generator:  body_generator_name
         workload:   number
         mobility?:  number
-        _boost?:    Partial<Record<BodyPartConstant,MineralBoostConstant>>
+        boost?:     Partial<Record<BodyPartConstant,MineralBoostConstant>>
     }
     _class: CreepMemory['_class']
 } : never
@@ -92,6 +92,6 @@ type body_generator_name =
     | "DH"
 
 type CreepLifeCycle = {
-    boost:      boolean
-    unboost:    boolean
+    boost:     string | null
+    unboost:   string | null
 }

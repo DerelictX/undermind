@@ -79,7 +79,7 @@ const consume_cache_updater: {
         for (let wall of walls) {
             if (wall.hits <= wallHits) {
                 if (wall.hits < wallHits * 0.9)
-                    wallHits *= 0.95
+                    wallHits *= 0.9
                 tasks.push({
                     action: 'repair',
                     args: [wall.id],

@@ -22,6 +22,7 @@ export const spawn_run = function(room: Room) {
     const generator = body_generator[spawn_task._body.generator]
     let workload = spawn_task._body.workload
     let mobility = spawn_task._body.mobility
+    let boost = spawn_task._body.boost
     if(!mobility) mobility = 2
 
     const caller = spawn_task._caller
@@ -34,7 +35,7 @@ export const spawn_run = function(room: Room) {
             looper = Memory._loop_room[caller.loop_key]?.[caller.task_type]
             break
         case '_loop_flag':
-            looper = Memory._loop_flag[caller.loop_key]?.[caller.task_type]
+            looper = Memory._loop_flag[caller.loop_key]
             break
     }
     if(!looper) return
@@ -51,8 +52,8 @@ export const spawn_run = function(room: Room) {
             _class:     spawn_task._class,
             _caller:    spawn_task._caller,
             _life:      {
-                boost:      false,
-                unboost:    false
+                boost:      boost ? room.name : null,
+                unboost:    null
             }
         }
     } else {
