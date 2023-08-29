@@ -1,5 +1,6 @@
 import { body_generator } from "@/constant/config.body";
 import { ceil, floor } from "lodash";
+import { publish_boost_task } from "./lv6_lab";
 
 export const spawn_run = function(room: Room) {
     if(room.energyAvailable < 300) return
@@ -52,9 +53,12 @@ export const spawn_run = function(room: Room) {
             _class:     spawn_task._class,
             _caller:    spawn_task._caller,
             _life:      {
-                boost:      boost ? room.name : null,
-                unboost:    null
+                boost:  boost,
+                boost_room: boost ? room.name : undefined
             }
+        }
+        if(boost){
+            publish_boost_task(creep_name,room.name,boost)
         }
     } else {
         looper.reload_time = Game.time + 200

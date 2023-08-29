@@ -35,7 +35,7 @@ export const inspect_memory = function (room_name: string, restart_room: boolean
     return
 }
 
-const room_memory_initializer: {[k in keyof Required<RoomMemory>]:
+export const room_memory_initializer: {[k in keyof Required<RoomMemory>]:
     (room_mem: RoomMemory, room_obj?: Room) => void
 } = {
     spawns: function (room_mem: RoomMemory, room_obj?: Room): void {
@@ -82,7 +82,9 @@ const room_memory_initializer: {[k in keyof Required<RoomMemory>]:
             ins: [],
             outs: [],
             reaction: null,
-            boosts: []
+            boost_type: {},
+            boost_lab: {},
+            boost_amount: {}
         }
         if(!room_obj) return
         const labs:StructureLab[] = room_obj.find(FIND_MY_STRUCTURES,{
@@ -146,3 +148,4 @@ const room_memory_initializer: {[k in keyof Required<RoomMemory>]:
             room_mem.observer.ob_id = observer.id
     }
 }
+_.assign(global, {room_memory_initializer:room_memory_initializer})

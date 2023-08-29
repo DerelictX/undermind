@@ -2,6 +2,7 @@ import { run_carrier } from "./role/driver/carrier";
 import { run_worker } from "./role/driver/worker";
 import { run_static } from "./role/driver/static";
 import { operator_run } from "./power_creep/operator";
+import { run_for_boost } from "./structure/lv6_lab";
 
 export const run_creeps = function(){
     for(let name in Memory.creeps) {
@@ -14,6 +15,11 @@ export const run_creeps = function(){
             if(creep.spawning) continue
             if(Game.cpu.bucket < 6000 && Game.cpu.getUsed() > 10) return
             if(Game.cpu.bucket < 8000 && Game.cpu.getUsed() > 15) return
+
+            if(creep.memory._life.boost){
+                run_for_boost(creep)
+                continue
+            }
 
             const _class = creep.memory._class
             switch(_class.bhvr_name){

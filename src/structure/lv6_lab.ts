@@ -1,6 +1,7 @@
 import { companion_base, compound_tier, reactions, reaction_line } from "@/constant/resource_series";
 import _ from "lodash";
 import { demand_res } from "./lv6_terminal";
+import { approach } from "@/move/action.virtual";
 
 export const lab_run = function(room: Room){
     const labs = room.memory.labs
@@ -22,9 +23,9 @@ export const lab_run = function(room: Room){
         return
 
     const labs_out = labs.outs;
-    for(var id in labs_out){
-        let lab = Game.getObjectById(labs_out[id]);
-        if(!lab || labs.boosts[id])
+    for(const id of labs_out){
+        let lab = Game.getObjectById(id);
+        if(!lab || labs.boost_type[id])
             continue;
         let ret = lab.runReaction(labs_in0, labs_in1);
         if(ret != OK)
@@ -125,20 +126,24 @@ export const T_react = function (room: Room): PosedCreepTask<"transfer">[] {
     }
     return tasks
 }
+
 export const T_boost = function (room: Room): PosedCreepTask<"transfer">[] {
     const labs = room.memory.labs
     if(!labs) return []
     var tasks: PosedCreepTask<'transfer'>[] = []
-    for (let i in labs.outs) {
-        const boostType: MineralBoostConstant | undefined = labs.boosts[i]
-        const lab_out = Game.getObjectById(labs.outs[i])
-        if (!lab_out)
-            continue
+    let id: Id<StructureLab>
+    for (id in labs.boost_type) {
+        const boostType = labs.boost_type[id]
+        const totalAmount = boostType ? labs.boost_amount[boostType] : undefined
+        const lab_out = Game.getObjectById(id)
+        if (!boostType || !totalAmount || !lab_out) continue
 
-        if (boostType && lab_out.store.getFreeCapacity(boostType) >= 1800) {
+        const free = lab_out.store.getFreeCapacity(boostType)
+        const amount = free > 0 ? Math.min(totalAmount - lab_out.store[boostType],free) : 0
+        if (amount > 0) {
             tasks.push({
                 action: 'transfer',
-                args: [lab_out.id, boostType, 1200],
+                args: [lab_out.id, boostType, amount],
                 pos: lab_out.pos
             })
         }
@@ -178,13 +183,13 @@ export const compound = function (room: Room) {
         }
     }
 
-    for (let i in labs.outs) {
-        const boostType: MineralBoostConstant | undefined = labs.boosts[i]
-        const lab_out = Game.getObjectById(labs.outs[i])
-        if (!lab_out)
-            continue
+    for (let id of labs.outs) {
+        const boostType = labs.boost_type[id]
+        const lab_out = Game.getObjectById(id)
+        if (!lab_out) continue
 
         if (boostType) {
+            /**boost化合物类型不对 */
             if (lab_out.mineralType && boostType != lab_out.mineralType) {
                 tasks.push({
                     action: 'withdraw',
@@ -193,6 +198,7 @@ export const compound = function (room: Room) {
                 })
             }
         } else {
+            /**收集反应产物 */
             if (lab_out.mineralType && (compoundType != lab_out.mineralType
                     || lab_out.store[compoundType] >= (tasks.length ? 200 : 300))) {
                 tasks.push({
@@ -204,4 +210,83 @@ export const compound = function (room: Room) {
         }
     }
     return tasks
+}
+
+export const publish_boost_task = function(creep_name: string, room_name: string,
+        boost: Partial<Record<BodyPartConstant, MineralBoostConstant>>) {
+    const creep = Game.creeps[creep_name]
+    const labs = Memory.rooms[room_name].labs
+    if(!creep || !labs) return
+
+    console.log("publish_boost_task:\t" + creep_name)
+    let body: BodyPartConstant
+    for(body in boost){
+        const amount = creep.getActiveBodyparts(body) * 30
+        const boostType = boost[body]
+        if(amount && boostType){
+            labs.boost_amount[boostType] = (labs.boost_amount[boostType] ?? 0) + amount
+        }
+    }
+    check_boost_labs(labs)
+}
+
+export function run_for_boost(creep: Creep) {
+    const boost = creep.memory._life.boost
+    const boost_room = creep.memory._life.boost_room
+    if(!boost || !boost_room) return
+    const labs = Memory.rooms[boost_room].labs
+    if(!labs) return
+
+    let body: BodyPartConstant
+    for(body in boost){
+        const boostType = boost[body]
+        if(!boostType) return
+        const lab_id = labs.boost_lab[boostType]
+        const lab = lab_id ? Game.getObjectById(lab_id) : null
+        if(!lab) return
+
+        if(creep.pos.isNearTo(lab)){
+            const ret = lab.boostCreep(creep,creep.getActiveBodyparts(body))
+            const amount = creep.getActiveBodyparts(body) * 30
+            if(ret == OK){
+                delete boost[body]
+                labs.boost_amount[boostType] = (labs.boost_amount[boostType] ?? 0) - amount
+                if((labs.boost_amount[boostType] ?? 0) < 0){
+                    labs.boost_amount[boostType] = 0
+                }
+                check_boost_labs(labs)
+            }
+        }else{
+            approach(creep,lab.pos,1)
+        }
+        return
+    }
+    delete creep.memory._life.boost
+}
+
+function check_boost_labs(labs: LabConfig) {
+    let missing_lab: MineralBoostConstant[] = []
+    let res: MineralBoostConstant
+    for(res in labs.boost_amount){
+        if((labs.boost_amount[res] ?? 0) <= 0){
+            delete labs.boost_lab[res]
+        } else if(!labs.boost_lab[res]){
+            missing_lab.push(res)
+        }
+    }
+
+    for(let id of labs.outs){
+        let res = labs.boost_type[id]
+        if(res) {
+            if(labs.boost_lab[res] == id)
+                continue
+            else
+                delete labs.boost_type[id]
+        }
+        res = missing_lab.pop()
+        if(res){
+            labs.boost_type[id] = res
+            labs.boost_lab[res] = id
+        }
+    }
 }

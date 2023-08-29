@@ -18,8 +18,8 @@ export const run_rooms = function(){
             spawn_run(room)
             tower_run(room)
             link_run(room)
-            continue
             lab_run(room)
+            continue
             factory_run(room)
             power_spawn_run(room)
             observer_run(room)

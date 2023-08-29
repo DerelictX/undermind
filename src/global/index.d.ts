@@ -44,7 +44,7 @@ interface GlobalStaticPool {
     _loop_flag: RoomRecord<Looper & SpawnCaller<FlagLoopType>>
 }
 
-type RoomLoopType = '_collect' | '_supply' | '_build' | '_maintain' | '_fortify'
+type RoomLoopType = '_collect' | '_supply' | '_build' | '_maintain' | '_fortify' | '_chemist'
 type FlagLoopType = '_observe'
 type GlobalLoopType = keyof StaticPoolKeyTypeMap
 interface StaticPoolKeyTypeMap {
@@ -92,6 +92,7 @@ type body_generator_name =
     | "DH"
 
 type CreepLifeCycle = {
-    boost:     string | null
-    unboost:   string | null
+    boost?:         Partial<Record<BodyPartConstant,MineralBoostConstant>>
+    boost_room?:    string
+    unboost?:       string
 }

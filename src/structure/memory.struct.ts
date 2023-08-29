@@ -28,7 +28,9 @@ interface LabConfig {
     ins:        Id<StructureLab>[]
     outs:       Id<StructureLab>[]
     reaction:   MineralCompoundConstant|null
-    boosts:     MineralBoostConstant[]
+    boost_type:     Partial<Record<Id<StructureLab>,MineralBoostConstant>>
+    boost_lab:      Partial<Record<MineralBoostConstant,Id<StructureLab>>>
+    boost_amount:   Partial<Record<MineralBoostConstant,number>>
 }
 
 interface FactoryConfig {

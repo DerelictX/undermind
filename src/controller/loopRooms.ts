@@ -142,12 +142,28 @@ const handlers: {
             _class: init_worker_behavior('Builder', room.name, room.name),
             _caller: caller
         }
+    },
+    _chemist: function (room: Room) {
+        change_reaction(room)
+        const caller: SpawnCaller<'_chemist'> = {
+            dest_room: room.name,
+            loop_type: '_loop_room',
+            task_type: '_chemist',
+            loop_key: room.name
+        }
+        if (!room.terminal?.my) {
+            return null
+        }
+        return {
+            _body: { generator: 'C', workload: 16 },
+            _class: init_carrier_behavior('Chemist', room.name, room.name),
+            _caller: caller
+        }
     }
 }
 
 const Observe = function (room: Room, looper: Looper) {
     //structure_updater.labs(room, room.memory._struct)
-    change_reaction(room)
     Memory._closest_owned[room.name] = {
         root:   room.name,
         prev:   room.name,
