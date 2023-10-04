@@ -138,7 +138,7 @@ const handlers: {
                 return null
         }
         return {
-            _body: { generator: 'WC', workload: 32, boost: { work: 'XLH2O' } },
+            _body: { generator: 'WC', workload: 32 },
             _class: init_worker_behavior('Builder', room.name, room.name),
             _caller: caller
         }
