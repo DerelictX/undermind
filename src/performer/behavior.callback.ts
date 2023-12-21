@@ -1,32 +1,32 @@
-import { approach } from "@/move/action.virtual";
-import { perform_primitive } from "./action.primitive";
+import {approach} from "@/move/action.virtual";
+import {perform_primitive} from "./action.primitive";
 
-export const TASK_DOING:       TASK_DOING      = -16
-export const TASK_COMPLETE:    TASK_COMPLETE   = -17
-export const TASK_FAILED:      TASK_FAILED     = -18
+export const TASK_DOING: TASK_DOING = -16
+export const TASK_COMPLETE: TASK_COMPLETE = -17
+export const TASK_FAILED: TASK_FAILED = -18
 
-export const perform_callback = function(creep:Creep, behavior:CallbackBehavior<PrimitiveAction>): TaskReturnCode {
+export const perform_callback = function (creep: Creep, behavior: CallbackBehavior<PrimitiveAction>): TaskReturnCode {
     let ret: ScreepsReturnCode
     let callback: CallbackBehavior<PrimitiveAction> | TaskReturnCode | undefined = behavior
-    do{
-        ret = perform_primitive(creep,callback.action,callback.args)
-        approach(creep,callback.pos,action_range[callback.action])
+    do {
+        ret = perform_primitive(creep, callback.action, callback.args)
+        approach(creep, callback.pos, action_range[callback.action])
         callback = callback[ret]
-        if(callback == TASK_DOING || callback == TASK_COMPLETE || callback == TASK_FAILED)
+        if (callback == TASK_DOING || callback == TASK_COMPLETE || callback == TASK_FAILED)
             return callback
-    }while(callback)
-    if(ret) creep.say('' + ret)
+    } while (callback)
+    if (ret) creep.say('' + ret)
     return ret ? TASK_FAILED : TASK_DOING
 }
 
 /**
  * 将缓存的任务，解析为能被perform_callback执行的格式，加上一些条件判断
- * @param posed 
- * @returns 
+ * @param posed
+ * @returns
  */
- export const parse_posed_task = function(posed:PosedCreepTask<PrimitiveAction>):CallbackBehavior<PrimitiveAction>{
+export const parse_posed_task = function (posed: PosedCreepTask<PrimitiveAction>): CallbackBehavior<PrimitiveAction> {
     const main: CallbackBehavior<PrimitiveAction> = {...posed}
-    switch(main.action){
+    switch (main.action) {
         case 'withdraw':
         case 'transfer':
         case 'pickup':
@@ -41,7 +41,7 @@ export const perform_callback = function(creep:Creep, behavior:CallbackBehavior<
     return main
 }
 
-export const action_range: {[A in PrimitiveAction]: number} = {
+export const action_range: { [A in PrimitiveAction]: number } = {
     harvest: 1,
     dismantle: 1,
     build: 3,

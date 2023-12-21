@@ -5,25 +5,25 @@ type PrimitiveAction =
     | FightAction
 
 type ConsumeAction =
-    |"build"|"repair"|"upgradeController"
-    |"transfer"|"drop"|"generateSafeMode"
+    | "build" | "repair" | "upgradeController"
+    | "transfer" | "drop" | "generateSafeMode"
 type CollectAction =
-    |"harvest"|"dismantle"
-    |"withdraw"|"pickup"
+    | "harvest" | "dismantle"
+    | "withdraw" | "pickup"
 
 type WorkAction =
-    |"harvest"|"dismantle"
-    |"build"|"repair"|"upgradeController"
+    | "harvest" | "dismantle"
+    | "build" | "repair" | "upgradeController"
 type CarryAction =
-    |"withdraw"|"transfer"
-    |"pickup"|"drop"
-    |"generateSafeMode"
+    | "withdraw" | "transfer"
+    | "pickup" | "drop"
+    | "generateSafeMode"
 
 type ClaimAction =
-    |"attackController"|"reserveController"|"claimController"
+    | "attackController" | "reserveController" | "claimController"
 type FightAction =
-    |"attack"|"rangedAttack"|"rangedMassAttack"
-    |"heal"|"rangedHeal"
+    | "attack" | "rangedAttack" | "rangedMassAttack"
+    | "heal" | "rangedHeal"
 
 /**动作描述 */
 /*
@@ -38,26 +38,26 @@ type Posed<T extends PrimitiveDescript<TargetedAction>> =
 
 /**限定work和carry动作的资源类型 */
 type RestrictedPrimitiveDescript<
-    T extends WorkAction|CarryAction,
+    T extends WorkAction | CarryAction,
     Res extends ResourceConstant = ResourceConstant
-> = T extends WorkAction|CarryAction ? {
+> = T extends WorkAction | CarryAction ? {
     action: T
-    args:   CachedArgs<
+    args: CachedArgs<
         T extends "harvest"
             ? [target: ("energy" extends Res ? Source : never)
-            | (MineralConstant extends Res ? Mineral : never)
-            | (DepositConstant extends Res ? Deposit : never)]
-        : T extends Exclude<WorkAction,"harvest">
-            ? Res extends "energy" ? Parameters<Creep[T]> : never
-        : T extends "withdraw"
-            ? [target: Parameters<AnyCreep['withdraw']>[0], resourceType: Res, amount?: number]
-        : T extends "transfer"
-            ? [target: Parameters<AnyCreep['transfer']>[0], resourceType: Res, amount?: number]
-        : T extends "drop"
-            ? [resourceType: Res, amount?: Parameters<Creep[T]>[1]]
-        : T extends "pickup" ? [target: Resource<Res>]
-        : T extends "generateSafeMode"
-            ? Res extends "G" ? Parameters<Creep[T]> : never
-        : never>
-    pos:    RoomPosition
+                | (MineralConstant extends Res ? Mineral : never)
+                | (DepositConstant extends Res ? Deposit : never)]
+            : T extends Exclude<WorkAction, "harvest">
+                ? Res extends "energy" ? Parameters<Creep[T]> : never
+                : T extends "withdraw"
+                    ? [target: Parameters<AnyCreep['withdraw']>[0], resourceType: Res, amount?: number]
+                    : T extends "transfer"
+                        ? [target: Parameters<AnyCreep['transfer']>[0], resourceType: Res, amount?: number]
+                        : T extends "drop"
+                            ? [resourceType: Res, amount?: Parameters<Creep[T]>[1]]
+                            : T extends "pickup" ? [target: Resource<Res>]
+                                : T extends "generateSafeMode"
+                                    ? Res extends "G" ? Parameters<Creep[T]> : never
+                                    : never>
+    pos: RoomPosition
 } : never

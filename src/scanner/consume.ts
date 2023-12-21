@@ -1,18 +1,16 @@
-import { T_tower } from "@/structure/lv3_tower"
-import { T_boost, T_react } from "@/structure/lv6_lab"
-import { T_term } from "@/structure/lv6_terminal"
-import { T_fact } from "@/structure/lv7_factory"
-import { T_nuker, T_power } from "@/structure/lv8_power_spawn"
+import {T_tower} from "@/structure/lv3_tower"
+import {T_boost, T_react} from "@/structure/lv6_lab"
+import {T_term} from "@/structure/lv6_terminal"
+import {T_fact} from "@/structure/lv7_factory"
+import {T_nuker, T_power} from "@/structure/lv8_power_spawn"
 
-export const update_con_cache = function
-    <T extends keyof ConsumeTaskCache>
-    (pool: Partial<ConsumeTaskCache>, key: T, room: Room)
-{
+export const update_con_cache = function <T extends keyof ConsumeTaskCache>
+(pool: Partial<ConsumeTaskCache>, key: T, room: Room) {
     pool[key] = consume_cache_updater[key](room)
 }
 
 const consume_cache_updater: {
-    [P in keyof ConsumeTaskCache]: (room:Room) => ConsumeTaskCache[P]
+    [P in keyof ConsumeTaskCache]: (room: Room) => ConsumeTaskCache[P]
 } = {
     build: function (room: Room) {
         var tasks: PosedCreepTask<"build">[] = []
@@ -60,7 +58,7 @@ const consume_cache_updater: {
     },
     fortify: function (room: Room) {
         var wallHits = room.memory.wall_hits
-        if(!wallHits) return []
+        if (!wallHits) return []
         var tasks: PosedCreepTask<"repair">[] = []
         let walls = room.find(FIND_STRUCTURES, {
             filter: (structure) => {
@@ -160,7 +158,7 @@ const consume_cache_updater: {
         for (let id of T_cntn) {
             const container = Game.getObjectById(id)
             if (container && container.store.getFreeCapacity('energy') >= 1000)
-                tasks.push({ action: 'transfer', args: [id,'energy'], pos: container.pos })
+                tasks.push({action: 'transfer', args: [id, 'energy'], pos: container.pos})
         }
         return tasks
     },

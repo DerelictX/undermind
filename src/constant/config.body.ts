@@ -1,7 +1,8 @@
-import _, { ceil } from "lodash"
+import _, {ceil} from "lodash"
 
-export const body_generator:{[c in body_generator_name]:
-    (workload: number, mobility: number)=>BodyPartConstant[]
+export const body_generator: {
+    [c in body_generator_name]:
+    (workload: number, mobility: number) => BodyPartConstant[]
 } = {
     WC: function (workload: number, mobility: number): BodyPartConstant[] {
         var ret: BodyPartConstant[] = []
@@ -42,8 +43,8 @@ export const body_generator:{[c in body_generator_name]:
     DH: function (workload: number, mobility: number): BodyPartConstant[] {
         var ret: BodyPartConstant[] = []
         ret = ret.concat(new Array(workload).fill(WORK))
-        ret = ret.concat(new Array(25-workload).fill(CARRY))
+        ret = ret.concat(new Array(25 - workload).fill(CARRY))
         return ret.concat(new Array(25).fill(MOVE))
     }
 }
-_.assign(global, {body_generator:body_generator})
+_.assign(global, {body_generator: body_generator})

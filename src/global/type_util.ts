@@ -1,14 +1,13 @@
-
 type StorePropertiesOnly = { [P in ResourceConstant]: number } &
     { [P in Exclude<ResourceConstant, ResourceConstant>]: 0 }
 
 type Looper = {
-    reload_time:    number
-    interval:       number
+    reload_time: number
+    interval: number
 }
 
 type CachedArgs<T extends Parameters<Creep[PrimitiveAction]>> = {
-    [P in keyof T] : T[P] extends _HasId
+    [P in keyof T]: T[P] extends _HasId
         ? Id<T[P]> : T[P];
 }
 
@@ -19,7 +18,7 @@ type ShadowedPick<T, K extends keyof T> = {
 }
 type FilterOptional<T extends object> = Pick<T, Exclude<{
     [K in keyof T]: T extends Record<K, T[K]>
-    ? K : never
+        ? K : never
 }[keyof T], undefined>>;
 
 type ValueTypes<T> = T[keyof T]
@@ -34,7 +33,7 @@ type Xides<R extends tier1_comp<base>> = R | tier2_comp<R> | tier3_t1<R>
 type Oxides = ValueTypes<typeof REACTIONS.O>
 type Hydrides = ValueTypes<typeof REACTIONS.H>
 
-type companion_base<R extends MineralConstant|MineralBaseCompoundsConstant,
-        S extends keyof typeof REACTIONS[R] = keyof typeof REACTIONS[R]>
+type companion_base<R extends MineralConstant | MineralBaseCompoundsConstant,
+    S extends keyof typeof REACTIONS[R] = keyof typeof REACTIONS[R]>
     = S extends keyof typeof REACTIONS[R] ?
-        typeof REACTIONS[R][S] extends MineralBaseCompoundsConstant ? S : never : never
+    typeof REACTIONS[R][S] extends MineralBaseCompoundsConstant ? S : never : never

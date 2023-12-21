@@ -1,20 +1,20 @@
-export const tower_run = function(room: Room){
+export const tower_run = function (room: Room) {
     const towers = room.memory.towers;
-    if(!towers)return
-    var tower:StructureTower|null = Game.getObjectById(towers[0]);
-    if(!tower)return
+    if (!towers) return
+    var tower: StructureTower | null = Game.getObjectById(towers[0]);
+    if (!tower) return
 
     const closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
-    if(!closestHostile)return
-    
-    for(let id in towers){
+    if (!closestHostile) return
+
+    for (let id in towers) {
         tower = Game.getObjectById(towers[id]);
-        if(tower)tower.attack(closestHostile);
+        if (tower) tower.attack(closestHostile);
     }
 }
 
 export const T_tower = function (room: Room): RestrictedPrimitiveDescript<'transfer', 'energy'>[] {
-    if(!room.memory.towers) return []
+    if (!room.memory.towers) return []
     var tasks: RestrictedPrimitiveDescript<'transfer', 'energy'>[] = []
     const towers = room.memory.towers
         .map(id => Game.getObjectById(id))

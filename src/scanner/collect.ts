@@ -1,14 +1,14 @@
-import { compound } from "@/structure/lv6_lab"
-import { W_term } from "@/structure/lv6_terminal"
-import { W_fact } from "@/structure/lv7_factory"
+import {compound} from "@/structure/lv6_lab"
+import {W_term} from "@/structure/lv6_terminal"
+import {W_fact} from "@/structure/lv7_factory"
 
-export const update_col_cache = function
-    <T extends keyof CollectTaskCache>
-    (pool: Partial<CollectTaskCache>, key: T, room: Room)
-    {pool[key] = collect_cache_updater[key](room)}
+export const update_col_cache = function <T extends keyof CollectTaskCache>
+(pool: Partial<CollectTaskCache>, key: T, room: Room) {
+    pool[key] = collect_cache_updater[key](room)
+}
 
 const collect_cache_updater: {
-    [P in keyof CollectTaskCache]: (room:Room) => CollectTaskCache[P]
+    [P in keyof CollectTaskCache]: (room: Room) => CollectTaskCache[P]
 } = {
     /**
      * 从container取所有类型资源
@@ -18,7 +18,7 @@ const collect_cache_updater: {
     W_cntn: function (room: Room) {
         const W_cntn = Memory.W_cntn[room.name]
         if (!W_cntn) return []
-        var tasks: RestrictedPrimitiveDescript<'withdraw',ResourceConstant>[] = []
+        var tasks: RestrictedPrimitiveDescript<'withdraw', ResourceConstant>[] = []
         for (let id of W_cntn) {
             const container = Game.getObjectById(id)
             if (!container || container.store.getFreeCapacity('energy') > 800)
@@ -26,7 +26,7 @@ const collect_cache_updater: {
             var store: StorePropertiesOnly = container.store
             var resourceType: keyof typeof store
             for (resourceType in store) {
-                tasks.push({ action: 'withdraw', args: [container.id, resourceType], pos: container.pos })
+                tasks.push({action: 'withdraw', args: [container.id, resourceType], pos: container.pos})
             }
         }
         return tasks
@@ -109,7 +109,7 @@ const collect_cache_updater: {
             var store: StorePropertiesOnly = ruin.store
             var resourceType: keyof typeof store
             for (resourceType in store) {
-                if(resourceType == 'ops' ||
+                if (resourceType == 'ops' ||
                     resourceType != 'G' && resourceType.length == 1)
                     continue
                 tasks.push({
@@ -144,8 +144,8 @@ const collect_cache_updater: {
         var tasks: RestrictedPrimitiveDescript<'harvest', 'energy'>[] = []
         for (let id of H_srcs) {
             const source = Game.getObjectById(id)
-            if(source?.energy)
-                tasks.push({ action: 'harvest' , args: [id], pos: source.pos })
+            if (source?.energy)
+                tasks.push({action: 'harvest', args: [id], pos: source.pos})
         }
         return tasks
     },
