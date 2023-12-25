@@ -79,12 +79,7 @@ type SpawnCaller<T extends AnyLoopType>
 
 type SpawnTask<T extends AnyLoopType> = T extends AnyLoopType ? {
     _caller: SpawnCaller<T>
-    _body: {
-        generator: body_generator_name
-        workload: number
-        mobility?: number
-        boost?: Partial<Record<BodyPartConstant, MineralBoostConstant>>
-    }
+    _body: CreepBodyConfig
     _class: CreepMemory['_class']
 } : never
 
@@ -92,6 +87,13 @@ type body_generator_name =
     | "W" | "C" | "WC" | "Wc"
     | "A" | "R" | "H" | "Cl"
     | "DH"
+
+type CreepBodyConfig = {
+    generator: body_generator_name
+    workload: number
+    mobility?: number
+    boost?: Partial<Record<BodyPartConstant, MineralBoostConstant>>
+}
 
 type CreepLifeCycle = {
     boost?: Partial<Record<BodyPartConstant, MineralBoostConstant>>
