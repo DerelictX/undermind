@@ -118,25 +118,30 @@ export const room_memory_initializer: {
             room_mem.factory.fact_id = factory.id
     },
     power_spawn: function (room_mem: RoomMemory, room_obj?: Room): void {
-        room_mem.power_spawn = null
+        room_mem.power_spawn = {
+            power_spawn_id: null
+        }
         if (!room_obj) return
         const power_spawn = room_obj.find(FIND_MY_STRUCTURES, {
             filter: {structureType: STRUCTURE_POWER_SPAWN}
         })[0];
         if (power_spawn instanceof StructurePowerSpawn)
-            room_mem.power_spawn = power_spawn.id
+            room_mem.power_spawn.power_spawn_id = power_spawn.id
     },
     nuker: function (room_mem: RoomMemory, room_obj?: Room): void {
-        room_mem.nuker = null
+        room_mem.nuker = {
+            nuker_id: null
+        }
         if (!room_obj) return
         const nuker = room_obj.find(FIND_MY_STRUCTURES, {
             filter: {structureType: STRUCTURE_NUKER}
         })[0];
         if (nuker instanceof StructureNuker)
-            room_mem.nuker = nuker.id
+            room_mem.nuker.nuker_id = nuker.id
     },
     observer: function (room_mem: RoomMemory, room_obj?: Room): void {
         room_mem.observer = {
+            start_time: 0,
             ob_id: null,
             observing: null,
             BFS_open: []

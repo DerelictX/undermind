@@ -4,6 +4,7 @@ type RoomRecord<T> = Record<string, T | undefined>
 interface Memory extends PathMemory, GlobalStaticPool {
     username: string
     creep_SN: number
+    visual: string
     room_type: RoomRecord<RoomTypes>
 
     terminal: {
@@ -18,16 +19,18 @@ interface Memory extends PathMemory, GlobalStaticPool {
     T_cntn: RoomRecord<Id<StructureContainer>[]>
 }
 
+interface RouteNode {
+    root: string
+    prev: string
+    dist: number
+    time: number
+}
+
 interface PathMemory {
     _edge_exits: RoomRecord<{
         [toRoom: string]: RoomPosition[]
     }>
-    _closest_owned: RoomRecord<{
-        root: string
-        prev: string
-        dist: number
-        time: number
-    }>
+    _closest_owned: RoomRecord<RouteNode>
     threat_level: RoomRecord<number>
 }
 

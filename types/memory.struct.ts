@@ -6,9 +6,9 @@ interface RoomStructureList {
     labs: LabConfig
     factory: FactoryConfig & Looper
 
-    power_spawn: Id<StructurePowerSpawn> | null
-    nuker: Id<StructureNuker> | null
     observer: ObserverConfig
+    power_spawn: PowerSpawnConfig
+    nuker: NukerConfig
 }
 
 interface SpawnConfig {
@@ -43,4 +43,13 @@ interface ObserverConfig {
     ob_id: Id<StructureObserver> | null
     observing: string | null | undefined
     BFS_open: string[]
+    start_time: number
+}
+
+interface NukerConfig {
+    nuker_id: Id<StructureNuker> | null
+}
+
+interface PowerSpawnConfig {
+    power_spawn_id: Id<StructurePowerSpawn> | null
 }

@@ -1,20 +1,17 @@
 import {demand_res} from "./lv6_terminal"
 
 export const power_spawn_run = function (room: Room) {
-    if (!room.memory.power_spawn)
-        return
-    const power_spawn = Game.getObjectById(room.memory.power_spawn)
+    if (!room.memory.power_spawn?.power_spawn_id) return
+    const power_spawn = Game.getObjectById(room.memory.power_spawn.power_spawn_id)
     if (power_spawn && power_spawn.store['power'])
         power_spawn.processPower()
 }
 
 export const T_power = function (room: Room): PosedCreepTask<"transfer">[] {
-    if (!room.memory.power_spawn)
-        return []
-    const power_spawn = Game.getObjectById(room.memory.power_spawn)
-    if (!power_spawn)
-        return []
-    var tasks: PosedCreepTask<'transfer'>[] = []
+    if (!room.memory.power_spawn?.power_spawn_id) return []
+    const power_spawn = Game.getObjectById(room.memory.power_spawn.power_spawn_id)
+    if (!power_spawn) return []
+    let tasks: PosedCreepTask<'transfer'>[] = [];
 
     if (room.storage && room.storage.store['energy'] > 150000
         && power_spawn.store['energy'] <= 3000) {
@@ -39,11 +36,9 @@ export const T_power = function (room: Room): PosedCreepTask<"transfer">[] {
 }
 
 export const T_nuker = function (room: Room): PosedCreepTask<"transfer">[] {
-    if (!room.memory.nuker)
-        return []
-    const nuker = Game.getObjectById(room.memory.nuker)
-    if (!nuker)
-        return []
+    if (!room.memory.nuker?.nuker_id) return []
+    const nuker = Game.getObjectById(room.memory.nuker.nuker_id)
+    if (!nuker) return []
     var tasks: PosedCreepTask<'transfer'>[] = []
 
     if (room.storage && room.storage.store['energy'] > 150000

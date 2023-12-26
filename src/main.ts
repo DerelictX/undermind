@@ -32,15 +32,24 @@ export const loop = function () {
     run_creeps()
     handle_moves()
 
-    for (let name in Memory._closest_owned) {
-        const qwer = Memory._closest_owned[name]
-        if (!qwer) continue
-        const color = Memory.threat_level[name] ? '#FF0000' : '#FFFF00'
-        Game.map.visual.line(
-            new RoomPosition(25, 25, qwer.prev),
-            new RoomPosition(25, 25, name), {color: color, width: 1, opacity: 0.3});
-        Game.map.visual.text('' + qwer.dist,
-            new RoomPosition(25, 25, name), {color: '#FF0000', fontSize: 15});
+    if (Game.time % 32 == 0) {
+        for (let name in Memory._closest_owned) {
+            const node = Memory._closest_owned[name]
+            if (!node) continue
+            if (node.time < Game.time + 4000) {
+                delete Memory._closest_owned[name]
+                continue
+            }
+            const color = Memory.threat_level[name] ? '#FF4020' : '#9FFF10'
+            Game.map.visual.line(
+                new RoomPosition(25, 25, node.prev),
+                new RoomPosition(25, 25, name), {color: color, width: 1, opacity: 0.3});
+            Game.map.visual.text('' + node.dist,
+                new RoomPosition(25, 25, name), {color: '#9F7FFF', fontSize: 15});
+        }
+        Memory.visual = Game.map.visual.export()
+    } else {
+        Game.map.visual.import(Memory.visual)
     }
 
     if (Game.shard.name == 'shard2')

@@ -38,7 +38,7 @@ export const operator_run = function (operator: PowerCreep) {
 
 function find_power_task(operator: PowerCreep, room: Room) {
     if (operator.ticksToLive && operator.ticksToLive < 2000) {
-        const power_spawn_id = room.memory.power_spawn
+        const power_spawn_id = room.memory.power_spawn?.power_spawn_id
         if (power_spawn_id)
             operator.memory._tasks.push({action: 'renew', args: [power_spawn_id]})
     }

@@ -34,6 +34,10 @@ const global_memory_initializer: { [k in keyof FilterOptional<Memory>]: () => vo
     creep_SN: function (): void {
         Memory.creep_SN = 1
     },
+    visual: function (): void {
+        Memory.visual = Game.map.visual.export()
+    },
+
     terminal: function (): void {
         Memory.terminal = {
             demand: {},

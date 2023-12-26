@@ -94,7 +94,7 @@ const consume_cache_updater: {
             })
         }
 
-        if (wallHits >= 100000 && wallHits <= 100000000) {
+        if (wallHits >= 100000 && wallHits <= 250000000) {
             room.memory.wall_hits = wallHits
         }
         return tasks
