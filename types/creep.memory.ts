@@ -1,6 +1,6 @@
 interface CreepMemory extends MoveMemory {
     _class: | CarrierMemory | WorkerMemory | StaticMemory
-    _caller: SpawnCaller<AnyLoopType>
+    _caller: string
     _life: CreepLifeCycle
 }
 

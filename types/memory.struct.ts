@@ -1,10 +1,14 @@
+interface RoomMemory extends Partial<RoomStructureList> {
+
+}
+
 interface RoomStructureList {
     spawns: SpawnConfig
     wall_hits: number
     towers: Id<StructureTower>[]
     links: LinkConfig
     labs: LabConfig
-    factory: FactoryConfig & Looper
+    factory: FactoryConfig
 
     observer: ObserverConfig
     power_spawn: PowerSpawnConfig
@@ -12,10 +16,10 @@ interface RoomStructureList {
 }
 
 interface SpawnConfig {
-    t0: SpawnTask<AnyLoopType>[]
-    t1: SpawnTask<AnyLoopType>[]
-    t2: SpawnTask<AnyLoopType>[]
-    t3: SpawnTask<AnyLoopType>[]
+    t0: SpawnTask[]
+    t1: SpawnTask[]
+    t2: SpawnTask[]
+    t3: SpawnTask[]
 }
 
 interface LinkConfig {
@@ -35,6 +39,7 @@ interface LabConfig {
 
 interface FactoryConfig {
     fact_id: Id<StructureFactory> | null
+    reload_time: number
     product?: CommodityConstant
     operate?: number
 }

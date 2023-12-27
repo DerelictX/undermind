@@ -26,19 +26,7 @@ export const spawn_run = function (room: Room) {
     let boost = spawn_task._body.boost
     if (!mobility) mobility = 2
 
-    const caller = spawn_task._caller
-    let looper: Looper | undefined
-    switch (caller.loop_type) {
-        case '_loop_id':
-            looper = Memory._loop_id[caller.loop_key]
-            break
-        case '_loop_room':
-            looper = Memory._loop_room[caller.loop_key]?.[caller.task_type]
-            break
-        case '_loop_flag':
-            looper = Memory._loop_flag[caller.loop_key]
-            break
-    }
+    let looper = Memory.flags[spawn_task._caller]?._loop
     if (!looper) return
 
     let ret = spawn.spawnCreep(generator(workload, mobility), creep_name)
@@ -66,8 +54,8 @@ export const spawn_run = function (room: Room) {
     }
 }
 
-export const publish_spawn_task = function (task: SpawnTask<AnyLoopType>) {
-    const dest_room = task._caller.dest_room
+export const publish_spawn_task = function (task: SpawnTask) {
+    const dest_room = Game.flags[task._caller]?.pos.roomName
     const queue = Memory.rooms[dest_room]?.spawns?.t1
     if (queue && queue.length < 20) queue.push(task)
 }

@@ -39,7 +39,7 @@ export const T_nuker = function (room: Room): PosedCreepTask<"transfer">[] {
     if (!room.memory.nuker?.nuker_id) return []
     const nuker = Game.getObjectById(room.memory.nuker.nuker_id)
     if (!nuker) return []
-    var tasks: PosedCreepTask<'transfer'>[] = []
+    let tasks: PosedCreepTask<'transfer'>[] = [];
 
     if (room.storage && room.storage.store['energy'] > 150000
         && nuker.store.getFreeCapacity('energy')) {

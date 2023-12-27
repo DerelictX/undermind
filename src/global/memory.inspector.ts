@@ -103,15 +103,6 @@ const global_memory_initializer: { [k in keyof FilterOptional<Memory>]: () => vo
                 Memory.room_type[name] = 'owned'
         }
     },
-    _loop_id: function (): void {
-        Memory._loop_id = {}
-    },
-    _loop_room: function (): void {
-        Memory._loop_room = {}
-    },
-    _loop_flag: function (): void {
-        Memory._loop_flag = {}
-    },
     H_srcs: function (): void {
         Memory.H_srcs = {}
     },

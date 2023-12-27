@@ -1,11 +1,6 @@
 type StorePropertiesOnly = { [P in ResourceConstant]: number } &
     { [P in Exclude<ResourceConstant, ResourceConstant>]: 0 }
 
-type Looper = {
-    reload_time: number
-    interval: number
-}
-
 type CachedArgs<T extends Parameters<Creep[PrimitiveAction]>> = {
     [P in keyof T]: T[P] extends _HasId
         ? Id<T[P]> : T[P];

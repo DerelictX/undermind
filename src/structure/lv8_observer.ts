@@ -59,7 +59,7 @@ function handle_unowned(curr_room: Room, curr_node: RouteNode) {
         //挖过道
         const isHighway = curr.indexOf('0') != -1
         if (isHighway && !Memory.rooms[curr]) {
-            //
+
         }
         const core: StructureInvaderCore[] = curr_room.find(FIND_STRUCTURES, {
             filter: (structure) => structure.structureType == 'invaderCore'

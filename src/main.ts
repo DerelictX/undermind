@@ -5,8 +5,7 @@ import {HelperRoomResource} from "./global/helper_roomResource";
 import {expand_commo} from "./constant/commodity_tree";
 import {run_rooms} from "./run_rooms";
 import {run_creeps, run_power_creeps} from "./run_creeps";
-import {loop_objects} from "./controller/loopObjects";
-import {loop_rooms} from "./controller/loopRooms";
+import {run_flags} from "@/run_flags";
 
 export const loop = function () {
 
@@ -22,11 +21,9 @@ export const loop = function () {
     if (!global._consume) global._consume = {}
     if (!global.commonMatrix) global.commonMatrix = {}
     global._move_intents = {}
-
     inspect_global()
-    loop_rooms()
-    loop_objects()
 
+    run_flags()
     run_rooms()
     run_power_creeps()
     run_creeps()

@@ -107,8 +107,7 @@ export const room_memory_initializer: {
     factory: function (room_mem: RoomMemory, room_obj?: Room): void {
         room_mem.factory = {
             fact_id: null,
-            reload_time: Game.time,
-            interval: 1000
+            reload_time: Game.time
         }
         if (!room_obj) return
         const factory = room_obj.find(FIND_MY_STRUCTURES, {

@@ -29,3 +29,16 @@ export const autoRoadCallback = function (roomName: string) {
     global.commonMatrix[room.name] = costs.serialize()
     return costs;
 }
+
+export const createHarvestRoad = function (fromPos: RoomPosition, toPos: RoomPosition) {
+    const path = PathFinder.search(fromPos, {pos: toPos, range: 1}, {
+        plainCost: 2, swampCost: 10, maxRooms: 2,
+        roomCallback: autoRoadCallback
+    })
+    const containerPos = path.path.pop()
+    for (let pos of path.path) {
+        Game.rooms[pos.roomName].createConstructionSite(pos, STRUCTURE_ROAD)
+    }
+    if (containerPos)
+        Game.rooms[containerPos.roomName].createConstructionSite(containerPos, STRUCTURE_CONTAINER)
+}

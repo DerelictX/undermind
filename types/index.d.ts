@@ -1,7 +1,7 @@
 type RoomTypes = 'owned' | 'reserved' | 'highway' | 'claimed' | 'neutral'
 type RoomRecord<T> = Record<string, T | undefined>
 
-interface Memory extends PathMemory, GlobalStaticPool {
+interface Memory extends PathMemory {
     username: string
     creep_SN: number
     visual: string
@@ -34,57 +34,16 @@ interface PathMemory {
     threat_level: RoomRecord<number>
 }
 
-type StaticPoolPart<T extends GlobalLoopType> = T extends GlobalLoopType ?
-    Record<StaticPoolKeyTypeMap[T], Looper & SpawnCaller<T>> : never
-
-interface GlobalStaticPool {
-    _loop_id:
-        & StaticPoolPart<'_source'>
-        & StaticPoolPart<'_mineral'>
-        & StaticPoolPart<'_deposit'>
-        & (StaticPoolPart<'_upgrade'>
-        | StaticPoolPart<'_reserve'>)
-    _loop_room: RoomRecord<Partial<Record<RoomLoopType, Looper>>>
-    _loop_flag: RoomRecord<Looper & SpawnCaller<FlagLoopType>>
-}
-
 type RoomLoopType = '_collect' | '_supply' | '_build' | '_maintain' | '_fortify' | '_chemist'
-type FlagLoopType = '_observe'
-type GlobalLoopType = keyof StaticPoolKeyTypeMap
+type ObjectLoopType = '_source' | '_mineral' | '_upgrade' | '_reserve'
+type FlagLoopType = '_observe' | '_deposit'
+type AnyLoopType = ObjectLoopType | RoomLoopType | FlagLoopType
 
-interface StaticPoolKeyTypeMap {
-    _source: Id<Source>
-    _mineral: Id<Mineral>
-    _deposit: Id<Deposit>
-    _upgrade: Id<StructureController>
-    _reserve: Id<StructureController>
-}
-
-type AnyLoopType = GlobalLoopType | RoomLoopType | FlagLoopType
-
-type SpawnCaller<T extends AnyLoopType>
-    = T extends GlobalLoopType ? {
-    dest_room: string
-    loop_type: '_loop_id'
-    task_type: T
-    loop_key: StaticPoolKeyTypeMap[T]
-} : T extends RoomLoopType ? {
-    dest_room: string
-    loop_type: '_loop_room'
-    task_type: T
-    loop_key: string
-} : T extends FlagLoopType ? {
-    dest_room: string
-    loop_type: '_loop_flag'
-    task_type: T
-    loop_key: string
-} : never
-
-type SpawnTask<T extends AnyLoopType> = T extends AnyLoopType ? {
-    _caller: SpawnCaller<T>
+type SpawnTask = {
+    _caller: string
     _body: CreepBodyConfig
     _class: CreepMemory['_class']
-} : never
+}
 
 type body_generator_name =
     | "W" | "C" | "WC" | "Wc"
