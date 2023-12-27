@@ -6,7 +6,7 @@ import {terminal_run} from "./structure/lv6_terminal";
 import {factory_run} from "./structure/lv7_factory";
 import {power_spawn_run} from "./structure/lv8_power_spawn";
 import {observer_run} from "./structure/lv8_observer";
-import {inspect_memory} from "./room/memory.inspector";
+import {inspect_memory} from "./structure/memory.inspector";
 
 export const run_rooms = function () {
     for (let name in Memory.rooms) {

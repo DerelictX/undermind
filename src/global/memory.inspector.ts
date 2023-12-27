@@ -1,5 +1,5 @@
 import {product_tier} from "@/constant/resource_series"
-import {inspect_memory} from "@/room/memory.inspector"
+import {inspect_memory} from "@/structure/memory.inspector"
 import _, {ceil} from "lodash"
 
 export const _reboot_all = function () {

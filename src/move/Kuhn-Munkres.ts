@@ -1,5 +1,8 @@
 import {autoRoadCallback} from "./roomCallback"
 
+/**
+ * 统一处理creep的移动意图，需要在所有creep的活动之后调用
+ */
 export const handle_moves = function () {
     for (let name in Game.creeps) {
         const creep = Game.creeps[name]
@@ -19,7 +22,14 @@ export const handle_moves = function () {
     }
 }
 
-/**二分图最大匹配 */
+/**
+ * 二分图最大匹配
+ * @param intents   所有creep的移动意图汇总
+ * @param matrix    用于判断可以让位的位置
+ * @param terrain   用于判断可以让位的位置
+ * @param visual    移动step可视化
+ * @constructor
+ */
 const Kuhn_Munkres = function (intents: RoomMoveIntents,
                                matrix: CostMatrix, terrain: RoomTerrain, visual: RoomVisual) {
     const matchedFrom: Record<string, string> = {}
@@ -31,7 +41,7 @@ const Kuhn_Munkres = function (intents: RoomMoveIntents,
 
         BFS:    while (true) {
             const from = queue.shift()
-            if (!from) break BFS
+            if (!from) break;
             const x = base64decode(from[0])
             const y = base64decode(from[1])
 
@@ -95,7 +105,7 @@ const idle_move = function (creep: AnyCreep) {
         ?? (global._move_intents[pos.roomName] = {})
     const pos_str = base64table[pos.x] + base64table[pos.y]
     if (_move_intents[pos_str]) return
-    _move_intents[pos_str] = {id: creep.id, step: adjace_dir[0]}
+    _move_intents[pos_str] = {id: creep.id, step: adjacent_dir[0]}
 }
 
 const offsetsByDirection: { [dir in 0 | DirectionConstant]: [number, number] } = [
@@ -126,7 +136,7 @@ const base64decode = function (char: string): number {
 }
 
 /**相邻方向 */
-export const adjace_dir: { [dir in 0 | DirectionConstant]: (0 | DirectionConstant)[] } = {
+export const adjacent_dir: { [dir in 0 | DirectionConstant]: (0 | DirectionConstant)[] } = {
     0: [0, 1, 5, 3, 7, 2, 6, 4, 8],
     1: [0, 1, 2, 8],
     2: [0, 2, 3, 1],

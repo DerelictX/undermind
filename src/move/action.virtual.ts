@@ -1,4 +1,4 @@
-import {adjace_dir, base64table} from "@/move/Kuhn-Munkres"
+import {adjacent_dir, base64table} from "@/move/Kuhn-Munkres"
 import {hikeTo} from "@/move/route"
 
 export const approach = function (creep: AnyCreep, pos: RoomPosition, range: number) {
@@ -21,7 +21,7 @@ export const approach = function (creep: AnyCreep, pos: RoomPosition, range: num
         let dir = creep.pos.getDirectionTo(pos)
         const _move_intents = global._move_intents[roomName] ?? (global._move_intents[roomName] = {})
         const pos_str = base64table[creep.pos.x] + base64table[creep.pos.y]
-        _move_intents[pos_str] = {id: creep.id, step: adjace_dir[dir]}
+        _move_intents[pos_str] = {id: creep.id, step: adjacent_dir[dir]}
         return OK
     }
 

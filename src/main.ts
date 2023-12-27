@@ -1,4 +1,4 @@
-import {_format_room} from "./room/memory.inspector";
+import {_format_room} from "./structure/memory.inspector";
 import {inspect_global} from "./global/memory.inspector";
 import {handle_moves} from "./move/Kuhn-Munkres";
 import {HelperRoomResource} from "./global/helper_roomResource";
