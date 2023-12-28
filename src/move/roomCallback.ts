@@ -1,8 +1,6 @@
 export const autoRoadCallback = function (roomName: string) {
     const matrix = global.commonMatrix[roomName]
-    if (matrix) {
-        return PathFinder.CostMatrix.deserialize(matrix)
-    }
+    if (matrix) return PathFinder.CostMatrix.deserialize(matrix)
     let room = Game.rooms[roomName]
     if (!room) return false
     let costs = new PathFinder.CostMatrix
@@ -27,6 +25,63 @@ export const autoRoadCallback = function (roomName: string) {
 
     console.log('autoRoadCallback(' + room.name + ')')
     global.commonMatrix[room.name] = costs.serialize()
+    return costs;
+}
+
+const squadCallback = function (roomName: string) {
+    const matrix = global.squadMatrix[roomName]
+    if (matrix) return PathFinder.CostMatrix.deserialize(matrix)
+    let room = Game.rooms[roomName]
+    if (!room) return false
+    let costs = new PathFinder.CostMatrix
+
+    const terrain = new Room.Terrain(roomName)
+    for (let y = 1; y < 50; y++) {
+        for (let x = 1; x < 50; x++) {
+            if (terrain.get(x, y) == TERRAIN_MASK_SWAMP) {
+                costs.set(x, y, 5)
+                costs.set(x - 1, y, 5)
+                costs.set(x, y - 1, 5)
+                costs.set(x - 1, y - 1, 5)
+            }
+        }
+    }
+    for (let y = 1; y < 50; y++) {
+        for (let x = 1; x < 50; x++) {
+            if (terrain.get(x, y) == TERRAIN_MASK_WALL) {
+                costs.set(x, y, 0xff)
+                costs.set(x - 1, y, 0xff)
+                costs.set(x, y - 1, 0xff)
+                costs.set(x - 1, y - 1, 0xff)
+            }
+        }
+    }
+
+    room.find(FIND_MY_STRUCTURES).forEach(function (struct) {
+        if (struct.structureType !== STRUCTURE_RAMPART) {
+            const x = struct.pos.x
+            const y = struct.pos.y
+            costs.set(x, y, 0xff)
+            costs.set(x - 1, y, 0xff)
+            costs.set(x, y - 1, 0xff)
+            costs.set(x - 1, y - 1, 0xff)
+        }
+    });
+    room.find(FIND_MY_CONSTRUCTION_SITES).forEach(function (struct) {
+        if (struct.structureType !== STRUCTURE_ROAD
+            && struct.structureType !== STRUCTURE_CONTAINER
+            && struct.structureType !== STRUCTURE_RAMPART) {
+            const x = struct.pos.x
+            const y = struct.pos.y
+            costs.set(x, y, 0xff)
+            costs.set(x - 1, y, 0xff)
+            costs.set(x, y - 1, 0xff)
+            costs.set(x - 1, y - 1, 0xff)
+        }
+    });
+
+    console.log('squadCallback(' + room.name + ')')
+    global.squadMatrix[room.name] = costs.serialize()
     return costs;
 }
 

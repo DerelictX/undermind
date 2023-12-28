@@ -14,7 +14,7 @@ export const loop_flags = function (flag: Flag) {
     _loop.reload_time = Game.time + _loop.interval
 
     console.log(`_loop\t${flag.name}\t${_loop._loop_type}`)
-    let spawn_task: SpawnTask | null = null
+    let spawn_task: SpawnTask | null
     spawn_task = handlers[_loop._loop_type](flag)
     if (spawn_task) {
         publish_spawn_task(spawn_task)

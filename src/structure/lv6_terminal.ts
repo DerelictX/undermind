@@ -17,23 +17,18 @@ export const terminal_run = function (room: Room) {
         return
     }
 
-    switch (Game.time % 40) {
-        case 0:
-            sendList(terminal, compressed.concat(product_tier[0]))
-            return
-        case 10:
-            if (!storage) return
+    if (Game.time % 40 === 0) {
+        sendList(terminal, compressed.concat(product_tier[0]))
+    } else if (Game.time % 40 === 10) {
+        if (storage)
             sendList(terminal, ['energy', 'ops', 'power', 'metal', 'biomass', 'silicon', 'mist'], storage.store)
-            return
-        case 20:
-            const config = room.memory.factory
-            if (config?.product)
-                sendList(terminal, [config.product])
-            return
-        case 30:
-            if (!storage) return
+    } else if (Game.time % 40 === 20) {
+        const config = room.memory.factory
+        if (config?.product)
+            sendList(terminal, [config.product])
+    } else if (Game.time % 40 === 30) {
+        if (storage)
             sendList(terminal, base_mineral, storage.store)
-            return
     }
 }
 

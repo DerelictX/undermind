@@ -6,8 +6,7 @@ export const hikeTo = function (creep: AnyCreep, targetPos: RoomPosition) {
     if (!creep.room) return ERR_NOT_FOUND
     /**同房间直接走 */
     if (creep.room.name == targetPos.roomName) {
-        const ret = crawlTo(creep, targetPos)
-        return ret
+        return crawlTo(creep, targetPos)
     }
 
     /**房际寻路信息储存在_hike */
@@ -36,8 +35,7 @@ export const hikeTo = function (creep: AnyCreep, targetPos: RoomPosition) {
     let exit = step.exitPos
     if (exit) {
         exit = new RoomPosition(exit.x, exit.y, exit.roomName)
-        const ret = crawlTo(creep, exit)
-        return ret
+        return crawlTo(creep, exit)
     }
 
     //分段寻路优化，在当前房间和下一个房间寻路，用来优化通往下个房间的exit
@@ -55,7 +53,6 @@ export const hikeTo = function (creep: AnyCreep, targetPos: RoomPosition) {
         })
         for (let portal of portals) {
             exits.push(portal.pos)
-            break
         }
         exit_cache[step.room] = exits
     } else if (_hike.route[1]) {
@@ -83,9 +80,9 @@ export const hikeTo = function (creep: AnyCreep, targetPos: RoomPosition) {
     exit = _.findLast(path.path, (pos) => pos.roomName == _hike?.from)
 
     if (exit) {
-        const a = (step.exit == TOP || step.exit == BOTTOM) ? exit.y : exit.x
-        const b = (step.exit == TOP || step.exit == LEFT) ? 0 : 49
-        if (/**a != b && */exit.roomName != creep.room.name) {
+        // const a = (step.exit == TOP || step.exit == BOTTOM) ? exit.y : exit.x
+        // const b = (step.exit == TOP || step.exit == LEFT) ? 0 : 49
+        if (/*a != b && */exit.roomName != creep.room.name) {
             creep.say('false exit')
             console.log('false exit: ' + exit)
             delete step.exitPos
