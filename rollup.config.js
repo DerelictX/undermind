@@ -2,6 +2,7 @@ import clear from 'rollup-plugin-clear'
 import screeps from 'rollup-plugin-screeps'
 import copy from 'rollup-plugin-copy'
 import typescript from 'rollup-plugin-typescript2' // <== 新增这一行
+import terser from '@rollup/plugin-terser'
 
 let config
 // 根据指定的目标获取对应的配置项
@@ -44,6 +45,7 @@ export default {
         clear({ targets: ["dist"] }),
         // 编译 ts
         typescript({ tsconfig: "./tsconfig.json" }), // <== 新增这一行，注意先后顺序不要搞错了
+        terser(),
         // 执行上传或者复制
         pluginDeploy
     ]
