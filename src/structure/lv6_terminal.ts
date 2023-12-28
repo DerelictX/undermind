@@ -12,9 +12,8 @@ export const terminal_run = function (room: Room) {
             Game.market.deal(order.id, amount, room.name)
             return
         }
-        const orders = Game.market.getAllOrders({type: ORDER_BUY, resourceType: 'energy'})
+        Memory.terminal.overflow = Game.market.getAllOrders({type: ORDER_BUY, resourceType: 'energy'})
             .filter(order => order.price >= 10 && order.amount > 1000)
-        Memory.terminal.overflow = orders
         return
     }
 
@@ -47,7 +46,6 @@ export const terminal_run = function (room: Room) {
  */
 export const demand_res = function (terminal: StructureTerminal,
                                     resourceType: ResourceConstant, amount: number) {
-    if (!terminal) return
     const demand = Memory.terminal.demand[resourceType]
         ?? (Memory.terminal.demand[resourceType] = {})
     demand[terminal.room.name] = amount
@@ -67,22 +65,21 @@ const sendList = function (terminal: StructureTerminal, list: ResourceConstant[]
         let amount = terminal.store[resourceType]
         if (supply && supply[resourceType] < amount)
             amount = supply[resourceType]
-
         const demand = Memory.terminal.demand[resourceType]
         if (!demand || amount <= 0) continue
-        let toRoom: string | undefined = undefined
-        for (toRoom in demand) if (demand[toRoom]) break
-        if (!toRoom) continue
 
-        if (demand[toRoom] > amount) {
-            demand[toRoom] -= amount
-        } else {
-            amount = demand[toRoom]
-            delete demand[toRoom]
+        for (const toRoom in demand) {
+            if (!demand[toRoom]) continue
+            if (demand[toRoom] > amount) {
+                demand[toRoom] -= amount
+            } else {
+                amount = demand[toRoom]
+                delete demand[toRoom]
+            }
+            const ret = terminal.send(resourceType, amount, toRoom)
+            console.log(`${terminal.room.name} -> ${toRoom}\t[${resourceType} : ${amount}] : ${ret}`)
+            return resourceType
         }
-        const ret = terminal.send(resourceType, amount, toRoom)
-        console.log(`${terminal.room.name} -> ${toRoom}\t[${resourceType} : ${amount}] : ${ret}`)
-        return resourceType
     }
 }
 
@@ -92,9 +89,9 @@ export const T_term = function (room: Room) {
     if (!storage || !terminal || terminal.store.getFreeCapacity() < 50000)
         return []
 
-    var tasks: RestrictedPrimitiveDescript<'transfer'>[] = []
-    var storage_store: StorePropertiesOnly = storage.store
-    var resourceType: keyof typeof storage_store
+    let tasks: RestrictedPrimitiveDescript<'transfer'>[] = [];
+    let storage_store: StorePropertiesOnly = storage.store
+    let resourceType: keyof typeof storage_store
     for (resourceType in storage_store) {
         let target_amount = 3000
         if (resourceType == 'energy') target_amount = 30000
@@ -116,7 +113,7 @@ export const W_term = function (room: Room) {
     if (!storage || !terminal || storage.store.getFreeCapacity() < 60000)
         return []
 
-    var tasks: RestrictedPrimitiveDescript<'withdraw'>[] = []
+    let tasks: RestrictedPrimitiveDescript<'withdraw'>[] = [];
     let terminal_store: StorePropertiesOnly = terminal.store
     let resourceType: keyof typeof terminal_store
     for (resourceType in terminal_store) {

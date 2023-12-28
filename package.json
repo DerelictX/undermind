@@ -6,7 +6,6 @@
   "scripts": {
     "build": "rollup -cw",
     "push": "rollup -cw --environment DEST:main",
-    "local": "rollup -cw --environment DEST:local",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
