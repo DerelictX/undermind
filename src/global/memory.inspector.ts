@@ -111,5 +111,9 @@ const global_memory_initializer: { [k in keyof FilterOptional<Memory>]: () => vo
     },
     T_cntn: function (): void {
         Memory.T_cntn = {}
-    }
+    },
+    flag_heap(): void {
+        Memory.flag_heap = []
+        return
+    },
 }

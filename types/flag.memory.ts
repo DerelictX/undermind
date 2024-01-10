@@ -1,3 +1,10 @@
+type AnyLoopType =
+    | '_collect' | '_supply' | '_chemist'
+    | '_build' | '_maintain' | '_fortify'
+    | '_source' | '_mineral' | '_deposit'
+    | '_feed' | '_upgrade' | '_reserve'
+    | '_observe'
+
 interface FlagMemory {
     _class: '_loop' | '_squad'
     _loop: {
