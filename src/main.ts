@@ -20,6 +20,7 @@ export const loop = function () {
     if (!global._collect) global._collect = {}
     if (!global._consume) global._consume = {}
     if (!global.commonMatrix) global.commonMatrix = {}
+    if (!global.squadMatrix) global.squadMatrix = {}
     global._move_intents = {}
     inspect_global()
 
@@ -29,7 +30,7 @@ export const loop = function () {
     run_creeps()
     handle_moves()
 
-    if (Game.time % 32 == 0) {
+    if ((Game.time & 31) == 0) {
         for (let name in Memory._closest_owned) {
             const node = Memory._closest_owned[name]
             if (!node) continue

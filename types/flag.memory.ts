@@ -2,7 +2,7 @@ interface FlagMemory {
     _class: '_loop' | '_squad'
     _loop: {
         _loop_type: AnyLoopType
-        reload_time: number
+        _time: number
         interval: number
     }
     _squad: {

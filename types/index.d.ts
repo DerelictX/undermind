@@ -36,7 +36,7 @@ interface PathMemory {
 
 type RoomLoopType = '_collect' | '_supply' | '_build' | '_maintain' | '_fortify' | '_chemist'
 type ObjectLoopType = '_source' | '_mineral' | '_upgrade' | '_reserve'
-type FlagLoopType = '_observe' | '_deposit'
+type FlagLoopType = '_observe' | '_deposit' | '_feed'
 type AnyLoopType = ObjectLoopType | RoomLoopType | FlagLoopType
 
 type SpawnTask = {

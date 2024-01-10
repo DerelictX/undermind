@@ -35,7 +35,7 @@ export const spawn_run = function (room: Room) {
         ret = spawn.spawnCreep(generator(workload, mobility), creep_name)
     }
     if (ret == OK) {
-        looper.reload_time = Game.time + looper.interval + 1
+        looper._time = Game.time + looper.interval + 1
         /**creep内存赋值 */
         Memory.creeps[creep_name] = {
             _class: spawn_task._class,
@@ -49,7 +49,7 @@ export const spawn_run = function (room: Room) {
             publish_boost_task(creep_name, room.name, boost)
         }
     } else {
-        looper.reload_time = Game.time + 200
+        looper._time = Game.time + 200
         console.log(spawn.name + ":" + creep_name + ":" + ret)
     }
 }

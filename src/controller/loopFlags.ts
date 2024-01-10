@@ -6,12 +6,12 @@ import {createHarvestRoad} from "@/move/roomCallback";
 
 export const loop_flags = function (flag: Flag) {
     const _loop = flag.memory._loop
-    if (!_loop || _loop.reload_time > Game.time) return;
+    if (!_loop || _loop._time > Game.time) return;
     /**限定时间间隔，防止无限生爬 */
     if (_loop.interval < 200) _loop.interval = 200
     if (_loop.interval > 10000) _loop.interval = 10000
     /**重置定时器 */
-    _loop.reload_time = Game.time + _loop.interval
+    _loop._time = Game.time + _loop.interval
 
     console.log(`_loop\t${flag.name}\t${_loop._loop_type}`)
     let spawn_task: SpawnTask | null
@@ -176,9 +176,7 @@ const handlers: {
             consume: [],
         }
         return {_body: {generator: 'Cl', workload: 4, mobility: 1}, _class: bhvr, _caller: flag.name}
-    },
-
-    _source: function (flag: Flag) {
+    }, _source: function (flag: Flag) {
         const source = flag.pos.lookFor(LOOK_SOURCES)[0]
         if (!source) return null
         const task: StaticMemory = {
@@ -212,9 +210,7 @@ const handlers: {
             return {_body: {generator: 'W', workload: 5, mobility: 1}, _class: task, _caller: flag.name}
         }
         return {_body: {generator: 'Wc', workload: 10}, _class: task, _caller: flag.name}
-    },
-
-    _supply(flag: Flag): SpawnTask | null {
+    }, _supply(flag: Flag): SpawnTask | null {
         const room_name = flag.pos.roomName
         const room = flag.room
         if (!room?.storage?.my) {
@@ -229,9 +225,7 @@ const handlers: {
             _class: init_carrier_behavior('Supplier', room.name, room.name),
             _caller: flag.name
         }
-    },
-
-    _upgrade: function (flag: Flag) {
+    }, _upgrade: function (flag: Flag) {
         const controller = flag.room?.controller
         if (!controller || Game.cpu.bucket < 9950 || controller.level >= 8) return null
         const storage = controller.room.storage
@@ -254,6 +248,47 @@ const handlers: {
             task.collect.push({action: 'withdraw', args: [struct.id, 'energy'], pos: struct.pos})
         }
         return {_body: {generator: 'Wc', workload: 15}, _class: task, _caller: flag.name}
+    }, _feed(flag: Flag): SpawnTask | null {
+        const pos = flag.pos
+        const ret: StaticMemory = {
+            bhvr_name: "static",
+            state: "collect",
+            collect: [],
+            consume: [],
+            buff_in: [],
+            buff_out: []
+        }
+
+        const link: StructureLink[] = pos.findInRange(FIND_MY_STRUCTURES, 1, {
+            filter: (structure) => structure.structureType == 'link'
+        })
+        link.forEach(s => ret.collect.push({
+            action: 'withdraw', args: [s.id, 'energy'], pos: s.pos
+        }))
+        //填extension
+        const extensions: (StructureSpawn | StructureExtension)[] = pos.findInRange(FIND_MY_STRUCTURES, 1, {
+            filter: (structure) => structure.structureType == 'spawn'
+                || structure.structureType == 'extension'
+        })
+        extensions.sort((a, b) => {
+            return b.store.getCapacity('energy') - a.store.getCapacity('energy')
+        })
+        extensions.forEach(s => ret.consume.push({
+            action: 'transfer', args: [s.id, 'energy'], pos: s.pos
+        }))
+        //container作为缓冲
+        const container: StructureContainer[] = pos.findInRange(FIND_STRUCTURES, 1, {
+            filter: (structure) => structure.structureType == 'container'
+        })
+        container.forEach(s => {
+            ret.buff_in?.push({
+                action: 'withdraw', args: [s.id, 'energy'], pos: s.pos
+            })
+            ret.buff_out?.push({
+                action: 'transfer', args: [s.id, 'energy'], pos: s.pos
+            })
+        })
+        return null;
     },
 }
 
@@ -311,50 +346,5 @@ const depricated = {
             _body: {generator: 'Cl', workload: 1, mobility: 1},
             _class: bhvr
         }
-    }, init_harvester: function (pos: RoomPosition): StaticMemory {
-        const ret: StaticMemory = {
-            bhvr_name: "static",
-            state: "collect",
-            collect: [],
-            consume: [],
-            buff_in: [],
-            buff_out: []
-        }
-
-        const sources = pos.findInRange(FIND_SOURCES, 1)
-        const sites = pos.findInRange(FIND_MY_CONSTRUCTION_SITES, 3)
-        const container: StructureContainer[] = pos.findInRange(FIND_STRUCTURES, 1, {
-            filter: (structure) => structure.structureType == 'container'
-        })
-        const link: StructureLink[] = pos.findInRange(FIND_MY_STRUCTURES, 1, {
-            filter: (structure) => structure.structureType == 'link'
-        })
-
-        sources.forEach(s => ret.collect.push({
-            action: 'harvest', args: [s.id], pos: s.pos
-        }))
-        container.forEach(s => {
-            ret.consume.push({
-                action: 'repair', args: [s.id], pos: s.pos
-            })
-            ret.buff_in?.push({
-                action: 'withdraw', args: [s.id, 'energy'], pos: s.pos
-            })
-            ret.buff_out?.push({
-                action: 'transfer', args: [s.id, 'energy'], pos: s.pos
-            })
-        })
-        sites.forEach(s => ret.consume.push({
-            action: 'build', args: [s.id], pos: s.pos
-        }))
-
-        link.sort((a, b) => {
-            return a.store.getCapacity('energy') - b.store.getCapacity('energy')
-                - a.pos.getRangeTo(pos) + b.pos.getRangeTo(pos)
-        })
-        link.forEach(s => ret.consume.push({
-            action: 'transfer', args: [s.id, 'energy'], pos: s.pos
-        }))
-        return ret
     }
 }
