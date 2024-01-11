@@ -106,7 +106,7 @@ export const T_react = function (room: Room): PosedCreepTask<"transfer">[] {
     const compoundType = labs?.reaction
     if (!terminal || !compoundType) return []
 
-    var tasks: PosedCreepTask<'transfer'>[] = []
+    const tasks: PosedCreepTask<'transfer'>[] = [];
     for (let i in labs.ins) {
         const reactantType = reactions[compoundType][i]
         const lab_in = Game.getObjectById(labs.ins[i])
@@ -130,7 +130,7 @@ export const T_react = function (room: Room): PosedCreepTask<"transfer">[] {
 export const T_boost = function (room: Room): PosedCreepTask<"transfer">[] {
     const labs = room.memory.labs
     if (!labs) return []
-    var tasks: PosedCreepTask<'transfer'>[] = []
+    const tasks: PosedCreepTask<'transfer'>[] = [];
     let id: Id<StructureLab>
     for (id in labs.boost_type) {
         const boostType = labs.boost_type[id]
@@ -167,7 +167,7 @@ export const compound = function (room: Room) {
     const labs = room.memory.labs
     if (!labs) return []
     const compoundType = labs.reaction
-    var tasks: PosedCreepTask<"withdraw">[] = []
+    const tasks: PosedCreepTask<"withdraw">[] = [];
     for (let i in labs.ins) {
         const reactantType = compoundType ? reactions[compoundType][i] : null
         const lab_in = Game.getObjectById(labs.ins[i])

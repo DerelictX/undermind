@@ -13,7 +13,7 @@ const consume_cache_updater: {
     [P in keyof ConsumeTaskCache]: (room: Room) => ConsumeTaskCache[P]
 } = {
     build: function (room: Room) {
-        var tasks: PosedCreepTask<"build">[] = []
+        const tasks: PosedCreepTask<"build">[] = [];
         const sites = room.find(FIND_MY_CONSTRUCTION_SITES)
         sites.forEach(s => tasks.push({
             action: 'build',
@@ -23,7 +23,7 @@ const consume_cache_updater: {
         return tasks
     },
     repair: function (room: Room) {
-        var tasks: PosedCreepTask<"repair">[] = []
+        const tasks: PosedCreepTask<"repair">[] = [];
         const damaged = room.find(FIND_MY_STRUCTURES, {
             filter: (structure) => {
                 if (structure.structureType == STRUCTURE_RAMPART)
@@ -39,7 +39,7 @@ const consume_cache_updater: {
         return tasks
     },
     decayed: function (room: Room) {
-        var tasks: PosedCreepTask<"repair">[] = []
+        const tasks: PosedCreepTask<"repair">[] = [];
         const decayed = room.find(FIND_STRUCTURES, {
             filter: (structure) => {
                 if (structure.structureType == STRUCTURE_ROAD)
@@ -57,9 +57,9 @@ const consume_cache_updater: {
         return tasks
     },
     fortify: function (room: Room) {
-        var wallHits = room.memory.wall_hits
+        let wallHits = room.memory.wall_hits;
         if (!wallHits) return []
-        var tasks: PosedCreepTask<"repair">[] = []
+        const tasks: PosedCreepTask<"repair">[] = [];
         let walls = room.find(FIND_STRUCTURES, {
             filter: (structure) => {
                 if (structure.hits > structure.hitsMax - 10000)
@@ -129,7 +129,7 @@ const consume_cache_updater: {
     },
 
     T_ext: function (room: Room): RestrictedPrimitiveDescript<'transfer', 'energy'>[] {
-        var tasks: RestrictedPrimitiveDescript<'transfer', 'energy'>[] = []
+        const tasks: RestrictedPrimitiveDescript<'transfer', 'energy'>[] = [];
         if (room.energyAvailable == room.energyCapacityAvailable)
             return []
         const extensions: (AnyStoreStructure & AnyOwnedStructure)[] = room.find(FIND_MY_STRUCTURES, {
@@ -154,7 +154,7 @@ const consume_cache_updater: {
     T_cntn: function (room: Room): RestrictedPrimitiveDescript<'transfer', 'energy'>[] {
         const T_cntn = Memory.T_cntn[room.name]
         if (!T_cntn) return []
-        var tasks: RestrictedPrimitiveDescript<'transfer', 'energy'>[] = []
+        const tasks: RestrictedPrimitiveDescript<'transfer', 'energy'>[] = [];
         for (let id of T_cntn) {
             const container = Game.getObjectById(id)
             if (container && container.store.getFreeCapacity('energy') >= 1000)

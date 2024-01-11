@@ -13,7 +13,13 @@ export const loop = function () {
         _format_room
         HelperRoomResource.showAllRes()
         expand_commo
-        Game.market.createOrder({type: 'buy', resourceType: 'pixel', price: 0.001, totalAmount: 1, roomName: 'sim'})
+        Game.market.createOrder({
+            type: 'buy',
+            resourceType: 'accessKey',
+            price: 0.001,
+            totalAmount: 1000,
+            roomName: 'sim'
+        })
         //Memory.terminal.demand['X']['E41S51'] = 60000
     }
 

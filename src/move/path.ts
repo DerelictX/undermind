@@ -54,7 +54,7 @@ export const crawlTo = function (creep: AnyCreep, targetPos: RoomPosition) {
 /**房内寻路 */
 const seekTo = function (creep: AnyCreep, targetPos: RoomPosition) {
     if (!creep.room) return ERR_NOT_FOUND
-    var x = targetPos.x, y = targetPos.y, roomName = targetPos.roomName
+    const x = targetPos.x, y = targetPos.y, roomName = targetPos.roomName;
     delete creep.memory._move;
     const path = creep.room.findPath(creep.pos, targetPos, {
         ignoreCreeps: true,

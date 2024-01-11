@@ -97,12 +97,10 @@ export const HelperRoomResource = {
         const b_grey: ResourceConstant[] = ["OH", "ZK", "UL", "G"]
 
         const formatNumber = function (n: number): string {
-            var b = n.toString();
-            var len = b.length;
-            if (len <= 3) {
-                return b;
-            }
-            var r = len % 3;
+            const b = n.toString();
+            const len = b.length;
+            if (len <= 3) return b;
+            const r = len % 3;
             if (r > 0) return b.slice(0, r) + "," + b.slice(r, len).match(/\d{3}/g)?.join(",")
             else return '' + b.slice(r, len).match(/\d{3}/g)?.join(",");
         }

@@ -57,7 +57,7 @@ export const T_fact = function (room: Room) {
     const config = room.memory.factory
     const factory = config?.fact_id ? Game.getObjectById(config.fact_id) : null
     if (!config || !terminal || !factory) return []
-    var tasks: RestrictedPrimitiveDescript<'transfer'>[] = []
+    const tasks: RestrictedPrimitiveDescript<'transfer'>[] = [];
 
     const demand = Memory.factory.demand[factory.level ?? 0]
     let component: ResourceConstant
@@ -77,7 +77,7 @@ export const W_fact = function (room: Room) {
     const config = room.memory.factory
     const factory = config?.fact_id ? Game.getObjectById(config.fact_id) : null
     if (!config || !terminal || !factory) return []
-    var tasks: RestrictedPrimitiveDescript<'withdraw'>[] = []
+    const tasks: RestrictedPrimitiveDescript<'withdraw'>[] = [];
 
     const demand = Memory.factory.demand[factory.level ?? 0]
     let resourceType: ResourceConstant

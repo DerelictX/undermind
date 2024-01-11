@@ -210,8 +210,8 @@ const lazy_restock = function (creep: Creep, fb: CarrierMemory) {
     if (!storage || !storage.my || storage.store.getFreeCapacity() < 50000)
         return
 
-    var store: StorePropertiesOnly = creep.store
-    var resourceType: keyof typeof store
+    const store: StorePropertiesOnly = creep.store;
+    let resourceType: keyof typeof store;
     for (resourceType in store) {   //遍历资源
         fb.consume.push(parse_posed_task({
             pos: storage.pos,

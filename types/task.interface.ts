@@ -1,5 +1,5 @@
 type ResSource = FilterCollectKey<CarryAction & CollectAction, ResourceConstant>
-type ResSink = FilterConsumeKey<CarryAction, ResourceConstant>
+type ResSink = FilterConsumeKey<CarryAction & ConsumeAction, ResourceConstant>
 
 type FilterCollectKey<T extends WorkAction | CarryAction, R extends ResourceConstant> =
     ValueTypes<{

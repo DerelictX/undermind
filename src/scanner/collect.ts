@@ -18,13 +18,13 @@ const collect_cache_updater: {
     W_cntn: function (room: Room) {
         const W_cntn = Memory.W_cntn[room.name]
         if (!W_cntn) return []
-        var tasks: RestrictedPrimitiveDescript<'withdraw', ResourceConstant>[] = []
+        const tasks: RestrictedPrimitiveDescript<'withdraw', ResourceConstant>[] = [];
         for (let id of W_cntn) {
             const container = Game.getObjectById(id)
             if (!container || container.store.getFreeCapacity('energy') > 800)
                 continue
-            var store: StorePropertiesOnly = container.store
-            var resourceType: keyof typeof store
+            const store: StorePropertiesOnly = container.store;
+            let resourceType: keyof typeof store;
             for (resourceType in store) {
                 tasks.push({action: 'withdraw', args: [container.id, resourceType], pos: container.pos})
             }
@@ -48,7 +48,7 @@ const collect_cache_updater: {
      * @returns
      */
     loot: function (room: Room) {
-        var tasks: PosedCreepTask<"withdraw">[] = []
+        const tasks: PosedCreepTask<"withdraw">[] = [];
         const hostile_stores: (AnyStoreStructure & AnyOwnedStructure)[] = room.find(FIND_HOSTILE_STRUCTURES, {
             filter: (structure) => {
                 if (structure.structureType == STRUCTURE_STORAGE
@@ -58,8 +58,8 @@ const collect_cache_updater: {
             }
         })
         for (let hostile_store of hostile_stores) {
-            var store: StorePropertiesOnly = hostile_store.store
-            var resourceType: keyof typeof store
+            const store: StorePropertiesOnly = hostile_store.store;
+            let resourceType: keyof typeof store;
             for (resourceType in store) {
                 tasks.push({
                     action: 'withdraw',
@@ -76,7 +76,8 @@ const collect_cache_updater: {
      * @returns
      */
     sweep: function (room: Room) {
-        var tasks: PosedCreepTask<"withdraw" | "pickup">[] = []
+        let store: StorePropertiesOnly;
+        const tasks: PosedCreepTask<"withdraw" | "pickup">[] = [];
         const tombstones: Tombstone[] = room.find(FIND_TOMBSTONES, {
             filter: (tombstone) => {
                 if (tombstone.store.getUsedCapacity() >= 200)
@@ -89,8 +90,8 @@ const collect_cache_updater: {
             }
         })
         for (let tombstone of tombstones) {
-            var store: StorePropertiesOnly = tombstone.store
-            var resourceType: keyof typeof store
+            store = tombstone.store;
+            let resourceType: keyof typeof store;
             for (resourceType in store) {
                 tasks.push({
                     action: 'withdraw',
@@ -106,8 +107,8 @@ const collect_cache_updater: {
             }
         })
         for (let ruin of ruins) {
-            var store: StorePropertiesOnly = ruin.store
-            var resourceType: keyof typeof store
+            store = ruin.store;
+            let resourceType: keyof typeof store;
             for (resourceType in store) {
                 if (resourceType == 'ops' ||
                     resourceType != 'G' && resourceType.length == 1)
@@ -141,7 +142,7 @@ const collect_cache_updater: {
     H_srcs: function (room: Room) {
         const H_srcs = Memory.H_srcs[room.name]
         if (!H_srcs) return []
-        var tasks: RestrictedPrimitiveDescript<'harvest', 'energy'>[] = []
+        const tasks: RestrictedPrimitiveDescript<'harvest', 'energy'>[] = [];
         for (let id of H_srcs) {
             const source = Game.getObjectById(id)
             if (source?.energy)
@@ -150,7 +151,7 @@ const collect_cache_updater: {
         return tasks
     },
     W_energy: function (room: Room) {
-        var tasks: RestrictedPrimitiveDescript<'withdraw' | 'pickup', 'energy'>[] = []
+        const tasks: RestrictedPrimitiveDescript<'withdraw' | 'pickup', 'energy'>[] = [];
         const storage = room.storage ?? room.terminal
         if (storage && storage.store['energy'] >= 10000) {
             tasks.push({

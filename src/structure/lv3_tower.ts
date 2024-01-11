@@ -1,7 +1,7 @@
 export const tower_run = function (room: Room) {
     const towers = room.memory.towers;
     if (!towers) return
-    var tower: StructureTower | null = Game.getObjectById(towers[0]);
+    let tower: StructureTower | null = Game.getObjectById(towers[0]);
     if (!tower) return
 
     const closestHostile = tower.pos.findClosestByRange(FIND_HOSTILE_CREEPS);
@@ -15,7 +15,7 @@ export const tower_run = function (room: Room) {
 
 export const T_tower = function (room: Room): RestrictedPrimitiveDescript<'transfer', 'energy'>[] {
     if (!room.memory.towers) return []
-    var tasks: RestrictedPrimitiveDescript<'transfer', 'energy'>[] = []
+    const tasks: RestrictedPrimitiveDescript<'transfer', 'energy'>[] = [];
     const towers = room.memory.towers
         .map(id => Game.getObjectById(id))
         .filter(s => s && s.store.getFreeCapacity('energy') >= 400)

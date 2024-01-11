@@ -91,7 +91,7 @@ export const room_memory_initializer: {
         const labs: StructureLab[] = room_obj.find(FIND_MY_STRUCTURES, {
             filter: {structureType: STRUCTURE_LAB}
         });
-        var near_num: number[] = []
+        const near_num: number[] = [];
         for (let i in labs) {
             const lab = labs[i]
             near_num[i] = lab.pos.findInRange(FIND_MY_STRUCTURES, 2, {
