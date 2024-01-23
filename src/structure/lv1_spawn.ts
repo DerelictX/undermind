@@ -24,6 +24,7 @@ export const spawn_run = function (room: Room) {
     let workload = spawn_task._body.workload
     let mobility = spawn_task._body.mobility
     let boost = spawn_task._body.boost
+    /**默认走在路上，其它Part是MOVE的两倍 */
     if (!mobility) mobility = 2
 
     let looper = Memory.flags[spawn_task._caller]?._loop
@@ -54,7 +55,7 @@ export const spawn_run = function (room: Room) {
     }
 }
 
-export const publish_spawn_task = function (task: SpawnTask) {
+export const publish_spawn_task = function (task: CalledSpawnTask) {
     const dest_room = Game.flags[task._caller]?.pos.roomName
     const queue = Memory.rooms[dest_room]?.spawns?.t1
     if (queue && queue.length < 20) queue.push(task)

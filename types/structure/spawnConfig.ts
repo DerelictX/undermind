@@ -1,15 +1,18 @@
 interface SpawnConfig {
-    t0: SpawnTask[]
-    t1: SpawnTask[]
-    t2: SpawnTask[]
-    t3: SpawnTask[]
+    t0: CalledSpawnTask[]
+    t1: CalledSpawnTask[]
+    t2: CalledSpawnTask[]
+    t3: CalledSpawnTask[]
 }
 
 type SpawnTask = {
-    _caller: string
     _body: CreepBodyConfig
     _class: CreepMemory['_class']
 }
+
+type CalledSpawnTask = {
+    _caller: string
+} & SpawnTask
 
 type body_generator_name =
     | "W" | "C" | "WC" | "Wc"
