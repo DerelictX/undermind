@@ -209,14 +209,12 @@ const handlers: {
         if (!room?.storage?.my) {
             return [{
                 _body: {generator: 'C', workload: 16},
-                _class: init_worker_behavior('EnergySupplier', room_name, room_name),
-
+                _class: init_worker_behavior('EnergySupplier', room_name, room_name)
             }]
         }
         return [{
             _body: {generator: 'C', workload: 16},
-            _class: init_carrier_behavior('Supplier', room.name, room.name),
-
+            _class: init_carrier_behavior('Supplier', room.name, room.name)
         }]
     }, _upgrade: function (flag: Flag): SpawnTask[] {
         const controller = flag.room?.controller
