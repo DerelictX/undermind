@@ -26,7 +26,9 @@ const collect_cache_updater: {
             const store: StorePropertiesOnly = container.store;
             let resourceType: keyof typeof store;
             for (resourceType in store) {
-                tasks.push({action: 'withdraw', args: [container.id, resourceType], pos: container.pos})
+                tasks.push({
+                    action: 'withdraw', args: [container.id, resourceType], pos: container.pos
+                })
             }
         }
         return tasks
@@ -37,9 +39,7 @@ const collect_cache_updater: {
         if (!nexus || nexus.store['energy'] < 600)
             return []
         return [{
-            action: 'withdraw',
-            args: [nexus.id, 'energy'],
-            pos: nexus.pos
+            action: 'withdraw', args: [nexus.id, 'energy'], pos: nexus.pos
         }]
     },
     /**
@@ -51,8 +51,9 @@ const collect_cache_updater: {
         const tasks: PosedCreepTask<"withdraw">[] = [];
         const hostile_stores: (AnyStoreStructure & AnyOwnedStructure)[] = room.find(FIND_HOSTILE_STRUCTURES, {
             filter: (structure) => {
-                if (structure.structureType == STRUCTURE_STORAGE
-                    || structure.structureType == STRUCTURE_TERMINAL)
+                if (structure.structureType == STRUCTURE_STORAGE ||
+                    structure.structureType == STRUCTURE_TERMINAL ||
+                    structure.structureType == STRUCTURE_FACTORY)
                     return structure.store.getUsedCapacity() > 0
                 return false
             }
@@ -84,9 +85,7 @@ const collect_cache_updater: {
                     return true
                 if (tombstone.creep.owner.username == 'Invader')
                     return false
-                if (tombstone.store.getUsedCapacity() > tombstone.store['energy'])
-                    return true
-                return false
+                return tombstone.store.getUsedCapacity() > tombstone.store['energy']
             }
         })
         for (let tombstone of tombstones) {
@@ -114,9 +113,7 @@ const collect_cache_updater: {
                     resourceType != 'G' && resourceType.length == 1)
                     continue
                 tasks.push({
-                    action: 'withdraw',
-                    args: [ruin.id, resourceType],
-                    pos: ruin.pos
+                    action: 'withdraw', args: [ruin.id, resourceType], pos: ruin.pos
                 })
             }
         }
@@ -128,15 +125,28 @@ const collect_cache_updater: {
         })
         for (let resource of dropped) {
             tasks.push({
-                action: 'pickup',
-                args: [resource.id],
-                pos: resource.pos
+                action: 'pickup', args: [resource.id], pos: resource.pos
             })
         }
         return tasks
     },
     recycle: function (room: Room): PosedCreepTask<"dismantle">[] {
-        return []
+        const tasks: PosedCreepTask<"dismantle">[] = [];
+        const hostile_structs: AnyOwnedStructure[] = room.find(FIND_HOSTILE_STRUCTURES, {
+            filter: (structure) => {
+                if (structure.structureType == STRUCTURE_STORAGE ||
+                    structure.structureType == STRUCTURE_TERMINAL ||
+                    structure.structureType == STRUCTURE_FACTORY)
+                    return structure.store.getUsedCapacity() <= 0
+                return structure.structureType == STRUCTURE_RAMPART
+            }
+        })
+        for (let struct of hostile_structs) {
+            tasks.push({
+                action: 'dismantle', args: [struct.id], pos: struct.pos
+            })
+        }
+        return tasks
     },
 
     H_srcs: function (room: Room) {
@@ -146,7 +156,9 @@ const collect_cache_updater: {
         for (let id of H_srcs) {
             const source = Game.getObjectById(id)
             if (source?.energy)
-                tasks.push({action: 'harvest', args: [id], pos: source.pos})
+                tasks.push({
+                    action: 'harvest', args: [id], pos: source.pos
+                })
         }
         return tasks
     },
@@ -155,9 +167,7 @@ const collect_cache_updater: {
         const storage = room.storage ?? room.terminal
         if (storage && storage.store['energy'] >= 10000) {
             tasks.push({
-                action: 'withdraw',
-                args: [storage.id, 'energy'],
-                pos: storage.pos
+                action: 'withdraw', args: [storage.id, 'energy'], pos: storage.pos
             })
         }
         if (tasks.length)
@@ -169,9 +179,7 @@ const collect_cache_updater: {
                 const container = Game.getObjectById(id)
                 if (container && container.store['energy'] >= 800) {
                     tasks.push({
-                        action: 'withdraw',
-                        args: [container.id, 'energy'],
-                        pos: container.pos
+                        action: 'withdraw', args: [container.id, 'energy'], pos: container.pos
                     })
                 }
             }
@@ -182,9 +190,7 @@ const collect_cache_updater: {
             for (let link of links) {
                 if (link && link.store['energy'] >= 600) {
                     tasks.push({
-                        action: 'withdraw',
-                        args: [link.id, 'energy'],
-                        pos: link.pos
+                        action: 'withdraw', args: [link.id, 'energy'], pos: link.pos
                     })
                 }
             }
@@ -199,9 +205,7 @@ const collect_cache_updater: {
         })
         for (let resource of dropped) {
             tasks.push({
-                action: 'pickup',
-                args: [resource.id],
-                pos: resource.pos
+                action: 'pickup', args: [resource.id], pos: resource.pos
             })
         }
         return tasks
