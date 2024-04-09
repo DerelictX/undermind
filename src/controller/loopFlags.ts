@@ -199,7 +199,7 @@ const handlers: {
         //spawn
         if (!task.consume[0]) {
             const fromPos = source.room.storage?.pos ?? source.room.controller?.pos
-            if (fromPos) createHarvestRoad(fromPos, source.pos)
+            if (fromPos && Game.shard.name != 'shard3') createHarvestRoad(fromPos, source.pos)
             return [{_body: {generator: 'W', workload: 5, mobility: 1}, _class: task}]
         }
         return [{_body: {generator: 'Wc', workload: 10}, _class: task}]

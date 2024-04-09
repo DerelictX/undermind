@@ -1,5 +1,5 @@
 import {body_generator} from "@/constant/config.body";
-import {ceil, floor} from "lodash";
+import {floor} from "lodash";
 import {publish_boost_task} from "./lv6_lab";
 
 export const spawn_run = function (room: Room) {
@@ -25,7 +25,9 @@ export const spawn_run = function (room: Room) {
     let mobility = spawn_task._body.mobility
     let boost = spawn_task._body.boost
     /**默认走在路上，其它Part是MOVE的两倍 */
-    if (!mobility) mobility = 2
+    if (!mobility) {
+        mobility = Game.shard.name == 'shard3' ? 2 : 1;
+    }
 
     let looper = Memory.flags[spawn_task._caller]?._loop
     if (!looper) return

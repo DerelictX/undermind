@@ -2,7 +2,7 @@ import {approach} from "@/move/action.virtual"
 import {carry_priority} from "@/role/initializer/config.behavior"
 import {update_col_cache} from "@/scanner/collect"
 import {update_con_cache} from "@/scanner/consume"
-import {action_range, parse_posed_task, perform_callback, TASK_DOING} from "../../performer/behavior.callback"
+import {action_range, parse_posed_task, perform_callback, TASK_DOING} from "@/performer/behavior.callback"
 
 export const run_carrier = function (creep: Creep, fb: CarrierMemory) {
     if (fb.state == 'idle') {
