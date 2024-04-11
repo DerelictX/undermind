@@ -80,9 +80,8 @@ export const room_memory_initializer: {
     },
     labs: function (room_mem: RoomMemory, room_obj?: Room): void {
         room_mem.labs = {
-            ins: [],
-            outs: [],
-            reaction: null,
+            labs: {},
+            target_res: {},
             boost_type: {},
             boost_lab: {},
             boost_amount: {}
@@ -91,17 +90,14 @@ export const room_memory_initializer: {
         const labs: StructureLab[] = room_obj.find(FIND_MY_STRUCTURES, {
             filter: {structureType: STRUCTURE_LAB}
         });
-        const near_num: number[] = [];
         for (let i in labs) {
             const lab = labs[i]
-            near_num[i] = lab.pos.findInRange(FIND_MY_STRUCTURES, 2, {
-                filter: {structureType: STRUCTURE_LAB}
-            }).length;
-        }
-        for (let i in labs) {
-            if (labs.length > 3 && near_num[i] == labs.length && room_mem.labs.ins.length < 2)
-                room_mem.labs.ins.push(labs[i].id)
-            else room_mem.labs.outs.push(labs[i].id)
+            room_mem.labs.labs[lab.id] = {
+                react_type: 'base',
+                near_num: lab.pos.findInRange(FIND_MY_STRUCTURES, 2, {
+                    filter: {structureType: STRUCTURE_LAB}
+                }).length
+            }
         }
     },
     factory: function (room_mem: RoomMemory, room_obj?: Room): void {

@@ -1,7 +1,9 @@
 type sLabConfig = {
     react_type: 'base'
+    near_num: number
 } | {
     react_type: 'run' | 'reverse'
+    near_num: number
     lab1: Id<StructureLab>
     lab2: Id<StructureLab>
 }
