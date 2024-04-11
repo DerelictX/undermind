@@ -1,7 +1,14 @@
+type sLabConfig = {
+    react_type: 'base'
+} | {
+    react_type: 'run' | 'reverse'
+    lab1: Id<StructureLab>
+    lab2: Id<StructureLab>
+}
+
 interface LabConfig {
-    ins: Id<StructureLab>[]
-    outs: Id<StructureLab>[]
-    reaction: MineralCompoundConstant | null
+    labs: Record<Id<StructureLab>, sLabConfig>
+    target_res: Partial<Record<Id<StructureLab>, MineralConstant | MineralCompoundConstant>>
     boost_type: Partial<Record<Id<StructureLab>, MineralBoostConstant>>
     boost_lab: Partial<Record<MineralBoostConstant, Id<StructureLab>>>
     boost_amount: Partial<Record<MineralBoostConstant, number>>

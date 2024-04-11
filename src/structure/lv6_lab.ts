@@ -4,57 +4,43 @@ import {demand_res} from "./lv6_terminal";
 import {approach} from "@/move/action.virtual";
 
 export const lab_run = function (room: Room) {
-    const labs = room.memory.labs
-    const reaction = labs?.reaction
-    if (!reaction) return
-    const labs_in0 = Game.getObjectById(labs.ins[0]);
-    const labs_in1 = Game.getObjectById(labs.ins[1]);
-    if (!labs_in0 || !labs_in1) return
+    const room_config = room.memory.labs
+    if (!room_config) return
 
-    const opts: TextStyle = {
-        font: 0.5, color: '#FF7F7F',
-        stroke: '#7F7F00',
-        strokeWidth: 0.1
-    }
-    room.visual.text(reactions[reaction][0], labs_in0.pos, opts)
-    room.visual.text(reactions[reaction][1], labs_in1.pos, opts)
-    if (labs_in0.mineralType != reactions[reaction][0]
-        || labs_in1.mineralType != reactions[reaction][1])
-        return
-
-    const labs_out = labs.outs;
-    for (const id of labs_out) {
-        let lab = Game.getObjectById(id);
-        if (!lab || labs.boost_type[id])
+    let id: Id<StructureLab>;
+    for (id in room_config.labs) {
+        const config = room_config.labs[id]
+        const lab0 = Game.getObjectById(id)
+        if (!lab0 || config.react_type == 'base')
             continue;
-        let ret = lab.runReaction(labs_in0, labs_in1);
-        if (ret != OK)
-            break;
+        const lab1 = Game.getObjectById(config.lab1)
+        const lab2 = Game.getObjectById(config.lab2)
+        if (!lab1 || !lab2) continue;
+        switch (config.react_type) {
+            case 'run':
+                if (room_config.target_res[config.lab1] == lab1.mineralType &&
+                    room_config.target_res[config.lab2] == lab2.mineralType) {
+                    lab0.runReaction(lab1, lab2);
+                }
+                break;
+            case 'reverse':
+                if (room_config.target_res[id] == lab1.mineralType)
+                    lab0.reverseReaction(lab1, lab2);
+                break;
+        }
     }
 }
 
 export const change_reaction = function (room: Room): MineralCompoundConstant | null {
     const storage = room.storage
     const terminal = room.terminal
-    const labs = room.memory.labs
-    if (!storage?.my || !terminal?.my || !labs) return null
+    const room_config = room.memory.labs
+    if (!storage?.my || !terminal?.my || !room_config) return null
 
     const list: ResourceConstant[] = ['X', 'OH', 'O', 'H']
     for (let resourceType of list)
-        if (terminal.store[resourceType] < 1000) {
+        if (terminal.store[resourceType] < 1000)
             demand_res(terminal, resourceType, 1000)
-        }
-
-    const reaction = labs.reaction
-    if (reaction && reaction.length > 2) {
-        /**当前reaction */
-        const labs_in0 = Game.getObjectById(labs.ins[0]);
-        const labs_in1 = Game.getObjectById(labs.ins[1]);
-        if (!labs_in0 || !labs_in1) return null
-        if (labs_in0.store[reactions[reaction][0]] > 200
-            && labs_in1.store[reactions[reaction][1]] > 200)
-            return reaction
-    }
 
     /**Base */
     let reactant0: keyof typeof companion_base
@@ -66,7 +52,7 @@ export const change_reaction = function (room: Room): MineralCompoundConstant | 
         if (terminal.store[reactant0] < 1000)
             continue
         if (terminal.store[reactant1] >= 1000) {
-            return labs.reaction = target
+            return target
         } else {
             demand_res(terminal, reactant1, 1000)
         }
@@ -78,7 +64,7 @@ export const change_reaction = function (room: Room): MineralCompoundConstant | 
     for (let target of reacts) {
         const reactants = reactions[target]
         if (terminal.store[reactants[0]] >= 1000 && terminal.store[reactants[1]] >= 1000) {
-            return labs.reaction = target
+            return target
         }
     }
 
@@ -92,35 +78,32 @@ export const change_reaction = function (room: Room): MineralCompoundConstant | 
             continue
         const reactants = reactions[tier1]
         if (storage.store[reactants[0]] >= 1000 && terminal.store[reactants[1]] >= 1000) {
-            return labs.reaction = tier1
+            return tier1
         }
     }
-    return labs.reaction = null
+    return null
 }
 _.assign(global, {change_reaction: change_reaction})
 
 export const T_react = function (room: Room): PosedCreepTask<"transfer">[] {
-
     const terminal = room.terminal
-    const labs = room.memory.labs
-    const compoundType = labs?.reaction
-    if (!terminal || !compoundType) return []
-
+    const room_config = room.memory.labs
+    if (!terminal || !room_config) return []
     const tasks: PosedCreepTask<'transfer'>[] = [];
-    for (let i in labs.ins) {
-        const reactantType = reactions[compoundType][i]
-        const lab_in = Game.getObjectById(labs.ins[i])
-        if (!lab_in) continue
 
+    let id: Id<StructureLab>;
+    for (id in room_config.labs) {
+        if (room_config.boost_type[id]) continue
+        const targetRes = room_config.target_res[id]
+        const lab = Game.getObjectById(id)
+        if (!lab || !targetRes) continue
         //reactant
-        if (lab_in.store.getFreeCapacity(reactantType) > 2400) {
-            if (!terminal.store[reactantType]) {
-                return []
-            }
+        if (lab.store.getFreeCapacity(targetRes) > 2400) {
+            if (!terminal.store[targetRes]) return []
             tasks.push({
                 action: 'transfer',
-                args: [lab_in.id, reactantType, 400],
-                pos: lab_in.pos
+                args: [lab.id, targetRes, 400],
+                pos: lab.pos
             })
         }
     }
@@ -164,47 +147,33 @@ export const T_boost = function (room: Room): PosedCreepTask<"transfer">[] {
  * @returns
  */
 export const compound = function (room: Room) {
-    const labs = room.memory.labs
-    if (!labs) return []
-    const compoundType = labs.reaction
+    const room_config = room.memory.labs
+    if (!room_config) return []
     const tasks: PosedCreepTask<"withdraw">[] = [];
-    for (let i in labs.ins) {
-        const reactantType = compoundType ? reactions[compoundType][i] : null
-        const lab_in = Game.getObjectById(labs.ins[i])
-        if (!lab_in)
-            continue
-        /**反应底物不对，取出来 */
-        if (lab_in.mineralType && reactantType != lab_in.mineralType) {
-            tasks.push({
-                action: 'withdraw',
-                args: [lab_in.id, lab_in.mineralType],
-                pos: lab_in.pos
-            })
-        }
-    }
 
-    for (let id of labs.outs) {
-        const boostType = labs.boost_type[id]
-        const lab_out = Game.getObjectById(id)
-        if (!lab_out) continue
+    let id: Id<StructureLab>;
+    for (id in room_config.labs) {
+        const lab = Game.getObjectById(id)
+        if (!lab?.mineralType) continue
 
+        const boostType = room_config.boost_type[id]
         if (boostType) {
-            /**boost化合物类型不对 */
-            if (lab_out.mineralType && boostType != lab_out.mineralType) {
+            if (boostType != lab.mineralType) {
                 tasks.push({
                     action: 'withdraw',
-                    args: [lab_out.id, lab_out.mineralType, lab_out.store[lab_out.mineralType]],
-                    pos: lab_out.pos
+                    args: [lab.id, lab.mineralType, lab.store[lab.mineralType]],
+                    pos: lab.pos
                 })
             }
         } else {
-            /**收集反应产物 */
-            if (lab_out.mineralType && (compoundType != lab_out.mineralType
-                || lab_out.store[compoundType] >= (tasks.length ? 200 : 300))) {
+            const config = room_config.labs[id]
+            const targetRes = room_config.target_res[id]
+            if (targetRes != lab.mineralType || config.react_type == 'run'
+                && lab.store[targetRes] >= (tasks.length ? 200 : 300)) {
                 tasks.push({
                     action: 'withdraw',
-                    args: [lab_out.id, lab_out.mineralType, lab_out.store[lab_out.mineralType]],
-                    pos: lab_out.pos
+                    args: [lab.id, lab.mineralType, lab.store[lab.mineralType]],
+                    pos: lab.pos
                 })
             }
         }
@@ -264,29 +233,31 @@ export function run_for_boost(creep: Creep) {
     delete creep.memory._life.boost
 }
 
-function check_boost_labs(labs: LabConfig) {
+function check_boost_labs(room_config: LabConfig) {
     let missing_lab: MineralBoostConstant[] = []
     let res: MineralBoostConstant
-    for (res in labs.boost_amount) {
-        if ((labs.boost_amount[res] ?? 0) <= 0) {
-            delete labs.boost_lab[res]
-        } else if (!labs.boost_lab[res]) {
+    for (res in room_config.boost_amount) {
+        if ((room_config.boost_amount[res] ?? 0) <= 0) {
+            delete room_config.boost_lab[res]
+        } else if (!room_config.boost_lab[res]) {
             missing_lab.push(res)
         }
     }
 
-    for (let id of labs.outs) {
-        let res = labs.boost_type[id]
+    let id: Id<StructureLab>;
+    for (id in room_config.labs) {
+        const config = room_config.labs[id]
+        let res = room_config.boost_type[id]
         if (res) {
-            if (labs.boost_lab[res] == id)
+            if (room_config.boost_lab[res] == id)
                 continue
             else
-                delete labs.boost_type[id]
+                delete room_config.boost_type[id]
         }
         res = missing_lab.pop()
         if (res) {
-            labs.boost_type[id] = res
-            labs.boost_lab[res] = id
+            room_config.boost_type[id] = res
+            room_config.boost_lab[res] = id
         }
     }
 }
