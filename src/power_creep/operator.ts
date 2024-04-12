@@ -86,19 +86,6 @@ function find_power_task(operator: PowerCreep, room: Room) {
             operator.memory._power.push({power: PWR_OPERATE_FACTORY, target: factory.id})
         }
     }
-
-    if (operator.powers[PWR_OPERATE_LAB] && !operator.powers[PWR_OPERATE_LAB].cooldown) {
-        const labs = room.memory.labs
-        if (labs?.reaction) {
-            for (let id of labs.outs) {
-                const lab_in = Game.getObjectById(id)
-                if (lab_in && !lab_in.effects?.[0] && lab_in.cooldown > 0) {
-                    operator.memory._power.push({power: PWR_OPERATE_LAB, target: id})
-                    break
-                }
-            }
-        }
-    }
 }
 
 const perform_normal = function (operator: PowerCreep, task: PowerActionDescript<PowerAction>) {
