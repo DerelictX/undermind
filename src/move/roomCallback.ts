@@ -28,11 +28,11 @@ export const autoRoadCallback = function (roomName: string) {
     return costs;
 }
 
-const squadCallback = function (roomName: string) {
+export const squadCallback = function (roomName: string) {
     const matrix = global.squadMatrix[roomName]
     if (matrix) return PathFinder.CostMatrix.deserialize(matrix)
     let room = Game.rooms[roomName]
-    if (!room) return false
+    if (!room) return
     let costs = new PathFinder.CostMatrix
 
     const terrain = new Room.Terrain(roomName)

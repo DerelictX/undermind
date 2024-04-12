@@ -1,6 +1,7 @@
 import _ from "lodash";
 import {base64table} from "@/move/Kuhn-Munkres";
 import {approach} from "@/move/action.virtual";
+import {squadCallback} from "@/move/roomCallback";
 
 const crawlTo = function (squad: SquadMemory, targetPos: RoomPosition) {
     const roomName = targetPos.roomName
@@ -60,6 +61,7 @@ const seekToPos = function (squad: SquadMemory, targetPos: RoomPosition) {
     delete squad._move;
     const room = Game.rooms[squad.head_pos.roomName]
     const path = room.findPath(squad.head_pos, targetPos, {
+        costCallback: squadCallback,
         ignoreCreeps: true,
         maxRooms: 1
     });
