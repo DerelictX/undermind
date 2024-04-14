@@ -12,7 +12,7 @@ interface FlagMemory {
         _time: number
         interval: number
     }
-    _squad: SquadMemory
+    _squad?: SquadMemory
 }
 
 interface SquadMemory extends MoveMemory {

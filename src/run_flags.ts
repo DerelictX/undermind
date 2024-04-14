@@ -1,6 +1,6 @@
 import {loop_flags} from "@/controller/loopFlags";
-import {approach} from "@/move/action.virtual";
 import {hikeTo} from "@/move/route";
+import _ from "lodash";
 
 export const run_flags = function () {
     for (let name in Memory.flags) {
@@ -19,9 +19,54 @@ export const run_flags = function () {
     }
 }
 
+export const init_loop_flag = function (name: string, key: AnyLoopType) {
+    Memory.flags[name] = {
+        _class: '_loop', _loop: {
+            _loop_type: key, _time: 0, interval: 1500
+        }
+    }
+}
+_.assign(global, {init_loop_flag: init_loop_flag})
+
+export const init_room_flag = function (room: Room) {
+    if (!room.controller?.my) return
+    {
+        const flag_name = room.name + '_supply'
+        if (!Game.flags[flag_name]) {
+            init_loop_flag(flag_name, '_supply')
+            room.createFlag(room.controller.pos, flag_name)
+        }
+    }
+    {
+        const flag_name = room.name + '_maintain'
+        if (!Game.flags[flag_name]) {
+            init_loop_flag(flag_name, '_maintain')
+            room.createFlag(room.controller.pos, flag_name)
+        }
+    }
+    const sources = room.find(FIND_SOURCES)
+    for (let i in sources) {
+        const source = sources[i]
+        const flag_name = room.name + '_source' + i
+        if (!Game.flags[flag_name]) {
+            init_loop_flag(flag_name, '_source')
+            room.createFlag(source.pos, flag_name)
+        }
+    }
+    {
+        const flag_name = room.name + '_upgrade'
+        if (!Game.flags[flag_name]) {
+            init_loop_flag(flag_name, '_upgrade')
+            room.createFlag(room.controller.pos, flag_name)
+        }
+    }
+}
+_.assign(global, {init_room_flag: init_room_flag})
+
 const run_squad = function (flag: Flag) {
     //const offset = (0 << 0) | (1 << 2) | (3 << 4) | (2 << 6)
     const _squad = flag.memory._squad
+    if (!_squad) return;
     let ready = true
     for (const creep_name in _squad.member) {
         const creep = Game.creeps[creep_name]

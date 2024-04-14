@@ -218,7 +218,7 @@ const handlers: {
         }]
     }, _upgrade: function (flag: Flag): SpawnTask[] {
         const controller = flag.room?.controller
-        if (!controller || Game.cpu.bucket < 9950 || controller.level >= 8) return []
+        if (!controller || Game.cpu.bucket < 9950) return []
         const storage = controller.room.storage
         if (storage?.my && storage.store.energy <= 15000 * controller.level) return []
         const task: StaticMemory = {
