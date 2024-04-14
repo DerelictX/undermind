@@ -40,7 +40,7 @@ const handlers: {
     }, _chemist(flag: Flag): SpawnTask[] {
         const room = flag.room
         if (!room?.terminal?.my) return []
-        change_reaction(room)
+        //change_reaction(room)
         return [{
             _body: {generator: 'C', workload: 16},
             _class: init_carrier_behavior('Chemist', room.name, room.name)
@@ -95,6 +95,13 @@ const handlers: {
         if (room.storage && room.controller) {
             if (room.storage.store.energy < room.controller.level * 20000)
                 return []
+        }
+        const storage = room.storage
+        if (storage?.my && storage.store['XGH2O'] >= 3000) {
+            return [{
+                _body: {generator: 'WC', workload: 32, boost: {work: 'XLH2O'}},
+                _class: init_worker_behavior('Builder', room.name, room.name)
+            }]
         }
         return [{
             _body: {generator: 'WC', workload: 32},
@@ -237,6 +244,13 @@ const handlers: {
         energy_structs.sort((a, b) => a.store.getCapacity('energy') - b.store.getCapacity('energy'))
         for (let struct of energy_structs) {
             task.collect.push({action: 'withdraw', args: [struct.id, 'energy'], pos: struct.pos})
+        }
+        if (storage?.my && storage.store['XGH2O'] >= 3000) {
+            return [{
+                _body: {
+                    generator: 'Wc', workload: 15, boost: {work: 'XGH2O'}
+                }, _class: task
+            }]
         }
         return [{_body: {generator: 'Wc', workload: 15}, _class: task}]
     }, _feed(flag: Flag): SpawnTask[] {

@@ -5,7 +5,7 @@ export const terminal_run = function (room: Room) {
     const storage = room.storage
     const terminal = room.terminal
     if (!storage || !terminal?.my || terminal.cooldown) return
-    if (storage.store.getFreeCapacity() < 100000 && terminal.store.energy > 30000) {
+    if (storage.store.getFreeCapacity() < 70000 && terminal.store.energy > 30000) {
         const order = Memory.terminal.overflow?.shift()
         if (order) {
             const amount = order.amount > 10000 ? 10000 : order.amount

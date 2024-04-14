@@ -30,20 +30,6 @@ _.assign(global, {init_loop_flag: init_loop_flag})
 
 export const init_room_flag = function (room: Room) {
     if (!room.controller?.my) return
-    {
-        const flag_name = room.name + '_supply'
-        if (!Game.flags[flag_name]) {
-            init_loop_flag(flag_name, '_supply')
-            room.createFlag(room.controller.pos, flag_name)
-        }
-    }
-    {
-        const flag_name = room.name + '_maintain'
-        if (!Game.flags[flag_name]) {
-            init_loop_flag(flag_name, '_maintain')
-            room.createFlag(room.controller.pos, flag_name)
-        }
-    }
     const sources = room.find(FIND_SOURCES)
     for (let i in sources) {
         const source = sources[i]
@@ -53,10 +39,11 @@ export const init_room_flag = function (room: Room) {
             room.createFlag(source.pos, flag_name)
         }
     }
-    {
-        const flag_name = room.name + '_upgrade'
+    const roles: AnyLoopType[] = ['_supply', '_collect', '_maintain', '_upgrade', '_chemist', '_fortify']
+    for (const role of roles) {
+        const flag_name = room.name + role
         if (!Game.flags[flag_name]) {
-            init_loop_flag(flag_name, '_upgrade')
+            init_loop_flag(flag_name, role)
             room.createFlag(room.controller.pos, flag_name)
         }
     }
