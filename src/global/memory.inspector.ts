@@ -51,8 +51,8 @@ const global_memory_initializer: { [k in keyof FilterOptional<Memory>]: () => vo
     _edge_exits: function (): void {
         Memory._edge_exits = {}
     },
-    _closest_owned: function (): void {
-        Memory._closest_owned = {}
+    _near_owned: function (): void {
+        Memory._near_owned = {}
     },
 
     creeps: function (): void {

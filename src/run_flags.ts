@@ -39,12 +39,18 @@ export const init_room_flag = function (room: Room) {
             room.createFlag(source.pos, flag_name)
         }
     }
-    const roles: AnyLoopType[] = ['_supply', '_collect', '_maintain', '_upgrade', '_chemist', '_fortify']
+    const roles: AnyLoopType[] = [
+        '_supply', '_collect', '_chemist',
+        '_maintain', '_upgrade', '_fortify',
+        '_observe'
+    ]
     for (const role of roles) {
         const flag_name = room.name + role
         if (!Game.flags[flag_name]) {
-            init_loop_flag(flag_name, role)
             room.createFlag(room.controller.pos, flag_name)
+        }
+        if (!Memory.flags[flag_name]) {
+            init_loop_flag(flag_name, role)
         }
     }
 }

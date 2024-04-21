@@ -27,16 +27,18 @@ type ResFlow = [
 ]
 export const carry_priority: { [role in CarrierRole]: ResFlow[] } = {
     Collector: [
-        ['W_link', 'storage'], ['W_cntn', 'storage'], ['sweep', 'storage'],
-        ['loot', 'storage'], ['storage', 'T_ext']],
+        ['W_link', 'storage'], ['W_cntn', 'storage'], ['compound', 'storage'],
+        ['sweep', 'storage'], ['loot', 'storage'], ['storage', 'T_ext']],
     Supplier: [
         ['W_link', 'storage'], ['storage', 'T_ext'], ['W_energy', 'T_tower'],
+        ['storage', 'T_boost'], ['storage', 'T_react'],
         ['storage', 'T_power'], ['storage', 'T_nuker']],
+
     Chemist: [
         ['storage', 'T_boost'], ['storage', 'T_react'], ['compound', 'storage'],
         ['W_term', 'storage'], ['storage', 'T_term']],
     Trader: [
-        ['W_link', 'storage'], ['sweep', 'storage'], ['storage', 'T_term']
+        ['W_link', 'storage'], ['W_term', 'storage'], ['storage', 'T_term']
     ]
 }
 

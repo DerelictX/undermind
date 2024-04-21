@@ -1,7 +1,6 @@
 import {publish_spawn_task} from "@/structure/lv1_spawn"
 import {parse_posed_task, TASK_COMPLETE, TASK_DOING} from "@/performer/behavior.callback";
 import {init_carrier_behavior, init_worker_behavior} from "@/role/initializer/config.behavior";
-import {change_reaction} from "@/structure/lv6_lab";
 import {createHarvestRoad} from "@/move/roomCallback";
 
 export const loop_flags = function (flag: Flag) {
@@ -63,7 +62,9 @@ const handlers: {
         const deposits = flag.room?.find(FIND_DEPOSITS)
         if (!deposits?.length) return []
 
-        const store_room = Memory._closest_owned[flag.pos.roomName]?.root
+        const _near = Memory._near_owned[flag.pos.roomName]
+        if (!_near) return []
+        const store_room = Object.keys(_near)[0]
         if (!store_room) return []
         const storage = Game.rooms[store_room]?.storage
         const deposit_type = deposits[0].depositType
@@ -91,13 +92,13 @@ const handlers: {
         return [{_body: {generator: 'DH', workload: 15, mobility: 1}, _class: task}]
     }, _fortify(flag: Flag): SpawnTask[] {
         const room = flag.room
-        if (!room) return []
+        if (!room || Game.cpu.bucket < 9950) return []
         if (room.storage && room.controller) {
             if (room.storage.store.energy < room.controller.level * 20000)
                 return []
         }
         const storage = room.storage
-        if (storage?.my && storage.store['XGH2O'] >= 3000) {
+        if (storage?.my && storage.store['XLH2O'] >= 3000) {
             return [{
                 _body: {generator: 'WC', workload: 32, boost: {work: 'XLH2O'}},
                 _class: init_worker_behavior('Builder', room.name, room.name)
@@ -150,13 +151,17 @@ const handlers: {
         return [{_body: {generator: 'Wc', workload: 25}, _class: task}]
     }, _observe: function (flag: Flag) {
         const room_name = flag.pos.roomName
-        Memory._closest_owned[room_name] = {
-            root: room_name,
+        const _near = Memory._near_owned[room_name] ?? (Memory._near_owned[room_name] = {})
+        _near[room_name] = {
             prev: room_name,
             dist: 0,
             time: Game.time
         }
-        //room.memory.observer.BFS_open = [room.name]
+        const config = flag.room?.memory.observer
+        if (config) {
+            config.start_time = Game.time
+            config.BFS_open = [room_name]
+        }
         return []
     }, _reserve: function (flag: Flag): SpawnTask[] {
         const controller = flag.room?.controller

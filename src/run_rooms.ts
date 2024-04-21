@@ -20,10 +20,10 @@ export const run_rooms = function () {
             link_run(room)
             lab_run(room)
             terminal_run(room)
+            observer_run(room)
             continue
             factory_run(room)
             power_spawn_run(room)
-            observer_run(room)
         } catch (error) {
             console.log(name + ':\t' + error);
             inspect_memory(name, false)

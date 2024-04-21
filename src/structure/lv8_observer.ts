@@ -13,12 +13,12 @@ export const observer_run = function (room: Room) {
 
     const curr = config.observing
     config.observing = null
-    const curr_node = Memory._closest_owned[curr]
+    const curr_node = Memory._near_owned[curr]?.[room.name]
     const curr_room = Game.rooms[curr]
     if (!curr_room || !curr_node) return
 
     handle_unowned(curr_room, curr_node)
-    if (Memory.threat_level[curr]) return
+    if (Memory.threat_level[curr] ?? 0 > 2) return
     if (curr_node.dist >= 4) return
 
     const exits = Game.map.describeExits(curr)
@@ -26,12 +26,12 @@ export const observer_run = function (room: Room) {
     for (exit in exits) {
         const next = exits[exit]
         if (!next) continue
-        const next_node = Memory._closest_owned[next]
+        const _near = Memory._near_owned[next] ?? (Memory._near_owned[next] = {})
+        const next_node = _near[room.name]
         if (!next_node
-            || (next_node.root == room.name && next_node.time < config.start_time)
-            || (next_node.root != room.name && curr_node.dist + 1 < next_node.dist)) {
-            Memory._closest_owned[next] = {
-                root: room.name,
+            || next_node.time < config.start_time
+            || next_node.dist > curr_node.dist + 1) {
+            _near[room.name] = {
                 prev: curr,
                 dist: curr_node.dist + 1,
                 time: Game.time
@@ -44,7 +44,7 @@ export const observer_run = function (room: Room) {
 function handle_unowned(curr_room: Room, curr_node: RouteNode) {
     const curr = curr_room.name
     const controller = curr_room.controller
-    Memory.threat_level[curr] = 0
+    delete Memory.threat_level[curr]
     if (controller) {
         //开外矿
         if (Game.shard.name != 'shard3' && !Memory.rooms[curr]
@@ -65,7 +65,7 @@ function handle_unowned(curr_room: Room, curr_node: RouteNode) {
             filter: (structure) => structure.structureType == 'invaderCore'
         })
         if (core[0]) {
-            Memory.threat_level[curr] = core[0].level
+            Memory.threat_level[curr] = core[0].level + 3
         }
     }
 }

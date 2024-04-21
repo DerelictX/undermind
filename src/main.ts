@@ -36,20 +36,21 @@ export const loop = function () {
     run_creeps()
     handle_moves()
 
-    if ((Game.time & 31) == 0) {
-        for (let name in Memory._closest_owned) {
-            const node = Memory._closest_owned[name]
-            if (!node) continue
-            if (node.time < Game.time + 4000) {
-                delete Memory._closest_owned[name]
-                continue
+    if ((Game.time & 255) == 0) {
+        for (let curr in Memory._near_owned) {
+            const _near = Memory._near_owned[curr]
+            for (let root in _near) {
+                const node = _near[root]
+                if (!node) continue
+                if (node.time < Game.time - 4000) {
+                    delete _near[root]
+                    continue
+                }
+                const color = Memory.threat_level[curr] ? '#FF4020' : '#9FFF10'
+                Game.map.visual.line(
+                    new RoomPosition(25, 25, node.prev),
+                    new RoomPosition(25, 25, curr), {color: color, width: 1, opacity: 0.3});
             }
-            const color = Memory.threat_level[name] ? '#FF4020' : '#9FFF10'
-            Game.map.visual.line(
-                new RoomPosition(25, 25, node.prev),
-                new RoomPosition(25, 25, name), {color: color, width: 1, opacity: 0.3});
-            Game.map.visual.text('' + node.dist,
-                new RoomPosition(25, 25, name), {color: '#9F7FFF', fontSize: 15});
         }
         Memory.visual = Game.map.visual.export()
     } else {
