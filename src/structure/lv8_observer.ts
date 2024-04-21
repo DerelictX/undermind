@@ -19,7 +19,7 @@ export const observer_run = function (room: Room) {
 
     handle_unowned(curr_room, curr_node)
     if (Memory.threat_level[curr] ?? 0 > 2) return
-    if (curr_node.dist >= 4) return
+    if (curr_node.dist >= 6) return
 
     const exits = Game.map.describeExits(curr)
     let exit: ExitKey
