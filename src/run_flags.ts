@@ -1,6 +1,8 @@
 import {loop_flags} from "@/controller/loopFlags";
 import {hikeTo} from "@/move/route";
 import _ from "lodash";
+import {crawlSquad} from "@/move/virtualPosition";
+import {base64table} from "@/move/Kuhn-Munkres";
 
 export const run_flags = function () {
     for (let name in Memory.flags) {
@@ -60,15 +62,19 @@ const run_squad = function (flag: Flag) {
     //const offset = (0 << 0) | (1 << 2) | (3 << 4) | (2 << 6)
     const _squad = flag.memory._squad
     if (!_squad) return;
+    if (!_squad.step) crawlSquad(_squad, flag.pos)
+    const step = _squad.step
+    if (!step) return;
+
+    const roomName = _squad.head_pos.roomName
     let ready = true
-    for (const creep_name in _squad.member) {
-        const creep = Game.creeps[creep_name]
+    const squad_length = _squad.member.length;
+    for (let i = 0; i < squad_length; ++i) {
+        const creep = Game.creeps[_squad.member[i]]
         if (!creep) continue
-        const i = (_squad.offset_head - _squad.member[creep_name]) & 3
         const off_xy = (_squad.offset_pos << (2 * i)) & 3
         const x = _squad.head_pos.x + (off_xy & 1)
         const y = _squad.head_pos.y + ((off_xy & 2) >> 1)
-        const roomName = _squad.head_pos.roomName
         if (creep.fatigue || !creep.pos.isEqualTo(new RoomPosition(x, y, roomName))) {
             //not ready to move
             ready = false
@@ -77,5 +83,19 @@ const run_squad = function (flag: Flag) {
     }
     if (!ready) return
 
-    //todo: _squad.head_pos 移动一步
+    /**设置intent */
+    const _move_intents = global._move_intents[roomName] ?? (global._move_intents[roomName] = {})
+    for (let i = 0; i < squad_length; ++i) {
+        const creep = Game.creeps[_squad.member[i]]
+        if (!creep) continue
+        const off_xy = (_squad.offset_pos << (2 * i)) & 3
+        const x = _squad.head_pos.x + (off_xy & 1)
+        const y = _squad.head_pos.y + ((off_xy & 2) >> 1)
+
+        const pos_str = base64table[x] + base64table[y]
+        _move_intents[pos_str] = {id: creep.id, step: [step.direction]}
+    }
+    _squad.head_pos.x += step.dx
+    _squad.head_pos.y += step.dy
+    delete _squad.step
 }

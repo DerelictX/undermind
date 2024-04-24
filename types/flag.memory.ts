@@ -17,7 +17,7 @@ interface FlagMemory {
 
 interface SquadMemory extends MoveMemory {
     head_pos: RoomPosition
-    offset_head: number
+    step?: PathStep
     offset_pos: number
-    member: Record<string, 0 | 1 | 2 | 3>
+    member: string[]
 }

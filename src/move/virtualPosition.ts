@@ -3,7 +3,7 @@ import {base64table} from "@/move/Kuhn-Munkres";
 import {approach} from "@/move/action.virtual";
 import {squadCallback} from "@/move/roomCallback";
 
-const crawlTo = function (squad: SquadMemory, targetPos: RoomPosition) {
+export const crawlSquad = function (squad: SquadMemory, targetPos: RoomPosition) {
     const roomName = targetPos.roomName
 
     /**房内寻路信息储存在_move */
@@ -39,19 +39,7 @@ const crawlTo = function (squad: SquadMemory, targetPos: RoomPosition) {
         delete squad._move
         return ERR_TIRED;
     }
-    /**设置intent */
-    const _move_intents = global._move_intents[roomName] ?? (global._move_intents[roomName] = {})
-    for (const creep_name in squad.member) {
-        const creep = Game.creeps[creep_name]
-        if (!creep) continue
-        const i = (squad.offset_head - squad.member[creep_name]) & 3
-        const off_xy = (squad.offset_pos << (2 * i)) & 3
-        const x = headPos.x + (off_xy & 1)
-        const y = headPos.y + ((off_xy & 2) >> 1)
-
-        const pos_str = base64table[x] + base64table[y]
-        _move_intents[pos_str] = {id: creep.id, step: [step.direction]}
-    }
+    squad.step = step
     return OK
 }
 
