@@ -6,13 +6,12 @@ type AnyLoopType =
     | '_observe'
 
 interface FlagMemory {
-    _class: '_loop' | '_squad'
+    _class: '_loop'
     _loop: {
         _loop_type: AnyLoopType
         _time: number
         interval: number
     }
-    _squad?: SquadMemory
 }
 
 interface SquadMemory extends MoveMemory {

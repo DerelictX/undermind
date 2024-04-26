@@ -55,9 +55,7 @@ export const init_room_flag = function (room: Room) {
 }
 _.assign(global, {init_room_flag: init_room_flag})
 
-const run_squad_square = function (flag: Flag) {
-    const _squad = flag.memory._squad
-    if (!_squad) return;
+const run_squad_square = function (flag: Flag, _squad: SquadMemory) {
     const roomName = _squad.head_pos.roomName
     const squad_length = _squad.member.length;
 
@@ -92,9 +90,7 @@ const run_squad_square = function (flag: Flag) {
     delete _squad.step
 }
 
-const run_squad_line = function (flag: Flag) {
-    const _squad = flag.memory._squad
-    if (!_squad) return;
+const run_squad_line = function (flag: Flag, _squad: SquadMemory) {
     const roomName = _squad.head_pos.roomName
     const headPos = new RoomPosition(_squad.head_pos.x, _squad.head_pos.x, roomName)
     const squad_length = _squad.member.length;
