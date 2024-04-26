@@ -56,16 +56,13 @@ export const init_room_flag = function (room: Room) {
 _.assign(global, {init_room_flag: init_room_flag})
 
 const run_squad_square = function (flag: Flag) {
-    //const offset = (0 << 0) | (1 << 2) | (3 << 4) | (2 << 6)
     const _squad = flag.memory._squad
     if (!_squad) return;
-    if (!_squad.step) crawlSquad(_squad, flag.pos)
-    const step = _squad.step
-    if (!step) return;
-
     const roomName = _squad.head_pos.roomName
-    let ready = true
     const squad_length = _squad.member.length;
+
+    /**判断是否就绪 */
+    let ready = true
     for (let i = 0; i < squad_length; ++i) {
         const creep = Game.creeps[_squad.member[i]]
         if (!creep) continue
@@ -73,14 +70,16 @@ const run_squad_square = function (flag: Flag) {
         const x = _squad.head_pos.x + (off_xy & 1)
         const y = _squad.head_pos.y + ((off_xy & 2) >> 1)
         if (creep.fatigue || !creep.pos.isEqualTo(new RoomPosition(x, y, roomName))) {
-            //not ready to move
-            ready = false
             hikeTo(creep, new RoomPosition(x, y, roomName))
+            ready = false
         }
     }
     if (!ready) return
 
     /**设置intent */
+    if (!_squad.step) crawlSquad(_squad, flag.pos)
+    const step = _squad.step
+    if (!step) return;
     const _move_intents = global._move_intents[roomName] ?? (global._move_intents[roomName] = {})
     for (let i = 0; i < squad_length; ++i) {
         const creep = Game.creeps[_squad.member[i]]
@@ -94,36 +93,34 @@ const run_squad_square = function (flag: Flag) {
 }
 
 const run_squad_line = function (flag: Flag) {
-    //const offset = (0 << 0) | (1 << 2) | (3 << 4) | (2 << 6)
     const _squad = flag.memory._squad
     if (!_squad) return;
-    if (!_squad.step) crawlSquad(_squad, flag.pos)
-    const step = _squad.step
-    if (!step) return;
-
     const roomName = _squad.head_pos.roomName
-    let ready = true
+    const headPos = new RoomPosition(_squad.head_pos.x, _squad.head_pos.x, roomName)
     const squad_length = _squad.member.length;
+
+    /**判断是否就绪 */
+    let ready = true
     let prev_creep: RoomPosition | undefined = undefined
     for (let i = 0; i < squad_length; ++i) {
         const creep = Game.creeps[_squad.member[i]]
         if (!creep) continue
-        if (!prev_creep) {
-            if (!creep.pos.isEqualTo(new RoomPosition(_squad.head_pos.x, _squad.head_pos.x, roomName))) {
-                ready = false
-                hikeTo(creep, new RoomPosition(_squad.head_pos.x, _squad.head_pos.x, roomName))
-            }
-        } else {
-            if (!creep.pos.isNearTo(prev_creep)) {
-                ready = false
-                hikeTo(creep, prev_creep)
-            }
+        if (!creep.pos.inRangeTo(headPos, i)) {
+            hikeTo(creep, headPos)
+            ready = false
+        } else if (ready && prev_creep && !creep.pos.isNearTo(prev_creep)) {
+            hikeTo(creep, prev_creep)
+            ready = false
         }
+        if (creep.fatigue) ready = false
         prev_creep = creep.pos
     }
     if (!ready) return
 
     /**设置intent */
+    if (!_squad.step) crawlSquad(_squad, flag.pos)
+    const step = _squad.step
+    if (!step) return;
     prev_creep = undefined
     const _move_intents = global._move_intents[roomName] ?? (global._move_intents[roomName] = {})
     for (let i = 0; i < squad_length; ++i) {
