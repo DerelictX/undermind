@@ -9,9 +9,7 @@ export const run_flags = function () {
         try {
             const flag = Game.flags[name]
             if (!flag) continue
-            if (flag.memory._class == '_loop') {
-                loop_flags(flag)
-            }
+            loop_flags(flag)
         } catch (error) {
             console.log(name + ':\t' + error);
         }
@@ -20,7 +18,7 @@ export const run_flags = function () {
 
 export const init_loop_flag = function (name: string, key: AnyLoopType) {
     Memory.flags[name] = {
-        _class: '_loop', _loop: {
+        _loop: {
             _loop_type: key, _time: 0, interval: 1500
         }
     }

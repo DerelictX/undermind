@@ -33,7 +33,7 @@ export const run_creeps = function () {
                     run_static(creep, _class)
                     break
                 default:
-                    throw new Error("Unexpected state.")
+                    console.log(name + ':\t' + "Unexpected state.");
             }
         } catch (error) {
             console.log(name + ':\t' + error);

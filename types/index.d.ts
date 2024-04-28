@@ -18,4 +18,5 @@ interface Memory extends PathMemory {
     H_srcs: RoomRecord<Id<Source>[]>
     W_cntn: RoomRecord<Id<StructureContainer>[]>
     T_cntn: RoomRecord<Id<StructureContainer>[]>
+    squads: RoomRecord<SquadMemory>
 }

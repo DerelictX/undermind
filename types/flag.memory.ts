@@ -6,7 +6,6 @@ type AnyLoopType =
     | '_observe'
 
 interface FlagMemory {
-    _class: '_loop'
     _loop: {
         _loop_type: AnyLoopType
         _time: number
@@ -19,4 +18,5 @@ interface SquadMemory extends MoveMemory {
     step?: PathStep
     offset_pos: number
     member: string[]
+    formation: 'square' | 'snake'
 }

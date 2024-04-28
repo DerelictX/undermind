@@ -7,13 +7,17 @@ export const approach = function (creep: AnyCreep, pos: RoomPosition, range: num
     pos = new RoomPosition(pos.x, pos.y, pos.roomName)
 
     /**站着不动 */
-    if (range <= 0 || creep instanceof Creep && creep.fatigue) {
+    if (creep instanceof Creep && creep.fatigue) {
         hold_place(creep)
         return OK
     }
 
     /**在范围内 */
     if (creep.pos.inRangeTo(pos, range)) {
+        if (range <= 0) {
+            hold_place(creep)
+            return OK
+        }
         if (creep.pos.inRangeTo(pos, range - 1)) {
             return OK
         }
