@@ -114,6 +114,8 @@ const global_memory_initializer: { [k in keyof FilterOptional<Memory>]: () => vo
     },
     flag_heap(): void {
         Memory.flag_heap = []
-        return
+    },
+    squads(): void {
+        Memory.squads = {}
     },
 }
