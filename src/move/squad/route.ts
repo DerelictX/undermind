@@ -1,33 +1,32 @@
-import _ from "lodash"
 import {crawlTo} from "@/move/single_creep/path";
+import _ from "lodash";
+import {crawlSquad} from "@/move/squad/virtualPosition";
 import {routeCallback, update_exit} from "@/move/routeCallback";
 
-export const hikeTo = function (creep: AnyCreep, targetPos: RoomPosition) {
-    /**powerCreep未召唤 */
-    if (!creep.room) return ERR_NOT_FOUND
+export const hikeTo = function (_squad: SquadMemory) {
+    const targetPos = new RoomPosition(_squad.target_pos.x, _squad.target_pos.y, _squad.target_pos.roomName)
     /**同房间直接走 */
-    if (creep.room.name == targetPos.roomName) {
-        return crawlTo(creep, targetPos)
+    if (_squad.head_pos.roomName == _squad.target_pos.roomName) {
+        return crawlSquad(_squad, targetPos)
     }
-
     /**房际寻路信息储存在_hike */
-    let _hike = creep.memory._hike
+    let _hike = _squad._hike
     /**缓存目标房间不正确 */
     if (_hike?.to != targetPos.roomName) {
-        if (seekToRoom(creep, targetPos.roomName) == ERR_NO_PATH)
+        if (seekToRoom(_squad) == ERR_NO_PATH)
             return ERR_NO_PATH
-        _hike = creep.memory._hike
+        _hike = _squad._hike
     }
     if (!_hike?.route[0]) return ERR_NO_PATH
 
     /**离开上一个房间，出队 */
-    if (creep.room.name == _hike.route[0].room) {
+    if (_squad.head_pos.roomName == _hike.route[0].room) {
         _hike.from = _hike.route[0].room
         _hike.route.shift()
     }
     /**当前房间不正确，可能是被exit或portal传回上个房间了 */
-    if (creep.room.name != _hike.from) {
-        console.log(creep.pos + '.roomName != ' + _hike.from)
+    if (_squad.head_pos.roomName != _hike.from) {
+        console.log(_squad.head_pos + '.roomName != ' + _hike.from)
         return ERR_TIRED
     }
 
@@ -36,7 +35,7 @@ export const hikeTo = function (creep: AnyCreep, targetPos: RoomPosition) {
     let exit = step.exitPos
     if (exit) {
         exit = new RoomPosition(exit.x, exit.y, exit.roomName)
-        return crawlTo(creep, exit)
+        return crawlSquad(_squad, exit)
     }
 
     //分段寻路优化，在当前房间和下一个房间寻路，用来优化通往下个房间的exit
@@ -53,7 +52,9 @@ export const hikeTo = function (creep: AnyCreep, targetPos: RoomPosition) {
         //终点在下个房间
         exits.push(targetPos)
     }
-    const path = PathFinder.search(creep.pos, exits, {
+
+    const headPos = new RoomPosition(_squad.head_pos.x, _squad.head_pos.y, _squad.head_pos.roomName)
+    const path = PathFinder.search(headPos, exits, {
         plainCost: 2, swampCost: 10, maxRooms: 2,
         roomCallback: function (roomName: string): CostMatrix | boolean {
             if (roomName != _hike?.from && roomName != step.room) return false
@@ -68,33 +69,35 @@ export const hikeTo = function (creep: AnyCreep, targetPos: RoomPosition) {
     if (exit) {
         // const a = (step.exit == TOP || step.exit == BOTTOM) ? exit.y : exit.x
         // const b = (step.exit == TOP || step.exit == LEFT) ? 0 : 49
-        if (/*a != b && */exit.roomName != creep.room.name) {
-            creep.say('false exit')
+        if (/*a != b && */exit.roomName != _squad.head_pos.roomName) {
             console.log('false exit: ' + exit)
             delete step.exitPos
             return ERR_NO_PATH
         } else {
             step.exitPos = exit
-            return crawlTo(creep, exit)
+            return crawlSquad(_squad, exit)
         }
     }
     return ERR_TIRED
 }
 
 /**房际寻路 */
-const seekToRoom = function (creep: AnyCreep, toRoom: string) {
-    if (!creep.room) return ERR_NOT_FOUND
-    delete creep.memory._hike;
-    const route = Game.map.findRoute(creep.room, toRoom, {routeCallback: routeCallback});
+const seekToRoom = function (_squad: SquadMemory) {
+    delete _squad._hike;
+    const route = Game.map.findRoute(
+        _squad.head_pos.roomName,
+        _squad.target_pos.roomName,
+        {routeCallback: routeCallback}
+    );
     if (route == ERR_NO_PATH || route.length <= 0) {
         return ERR_NO_PATH
     }
-    creep.memory._hike = {
-        from: creep.room.name,
-        to: toRoom,
+    _squad._hike = {
+        from: _squad.head_pos.roomName,
+        to: _squad.target_pos.roomName,
         route: route
     }
-    update_exit(creep.room.name)
+    update_exit(_squad.head_pos.roomName)
     for (let step of route) {
         update_exit(step.room)
     }

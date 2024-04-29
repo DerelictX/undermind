@@ -1,25 +1,23 @@
 import _ from "lodash";
 import {squadCallback} from "@/move/roomCallback";
 
-export const crawlSquad = function (squad: SquadMemory) {
-    const targetPos = new RoomPosition(squad.target_pos.x, squad.target_pos.y, squad.target_pos.roomName)
-
+export const crawlSquad = function (_squad: SquadMemory, targetPos: RoomPosition) {
     /**房内寻路信息储存在_move */
-    let _move = squad._move;
+    let _move = _squad._move;
     /**缓存目标位置不正确 */
     if (!_move || _move.room != targetPos.roomName
         || _move.dest.room != targetPos.roomName
         || _move.dest.x != targetPos.x
         || _move.dest.y != targetPos.y) {
-        if (seekToPos(squad, targetPos) == ERR_NO_PATH)
+        if (seekToPos(_squad, targetPos) == ERR_NO_PATH)
             return ERR_NO_PATH
-        _move = squad._move;
+        _move = _squad._move;
     }
     if (!_move) return ERR_NO_PATH
 
     /**获取path */
     const path = Room.deserializePath(_move.path)
-    const headPos = new RoomPosition(squad.head_pos.x, squad.head_pos.y, squad.head_pos.roomName)
+    const headPos = new RoomPosition(_squad.head_pos.x, _squad.head_pos.y, _squad.head_pos.roomName)
     const idx = _.findIndex(path, {x: headPos.x, y: headPos.y});
     if (idx != -1) {
         //从creep的位置截断path
@@ -34,10 +32,10 @@ export const crawlSquad = function (squad: SquadMemory) {
     const step = _.find(path, (i) => i.x - i.dx == headPos.x && i.y - i.dy == headPos.y);
     if (!step) {
         //path无效
-        delete squad._move
+        delete _squad._move
         return ERR_TIRED;
     }
-    squad.step = step
+    _squad.step = step
     return OK
 }
 

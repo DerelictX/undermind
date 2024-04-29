@@ -9,7 +9,7 @@ interface MoveMemory {
         from: string
         to: string
         route: {
-            exit: ExitConstant | STRUCTURE_PORTAL
+            exit: ExitConstant
             room: string
             exitPos?: RoomPosition
         }[]
