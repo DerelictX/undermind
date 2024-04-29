@@ -1,16 +1,14 @@
 import _ from "lodash";
-import {base64table} from "@/move/Kuhn-Munkres";
-import {approach} from "@/move/action.virtual";
 import {squadCallback} from "@/move/roomCallback";
 
-export const crawlSquad = function (squad: SquadMemory, targetPos: RoomPosition) {
-    const roomName = targetPos.roomName
+export const crawlSquad = function (squad: SquadMemory) {
+    const targetPos = new RoomPosition(squad.target_pos.x, squad.target_pos.y, squad.target_pos.roomName)
 
     /**房内寻路信息储存在_move */
     let _move = squad._move;
     /**缓存目标位置不正确 */
-    if (!_move || _move.room != roomName
-        || _move.dest.room != roomName
+    if (!_move || _move.room != targetPos.roomName
+        || _move.dest.room != targetPos.roomName
         || _move.dest.x != targetPos.x
         || _move.dest.y != targetPos.y) {
         if (seekToPos(squad, targetPos) == ERR_NO_PATH)
