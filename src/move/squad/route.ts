@@ -1,9 +1,9 @@
 import {crawlTo} from "@/move/single_creep/path";
 import _ from "lodash";
-import {crawlSquad} from "@/move/squad/virtualPosition";
+import {crawlSquad} from "@/move/squad/path";
 import {routeCallback, update_exit} from "@/move/routeCallback";
 
-export const hikeTo = function (_squad: SquadMemory) {
+export const hikeSquad = function (_squad: SquadMemory) {
     const targetPos = new RoomPosition(_squad.target_pos.x, _squad.target_pos.y, _squad.target_pos.roomName)
     /**同房间直接走 */
     if (_squad.head_pos.roomName == _squad.target_pos.roomName) {

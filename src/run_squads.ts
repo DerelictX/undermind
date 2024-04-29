@@ -1,7 +1,6 @@
 import {hikeTo} from "@/move/single_creep/route";
-import {crawlSquad} from "@/move/squad/virtualPosition";
+import {hikeSquad} from "@/move/squad/route";
 import {base64table} from "@/move/Kuhn-Munkres";
-import {loop_flags} from "@/controller/loopFlags";
 
 export const run_squads = function () {
     for (let name in Memory.squads) {
@@ -42,7 +41,7 @@ const run_squad_square = function (_squad: SquadMemory) {
     if (!ready) return
 
     /**设置intent */
-    if (!_squad.step) crawlSquad(_squad)
+    if (!_squad.step) hikeSquad(_squad)
     const step = _squad.step
     if (!step) return;
     const _move_intents = global._move_intents[roomName] ?? (global._move_intents[roomName] = {})
@@ -81,7 +80,7 @@ const run_squad_snake = function (_squad: SquadMemory) {
     if (!ready) return
 
     /**设置intent */
-    if (!_squad.step) crawlSquad(_squad)
+    if (!_squad.step) hikeSquad(_squad)
     const step = _squad.step
     if (!step) return;
     prev_creep = undefined
