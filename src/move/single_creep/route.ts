@@ -1,5 +1,5 @@
 import _ from "lodash"
-import {crawlTo} from "@/move/path";
+import {crawlTo} from "@/move/single_creep/path";
 
 export const hikeTo = function (creep: AnyCreep, targetPos: RoomPosition) {
     /**powerCreep未召唤 */

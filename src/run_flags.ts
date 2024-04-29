@@ -1,7 +1,7 @@
 import {loop_flags} from "@/controller/loopFlags";
-import {hikeTo} from "@/move/route";
+import {hikeTo} from "@/move/single_creep/route";
 import _ from "lodash";
-import {crawlSquad} from "@/move/virtualPosition";
+import {crawlSquad} from "@/move/squad/virtualPosition";
 import {base64table} from "@/move/Kuhn-Munkres";
 
 export const run_flags = function () {

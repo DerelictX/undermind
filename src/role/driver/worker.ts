@@ -1,5 +1,5 @@
 import {work_priority} from "@/role/initializer/config.behavior"
-import {hikeTo} from "@/move/route"
+import {hikeTo} from "@/move/single_creep/route"
 import {parse_posed_task, perform_callback, TASK_COMPLETE, TASK_DOING} from "@/performer/behavior.callback"
 import {update_col_cache} from "@/scanner/collect"
 import {update_con_cache} from "@/scanner/consume"

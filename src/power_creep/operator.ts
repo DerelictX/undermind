@@ -1,4 +1,4 @@
-import {hikeTo} from "@/move/route"
+import {hikeTo} from "@/move/single_creep/route"
 import {demand_res} from "@/structure/lv6_terminal"
 
 export const operator_run = function (operator: PowerCreep) {

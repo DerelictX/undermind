@@ -1,5 +1,5 @@
 import {adjacent_dir, base64table} from "@/move/Kuhn-Munkres"
-import {hikeTo} from "@/move/route"
+import {hikeTo} from "@/move/single_creep/route"
 
 export const approach = function (creep: AnyCreep, pos: RoomPosition, range: number) {
     if (!creep.room) return ERR_NOT_FOUND

@@ -1,5 +1,5 @@
-import {hikeTo} from "@/move/route";
-import {crawlSquad} from "@/move/virtualPosition";
+import {hikeTo} from "@/move/single_creep/route";
+import {crawlSquad} from "@/move/squad/virtualPosition";
 import {base64table} from "@/move/Kuhn-Munkres";
 import {loop_flags} from "@/controller/loopFlags";
 
