@@ -31,7 +31,7 @@ export const carry_priority: { [role in CarrierRole]: ResFlow[] } = {
         ['sweep', 'storage'], ['loot', 'storage'], ['storage', 'T_ext']],
     Supplier: [
         ['W_link', 'storage'], ['storage', 'T_ext'], ['W_energy', 'T_tower'],
-        ['storage', 'T_boost'], ['storage', 'T_react'],
+        ['storage', 'T_boost'], ['storage', 'T_react'], ['storage', 'T_term'],
         ['storage', 'T_power'], ['storage', 'T_nuker']],
 
     Chemist: [

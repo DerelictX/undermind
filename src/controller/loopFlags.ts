@@ -299,7 +299,9 @@ const handlers: {
             })
         })
         return [];
-    },
+    }, attack_squad(flag: Flag): SpawnTask[] {
+        return []
+    }
 }
 
 const containers = function (room: Room) {

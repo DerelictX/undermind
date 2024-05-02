@@ -1,5 +1,5 @@
 interface CreepMemory extends MoveMemory {
-    _class: | CarrierMemory | WorkerMemory | StaticMemory
+    _class: | CarrierMemory | WorkerMemory | StaticMemory | FighterMemory
     _caller: string
     _life: CreepLifeCycle
 }

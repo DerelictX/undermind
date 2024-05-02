@@ -3,7 +3,7 @@ type AnyLoopType =
     | '_build' | '_maintain' | '_fortify'
     | '_source' | '_mineral' | '_deposit'
     | '_feed' | '_upgrade' | '_reserve'
-    | '_observe'
+    | '_observe' | 'attack_squad'
 
 interface FlagMemory {
     _loop: {
@@ -14,10 +14,14 @@ interface FlagMemory {
 }
 
 interface SquadMemory extends MoveMemory {
+    pending?: boolean
+
     head_pos: RoomPosition
     target_pos: RoomPosition
     step?: PathStep
-    offset_pos: number
+
+    size: number
     member: string[]
     formation: 'square' | 'snake'
+    offset_pos: number
 }

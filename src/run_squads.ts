@@ -7,6 +7,11 @@ export const run_squads = function () {
         try {
             const _squad = Memory.squads[name]
             if (!_squad) continue
+            if (_squad.pending) {
+                if (_squad.size == _squad.member.length)
+                    delete _squad.pending
+                else continue
+            }
             switch (_squad.formation) {
                 case 'square':
                     run_squad_square(_squad)

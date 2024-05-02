@@ -6,6 +6,7 @@ import {expand_commo} from "./constant/commodity_tree";
 import {run_rooms} from "./run_rooms";
 import {run_creeps, run_power_creeps} from "./run_creeps";
 import {run_flags} from "@/run_flags";
+import {run_squads} from "@/run_squads";
 
 export const loop = function () {
 
@@ -32,6 +33,7 @@ export const loop = function () {
 
     run_flags()
     run_rooms()
+    run_squads()
     run_power_creeps()
     run_creeps()
     handle_moves()
