@@ -300,7 +300,25 @@ const handlers: {
         })
         return [];
     }, attack_squad(flag: Flag): SpawnTask[] {
-        return []
+        const _squad_id = flag.name + (Game.time % 10000)
+        Memory.squads[_squad_id] = {
+            formation: 'snake',
+            head_pos: flag.pos,
+            member: [],
+            offset_pos: 0,
+            pending: true,
+            size: 0,
+            target_pos: flag.pos
+        }
+
+        const tasks: SpawnTask[] = []
+        for (let i = 0; i < 4; ++i) {
+            tasks.push({
+                _body: {generator: (i & 1) ? 'R' : 'A', workload: 1},
+                _class: {bhvr_name: 'fighter', slot: i, squad_id: _squad_id}
+            })
+        }
+        return tasks
     }
 }
 
