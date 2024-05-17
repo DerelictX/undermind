@@ -28,6 +28,47 @@ export const autoRoadCallback = function (roomName: string) {
     return costs;
 }
 
+export const plainCallback = function (roomName: string) {
+    const matrix = global.plainMatrix[roomName]
+    if (matrix) return PathFinder.CostMatrix.deserialize(matrix)
+    let room = Game.rooms[roomName]
+    if (!room) return
+    let costs = new PathFinder.CostMatrix
+
+    const terrain = new Room.Terrain(roomName)
+    for (let y = 1; y < 50; y++) {
+        for (let x = 1; x < 50; x++) {
+            if (terrain.get(x, y) == TERRAIN_MASK_SWAMP) {
+                costs.set(x, y, 5)
+            }
+        }
+    }
+    for (let y = 1; y < 50; y++) {
+        for (let x = 1; x < 50; x++) {
+            if (terrain.get(x, y) == TERRAIN_MASK_WALL) {
+                costs.set(x, y, 0xff)
+            }
+        }
+    }
+
+    room.find(FIND_MY_STRUCTURES).forEach(function (struct) {
+        if (struct.structureType !== STRUCTURE_RAMPART) {
+            costs.set(struct.pos.x, struct.pos.y, 0xff)
+        }
+    });
+    room.find(FIND_MY_CONSTRUCTION_SITES).forEach(function (struct) {
+        if (struct.structureType !== STRUCTURE_ROAD
+            && struct.structureType !== STRUCTURE_CONTAINER
+            && struct.structureType !== STRUCTURE_RAMPART) {
+            costs.set(struct.pos.x, struct.pos.y, 0xff)
+        }
+    });
+
+    console.log('plainCallback(' + room.name + ')')
+    global.plainMatrix[room.name] = costs.serialize()
+    return costs;
+}
+
 export const squadCallback = function (roomName: string) {
     const matrix = global.squadMatrix[roomName]
     if (matrix) return PathFinder.CostMatrix.deserialize(matrix)

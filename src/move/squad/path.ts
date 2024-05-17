@@ -1,5 +1,5 @@
 import _ from "lodash";
-import {squadCallback} from "@/move/roomCallback";
+import {plainCallback, squadCallback} from "@/move/roomCallback";
 
 export const crawlSquad = function (_squad: SquadMemory, targetPos: RoomPosition) {
     /**房内寻路信息储存在_move */
@@ -45,7 +45,7 @@ const seekToPos = function (squad: SquadMemory, targetPos: RoomPosition) {
     delete squad._move;
     const room = Game.rooms[squad.head_pos.roomName]
     const path = room.findPath(squad.head_pos, targetPos, {
-        costCallback: squadCallback,
+        costCallback: squad.formation == 'square' ? squadCallback : plainCallback,
         ignoreCreeps: true,
         maxRooms: 1
     });

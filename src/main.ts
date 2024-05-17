@@ -27,6 +27,7 @@ export const loop = function () {
     if (!global._collect) global._collect = {}
     if (!global._consume) global._consume = {}
     if (!global.commonMatrix) global.commonMatrix = {}
+    if (!global.plainMatrix) global.plainMatrix = {}
     if (!global.squadMatrix) global.squadMatrix = {}
     global._move_intents = {}
     inspect_global()
