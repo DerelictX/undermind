@@ -301,7 +301,7 @@ const handlers: {
         return [];
     }, attack_squad(flag: Flag): SpawnTask[] {
         const _squad_id = flag.name + (Game.time % 10000)
-        const size = 2
+        const size = 4
         Memory.squads[_squad_id] = {
             formation: 'snake',
             head_pos: flag.pos,

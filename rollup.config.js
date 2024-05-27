@@ -31,7 +31,7 @@ const pluginDeploy = config && config.copyPath ?
         verbose: true
     }) :
     // 更新 .map 到 .map.js 并上传
-    screeps({ config, dryRun: !config })
+    screeps({config, dryRun: !config})
 
 export default {
     input: 'src/main.ts',
@@ -42,10 +42,10 @@ export default {
     },
     plugins: [
         // 清除上次编译成果
-        clear({ targets: ["dist"] }),
+        clear({targets: ["dist"]}),
         // 编译 ts
-        typescript({ tsconfig: "./tsconfig.json" }), // <== 新增这一行，注意先后顺序不要搞错了
-        terser(),
+        typescript({tsconfig: "./tsconfig.json"}), // <== 新增这一行，注意先后顺序不要搞错了
+        //terser(),
         // 执行上传或者复制
         pluginDeploy
     ]

@@ -7,4 +7,5 @@ export const run_fighter = function (creep: Creep, fb: FighterMemory) {
         }
         return;
     }
+    //creep.rangedMassAttack()
 }
