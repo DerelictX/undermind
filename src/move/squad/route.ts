@@ -4,7 +4,10 @@ import {crawlSquad} from "@/move/squad/path";
 import {routeCallback, update_exit} from "@/move/routeCallback";
 
 export const hikeSquad = function (_squad: SquadMemory) {
+    const headPos = new RoomPosition(_squad.head_pos.x, _squad.head_pos.y, _squad.head_pos.roomName)
     const targetPos = new RoomPosition(_squad.target_pos.x, _squad.target_pos.y, _squad.target_pos.roomName)
+    if (headPos.isEqualTo(targetPos)) return OK
+
     /**同房间直接走 */
     if (_squad.head_pos.roomName == _squad.target_pos.roomName) {
         return crawlSquad(_squad, targetPos)
@@ -53,7 +56,6 @@ export const hikeSquad = function (_squad: SquadMemory) {
         exits.push(targetPos)
     }
 
-    const headPos = new RoomPosition(_squad.head_pos.x, _squad.head_pos.y, _squad.head_pos.roomName)
     const path = PathFinder.search(headPos, exits, {
         plainCost: 2, swampCost: 10, maxRooms: 2,
         roomCallback: function (roomName: string): CostMatrix | boolean {

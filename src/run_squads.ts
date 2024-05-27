@@ -53,7 +53,7 @@ const run_squad_square = function (_squad: SquadMemory) {
     for (let i = 0; i < squad_length; ++i) {
         const creep = Game.creeps[_squad.member[i]]
         if (!creep) continue
-        const pos_str = base64table[creep.pos.x] + base64table[creep.pos.x]
+        const pos_str = base64table[creep.pos.x] + base64table[creep.pos.y]
         _move_intents[pos_str] = {id: creep.id, step: [step.direction]}
     }
     _squad.head_pos.x += step.dx
@@ -63,7 +63,7 @@ const run_squad_square = function (_squad: SquadMemory) {
 
 const run_squad_snake = function (_squad: SquadMemory) {
     const roomName = _squad.head_pos.roomName
-    const headPos = new RoomPosition(_squad.head_pos.x, _squad.head_pos.x, roomName)
+    const headPos = new RoomPosition(_squad.head_pos.x, _squad.head_pos.y, roomName)
     const squad_length = _squad.member.length;
 
     /**判断是否就绪 */
@@ -93,7 +93,7 @@ const run_squad_snake = function (_squad: SquadMemory) {
     for (let i = 0; i < squad_length; ++i) {
         const creep = Game.creeps[_squad.member[i]]
         if (!creep) continue
-        const pos_str = base64table[creep.pos.x] + base64table[creep.pos.x]
+        const pos_str = base64table[creep.pos.x] + base64table[creep.pos.y]
         if (!prev_creep) {
             _move_intents[pos_str] = {id: creep.id, step: [step.direction]}
         } else {

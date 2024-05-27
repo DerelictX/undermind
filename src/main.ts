@@ -40,26 +40,30 @@ export const loop = function () {
     handle_moves()
 
     if ((Game.time & 255) == 0) {
-        for (let curr in Memory._near_owned) {
-            const _near = Memory._near_owned[curr]
-            for (let root in _near) {
-                const node = _near[root]
-                if (!node) continue
-                if (node.time < Game.time - 4000) {
-                    delete _near[root]
-                    continue
-                }
-                const color = Memory.threat_level[curr] ? '#FF4020' : '#9FFF10'
-                Game.map.visual.line(
-                    new RoomPosition(25, 25, node.prev),
-                    new RoomPosition(25, 25, curr), {color: color, width: 1, opacity: 0.3});
-            }
-        }
-        Memory.visual = Game.map.visual.export()
+        refresh_map_visual()
     } else {
         Game.map.visual.import(Memory.visual)
     }
 
     if (Game.shard.name == 'shard2')
         Game.cpu.generatePixel()
+}
+
+const refresh_map_visual = function () {
+    for (let curr in Memory._near_owned) {
+        const _near = Memory._near_owned[curr]
+        for (let root in _near) {
+            const node = _near[root]
+            if (!node) continue
+            if (node.time < Game.time - 4000) {
+                delete _near[root]
+                continue
+            }
+            const color = Memory.threat_level[curr] ? '#FF4020' : '#9FFF10'
+            Game.map.visual.line(
+                new RoomPosition(25, 25, node.prev),
+                new RoomPosition(25, 25, curr), {color: color, width: 1, opacity: 0.3});
+        }
+    }
+    Memory.visual = Game.map.visual.export()
 }

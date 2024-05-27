@@ -44,7 +44,8 @@ const seekToPos = function (squad: SquadMemory, targetPos: RoomPosition) {
     const x = targetPos.x, y = targetPos.y, roomName = targetPos.roomName;
     delete squad._move;
     const room = Game.rooms[squad.head_pos.roomName]
-    const path = room.findPath(squad.head_pos, targetPos, {
+    const headPos = new RoomPosition(squad.head_pos.x, squad.head_pos.y, squad.head_pos.roomName)
+    const path = room.findPath(headPos, targetPos, {
         costCallback: squad.formation == 'square' ? squadCallback : plainCallback,
         ignoreCreeps: true,
         maxRooms: 1
