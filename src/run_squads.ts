@@ -119,7 +119,7 @@ const run_squad_snake = function (_squad: SquadMemory) {
         _squad.head_pos.roomName = exitRoom[RIGHT]
     }
     if (_squad.head_pos.y == 0 && exitRoom[TOP]) {
-          _squad.head_pos.y = 48
+        _squad.head_pos.y = 48
         _squad.head_pos.roomName = exitRoom[TOP]
     }
     if (_squad.head_pos.y == 49 && exitRoom[BOTTOM]) {

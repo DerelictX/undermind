@@ -14,6 +14,7 @@ interface FlagMemory {
 }
 
 interface SquadMemory extends MoveMemory {
+    enemy?: Id<Creep | AnyOwnedStructure>;
     pending?: boolean
 
     head_pos: RoomPosition
