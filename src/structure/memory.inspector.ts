@@ -5,7 +5,7 @@ import _ from "lodash"
  * @param room_name 房间名
  * @param type 房间类型
  */
-export const _format_room = function (room_name: string, type: RoomTypes, spawn_room: string) {
+export const _format_room = function (room_name: string, type: RoomTypes) {
     delete Memory.rooms[room_name]
     inspect_memory(room_name, true)
 }

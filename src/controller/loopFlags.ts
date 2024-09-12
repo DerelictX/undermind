@@ -58,7 +58,7 @@ const handlers: {
             _class: init_carrier_behavior('Collector', room.name, room.name)
         }]
     }, _deposit: function (flag: Flag): SpawnTask[] {
-        if (Game.cpu.bucket < 9950) return []
+        if (Game.shard.name == 'shard3' && Game.cpu.bucket < 9950) return []
         const deposits = flag.room?.find(FIND_DEPOSITS)
         if (!deposits?.length) return []
 
@@ -92,7 +92,7 @@ const handlers: {
         return [{_body: {generator: 'DH', workload: 15, mobility: 1}, _class: task}]
     }, _fortify(flag: Flag): SpawnTask[] {
         const room = flag.room
-        if (!room || Game.cpu.bucket < 9950) return []
+        if (!room || Game.shard.name == 'shard3' && Game.cpu.bucket < 9950) return []
         if (room.storage && room.controller) {
             if (room.storage.store.energy < room.controller.level * 20000)
                 return []
@@ -230,7 +230,7 @@ const handlers: {
         }]
     }, _upgrade: function (flag: Flag): SpawnTask[] {
         const controller = flag.room?.controller
-        if (!controller || Game.cpu.bucket < 9950) return []
+        if (!controller || Game.shard.name == 'shard3' && Game.cpu.bucket < 9950) return []
         const storage = controller.room.storage
         if (storage?.my && storage.store.energy <= 15000 * controller.level) return []
         const task: StaticMemory = {
@@ -320,6 +320,11 @@ const handlers: {
             })
         }
         return tasks
+    }, _manual(flag: Flag): SpawnTask[] {
+        return [{
+            _body: {generator: 'WC', workload: 32, boost: {work: 'XLH2O'}},
+            _class: {bhvr_name: "manual"}
+        }]
     }
 }
 

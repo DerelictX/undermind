@@ -4,6 +4,7 @@ import {run_static} from "./role/driver/static";
 import {operator_run} from "./power_creep/operator";
 import {run_for_boost} from "./structure/lv6_lab";
 import {run_fighter} from "@/role/driver/fighter";
+import {run_manual} from "@/role/driver/manual";
 
 export const run_creeps = function () {
     for (let name in Memory.creeps) {
@@ -35,6 +36,9 @@ export const run_creeps = function () {
                     break
                 case 'fighter':
                     run_fighter(creep, _class)
+                    break
+                case 'manual':
+                    run_manual(creep, _class)
                     break
                 default:
                     console.log(name + ':\t' + "Unexpected state.");

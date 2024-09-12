@@ -4,6 +4,7 @@ type AnyLoopType =
     | '_source' | '_mineral' | '_deposit'
     | '_feed' | '_upgrade' | '_reserve'
     | '_observe' | 'attack_squad'
+    | '_manual'
 
 interface FlagMemory {
     _loop: {

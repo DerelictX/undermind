@@ -26,7 +26,7 @@ export const spawn_run = function (room: Room) {
     let boost = spawn_task._body.boost
     /**默认走在路上，其它Part是MOVE的两倍 */
     if (!mobility) {
-        mobility = Game.shard.name == 'shard3' ? 2 : 1;
+        mobility = 2;
     }
 
     let looper = Memory.flags[spawn_task._caller]?._loop
