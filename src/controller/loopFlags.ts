@@ -47,7 +47,7 @@ const handlers: {
     }, _collect(flag: Flag): SpawnTask[] {
         const room_name = flag.pos.roomName
         const room = flag.room
-        if (!room?.storage?.my) {
+        if (!room?.terminal?.my) {
             return [{
                 _body: {generator: 'C', workload: 16},
                 _class: init_worker_behavior('EnergySupplier', room_name, room_name)
@@ -218,7 +218,7 @@ const handlers: {
     }, _supply(flag: Flag): SpawnTask[] {
         const room_name = flag.pos.roomName
         const room = flag.room
-        if (!room?.storage?.my) {
+        if (!room?.terminal?.my) {
             return [{
                 _body: {generator: 'C', workload: 16},
                 _class: init_worker_behavior('EnergySupplier', room_name, room_name)
@@ -239,6 +239,7 @@ const handlers: {
             collect: [],
             consume: [{action: 'upgradeController', args: [controller.id], pos: controller.pos}]
         }
+
         const energy_structs: AnyStoreStructure[] = controller.pos.findInRange(FIND_STRUCTURES, 3, {
             filter: structure => structure.structureType == STRUCTURE_CONTAINER
                 || structure.structureType == STRUCTURE_STORAGE
@@ -250,14 +251,18 @@ const handlers: {
         for (let struct of energy_structs) {
             task.collect.push({action: 'withdraw', args: [struct.id, 'energy'], pos: struct.pos})
         }
+
+        let tasks: SpawnTask[] = [{_body: {generator: 'Wc', workload: 15}, _class: task}]
         if (storage?.my && storage.store['XGH2O'] >= 3000) {
-            return [{
-                _body: {
-                    generator: 'Wc', workload: 15, boost: {work: 'XGH2O'}
-                }, _class: task
-            }]
+            tasks[0]._body.boost = {work: 'XGH2O'}
         }
-        return [{_body: {generator: 'Wc', workload: 15}, _class: task}]
+        if (energy_structs.length == 1 && energy_structs[0].structureType == STRUCTURE_CONTAINER) {
+            tasks.push({
+                _body: {generator: 'C', workload: 16},
+                _class: init_worker_behavior('EnergySupplier', flag.pos.roomName, flag.pos.roomName)
+            })
+        }
+        return tasks
     }, _feed(flag: Flag): SpawnTask[] {
         const pos = flag.pos
         const ret: StaticMemory = {

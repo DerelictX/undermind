@@ -48,7 +48,7 @@ function find_power_task(operator: PowerCreep, room: Room) {
             operator.memory._tasks.push({action: 'enableRoom', args: [controller.id]})
     }
     const storage = room.storage
-    if (storage && operator.store.getFreeCapacity('ops') < 20) {
+    if (storage && storage.store.ops < 60000 && operator.store.getFreeCapacity('ops') < 20) {
         operator.memory._tasks.push({
             action: 'transfer',
             args: [storage.id, 'ops', operator.store['ops'] * 0.4]
