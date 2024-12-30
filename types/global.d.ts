@@ -8,4 +8,6 @@ declare global {
 
     var _collect: RoomRecord<{ [k in keyof CollectTaskCache]?: CollectTaskCache[k] }>
     var _consume: RoomRecord<{ [k in keyof ConsumeTaskCache]?: ConsumeTaskCache[k] }>
+
+    var layout: LayoutPlanner
 }

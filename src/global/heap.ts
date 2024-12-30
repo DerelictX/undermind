@@ -1,4 +1,4 @@
-export class FlagHeapUtils<T extends { w: number }> {
+class FlagHeapUtils<T extends { w: number }> {
     arr: T[] = []
 
     constructor() {

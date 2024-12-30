@@ -1,15 +1,12 @@
-import {FlagHeapUtils} from "@/global/heap";
 import {exec, for4Direction, forBorder, forEach, forNear} from "@/layout/RoomArray";
-
-type _node = { w: number, x: number, y: number }
 
 /**
  * 计算区块的最大性能指标 ，性能消耗的大头！
  * 优化不动了
  */
-export function getBlockPutAbleCnt(roomWalkable: CostMatrix, visited: CostMatrix, queMin: FlagHeapUtils<_node>,
+export function getBlockPutAbleCnt(roomWalkable: CostMatrix, visited: CostMatrix, queMin: FlagHeapUtils<pos_node>,
                                    unionFind: UnionFind, tarRoot: number,
-                                   putAbleCacheMap: Record<number, _node[]>, AllCacheMap: Record<number, _node[]>) {
+                                   putAbleCacheMap: Record<number, pos_node[]>, AllCacheMap: Record<number, pos_node[]>) {
     if (putAbleCacheMap[tarRoot]) return [putAbleCacheMap[tarRoot], AllCacheMap[tarRoot]]
     // let t = Game.cpu.getUsed() //这很吃性能，但是是必须的
     let roomManor = new PathFinder.CostMatrix
@@ -57,9 +54,8 @@ export function getBlockPutAbleCnt(roomWalkable: CostMatrix, visited: CostMatrix
         }
     })
 
-    let innerPutAbleList: _node[] = []
-    let AllCacheList: _node[] = []
-
+    let innerPutAbleList: pos_node[] = []
+    let AllCacheList: pos_node[] = []
 
     // &&!roomObjectCache.get(x,y)
     visited = new PathFinder.CostMatrix()
@@ -74,7 +70,7 @@ export function getBlockPutAbleCnt(roomWalkable: CostMatrix, visited: CostMatrix
     // let t = Game.cpu.getUsed() //这很吃性能，真的优化不动了
     queMin.whileNoEmpty(nd => {
         let func = function (x: number, y: number, val: number) {
-            let item: _node = {w: nd.w + 2, x, y};
+            let item: pos_node = {w: nd.w + 2, x, y};
             if (!exec(visited, x, y, 1)) {
                 queMin.push({w: nd.w + 1, x, y})
                 if (roomManor.get(x, y)) {
